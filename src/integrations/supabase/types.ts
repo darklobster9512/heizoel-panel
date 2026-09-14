@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      bank_accounts: {
+        Row: {
+          bank_name: string
+          bic: string
+          created_at: string
+          created_by: string | null
+          iban: string
+          id: string
+          is_active: boolean
+          limit_amount: number
+          name: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          bank_name: string
+          bic: string
+          created_at?: string
+          created_by?: string | null
+          iban: string
+          id?: string
+          is_active?: boolean
+          limit_amount?: number
+          name: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          bank_name?: string
+          bic?: string
+          created_at?: string
+          created_by?: string | null
+          iban?: string
+          id?: string
+          is_active?: boolean
+          limit_amount?: number
+          name?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_accounts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_accounts_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brandings: {
         Row: {
           account_holder: string | null
