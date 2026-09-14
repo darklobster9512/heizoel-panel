@@ -31,14 +31,12 @@ import {
 export type BankDetails = {
   accountHolder: string;
   iban: string;
-  bankName: string;
   bic: string;
 };
 
 export const DEMO_BANK: BankDetails = {
   accountHolder: "Muster-Energie GmbH",
   iban: "DE89 3704 0044 0532 0130 00",
-  bankName: "Musterbank",
   bic: "COBADEFFXXX",
 };
 
@@ -56,7 +54,6 @@ export type OrderInvoiceData = {
   deliveryWindow: string;
   totalPrice: number;
   phone: string;
-  paymentDueDays: number;
 };
 
 export const DEMO_INVOICE: OrderInvoiceData = {
@@ -73,22 +70,20 @@ export const DEMO_INVOICE: OrderInvoiceData = {
   deliveryWindow: "Di 22.09.2026 8:00 - 12:00 Uhr",
   totalPrice: 2561.4,
   phone: "017035829853",
-  paymentDueDays: 14,
 };
 
 function bankFrom(branding: EmailBranding): BankDetails {
   const iban = (branding.iban ?? "").trim();
   const accountHolder = (branding.accountHolder ?? branding.companyName ?? "").trim();
-  const bankName = (branding.bankName ?? "").trim();
   const bic = (branding.bic ?? "").trim();
-  if (!iban || !accountHolder || !bankName) return DEMO_BANK;
-  return { accountHolder, iban, bankName, bic: bic || DEMO_BANK.bic };
+  if (!iban || !accountHolder) return DEMO_BANK;
+  return { accountHolder, iban, bic: bic || DEMO_BANK.bic };
 }
 
-function bankRow(label: string, value: string, zebra: boolean, mono = false) {
+function bankRow(label: string, value: string, mono = false) {
   return `<tr>
-    <td width="38%" style="padding:11px 16px;background:${zebra ? "#ffffff" : "transparent"};border-bottom:1px solid ${GREEN_BORDER};font:400 13px/18px ${FONT};color:${MUTED}">${label}</td>
-    <td style="padding:11px 16px;background:${zebra ? "#ffffff" : "transparent"};border-bottom:1px solid ${GREEN_BORDER};font:${mono ? "700 14px/18px 'Courier New',monospace" : `700 13px/18px ${FONT}`};color:${HEADING}">${value}</td>
+    <td width="38%" style="padding:8px 16px;font:400 13px/18px ${FONT};color:${GREEN_DARK}">${label}</td>
+    <td style="padding:8px 16px;font:${mono ? "700 14px/18px 'Courier New',monospace" : `700 13px/18px ${FONT}`};color:${HEADING}">${value}</td>
   </tr>`;
 }
 
@@ -112,7 +107,7 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
 </tr></table>`, "24px 32px 4px")}
 
 ${section(`<p style="margin:0 0 14px;font:400 15px/23px ${FONT};color:${TEXT}">${esc(invoice.salutation)},</p>
-<p style="margin:0;font:400 15px/23px ${FONT};color:${TEXT}">vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Bitte überweisen Sie den Rechnungsbetrag innerhalb von <strong style="color:${HEADING}">${invoice.paymentDueDays} Tagen</strong> auf das unten genannte Konto.</p>`, "8px 32px 22px")}
+<p style="margin:0;font:400 15px/23px ${FONT};color:${TEXT}">vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Bitte überweisen Sie den Rechnungsbetrag auf das unten genannte Konto.</p>`, "8px 32px 22px")}
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:6px"><tr>
   <td width="33%" align="center" style="padding:12px 8px">
@@ -145,24 +140,22 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
 </table>`)}
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${GREEN_SOFT};border:1px solid ${GREEN_BORDER};border-radius:8px;overflow:hidden">
-  <tr><td style="padding:14px 18px;border-bottom:1px solid ${GREEN_BORDER}">
+  <tr><td style="padding:18px 18px 10px">
     <div style="font:700 10px/14px ${FONT};color:${GREEN_DARK};text-transform:uppercase;letter-spacing:.9px">Bitte überweisen Sie</div>
-    <div style="margin-top:4px;font:700 22px/28px ${FONT};color:${HEADING}">${euro.format(invoice.totalPrice)}</div>
-    <div style="margin-top:2px;font:400 12px/17px ${FONT};color:${MUTED}">Zahlbar innerhalb von ${invoice.paymentDueDays} Tagen ab Rechnungsdatum</div>
+    <div style="margin-top:4px;font:700 22px/28px ${FONT};color:${GREEN_DARK}">${euro.format(invoice.totalPrice)}</div>
   </td></tr>
-  <tr><td style="padding:6px 2px">
+  <tr><td style="padding:4px 2px 8px">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-      ${bankRow("Zahlungsempfänger", esc(bank.accountHolder), false)}
-      ${bankRow("Bank", esc(bank.bankName), true)}
-      ${bankRow("IBAN", esc(bank.iban), false, true)}
-      ${bankRow("BIC", esc(bank.bic), true, true)}
+      ${bankRow("Zahlungsempfänger", esc(bank.accountHolder))}
+      ${bankRow("IBAN", esc(bank.iban), true)}
+      ${bankRow("BIC", esc(bank.bic), true)}
       <tr>
-        <td style="padding:11px 16px;font:400 13px/18px ${FONT};color:${MUTED}">Verwendungszweck</td>
-        <td style="padding:11px 16px"><span style="display:inline-block;padding:4px 10px;border-radius:5px;background:#ffffff;border:1px solid ${GREEN_BORDER};font:700 14px/18px 'Courier New',monospace;color:${GREEN_DARK}">${esc(invoice.orderNumber)}</span></td>
+        <td style="padding:8px 16px;font:400 13px/18px ${FONT};color:${GREEN_DARK}">Verwendungszweck</td>
+        <td style="padding:8px 16px"><span style="display:inline-block;padding:4px 10px;border-radius:5px;background:${GREEN_BORDER};font:700 14px/18px 'Courier New',monospace;color:${GREEN_DARK}">${esc(invoice.orderNumber)}</span></td>
       </tr>
     </table>
   </td></tr>
-  <tr><td style="padding:12px 18px;border-top:1px solid ${GREEN_BORDER};font:400 12px/19px ${FONT};color:${MUTED}">Ihre Lieferung wird <strong style="color:${HEADING}">nach Zahlungseingang</strong> disponiert. Bitte geben Sie unbedingt den Verwendungszweck an, damit wir Ihre Zahlung zuordnen können.</td></tr>
+  <tr><td style="padding:8px 18px 18px;font:400 12px/19px ${FONT};color:${GREEN_DARK}">Ihre Lieferung wird <strong style="color:${HEADING}">nach Zahlungseingang</strong> disponiert. Bitte geben Sie unbedingt den Verwendungszweck an, damit wir Ihre Zahlung zuordnen können.</td></tr>
 </table>`, "0 32px 26px")}
 
 ${trustBar()}
@@ -178,7 +171,7 @@ ${section(`<div style="font:700 10px/14px ${FONT};color:${MUTED};text-transform:
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
   ${stepRow("&#10003;", "Bestellung eingegangen", "", "done", false)}
   ${stepRow("&#10003;", "Rechnung erhalten", "", "done", false)}
-  ${stepRow("3", `Zahlung (${invoice.paymentDueDays} Tage)`, "Überweisen Sie den Rechnungsbetrag unter Angabe des Verwendungszwecks.", "active", false)}
+  ${stepRow("3", "Zahlung", "Überweisen Sie den Rechnungsbetrag unter Angabe des Verwendungszwecks.", "active", false)}
   ${stepRow("4", "Lieferung", `Nach Zahlungseingang liefern wir zum vereinbarten Termin: ${esc(invoice.deliveryWindow)}.`, "todo", true)}
 </table>`)}
 
@@ -203,7 +196,7 @@ ${emailFooter(branding, r)}`;
 
   return emailShell(
     `Rechnung ${esc(invoice.invoiceNumber)}`,
-    `Ihre Rechnung ${esc(invoice.invoiceNumber)} über ${euro.format(invoice.totalPrice)} — bitte innerhalb von ${invoice.paymentDueDays} Tagen überweisen.`,
+    `Ihre Rechnung ${esc(invoice.invoiceNumber)} über ${euro.format(invoice.totalPrice)}.`,
     content,
   );
 }

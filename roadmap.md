@@ -13,3 +13,9 @@
 - [x] Gemeinsame E-Mail-Bausteine in email-shared.ts ausgelagert
 - [x] Neue Vorlage „Rechnung" mit Überweisungsdaten + Auswahl auf /admin/emails
 - [x] Typecheck und Build OK
+
+## 2026-09-14 Zahlungsinformationen der Rechnung
+- [x] Bankzeile und Musterbank aus der Rechnung entfernen
+- [x] Zahlungsbereich einheitlich grün und ohne Trennlinien gestalten
+- [x] Zahlungsziel von 14 Tagen aus der Rechnung entfernen
+- [x] Typecheck und Vorschau-Build prüfen
