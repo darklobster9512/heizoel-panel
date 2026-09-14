@@ -14,6 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
+      brandings: {
+        Row: {
+          city: string | null
+          commercial_register_number: string | null
+          company_name: string | null
+          created_at: string
+          created_by: string | null
+          domain: string | null
+          email: string | null
+          id: string
+          logo_path: string | null
+          managing_director: string | null
+          postal_code: string | null
+          public_id: string
+          registry_court: string | null
+          resend_api_key: string | null
+          resend_sender_email: string | null
+          resend_sender_name: string | null
+          seven_api_key: string | null
+          seven_sender_name: string | null
+          shop_name: string | null
+          status: Database["public"]["Enums"]["branding_status"]
+          street_address: string | null
+          updated_at: string
+          updated_by: string | null
+          vat_id: string | null
+        }
+        Insert: {
+          city?: string | null
+          commercial_register_number?: string | null
+          company_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          domain?: string | null
+          email?: string | null
+          id?: string
+          logo_path?: string | null
+          managing_director?: string | null
+          postal_code?: string | null
+          public_id?: string
+          registry_court?: string | null
+          resend_api_key?: string | null
+          resend_sender_email?: string | null
+          resend_sender_name?: string | null
+          seven_api_key?: string | null
+          seven_sender_name?: string | null
+          shop_name?: string | null
+          status?: Database["public"]["Enums"]["branding_status"]
+          street_address?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          vat_id?: string | null
+        }
+        Update: {
+          city?: string | null
+          commercial_register_number?: string | null
+          company_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          domain?: string | null
+          email?: string | null
+          id?: string
+          logo_path?: string | null
+          managing_director?: string | null
+          postal_code?: string | null
+          public_id?: string
+          registry_court?: string | null
+          resend_api_key?: string | null
+          resend_sender_email?: string | null
+          resend_sender_name?: string | null
+          seven_api_key?: string | null
+          seven_sender_name?: string | null
+          shop_name?: string | null
+          status?: Database["public"]["Enums"]["branding_status"]
+          street_address?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          vat_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brandings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brandings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -74,6 +170,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "caller"
+      branding_status: "draft" | "active"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -202,6 +299,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "caller"],
+      branding_status: ["draft", "active"],
     },
   },
 } as const
