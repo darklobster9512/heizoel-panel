@@ -45,22 +45,20 @@ function Index() {
       <SiteHeader />
       <main>
         <Hero onSearch={() => {}} />
-            <ConditionsBox mobileOnly />
-            <TrustBar />
-            <ConditionsBox />
-            <CustomerVoices />
-            <Steps />
-            <PersonalDataInfo />
-            <MatchingOffers />
-            <HeizoelSorten />
-            <ReferralBanner />
-            <HeizoelServiceIntro />
-            <TrustLinks />
-            <RegionalSeo />
-          </main>
-          <SiteFooter />
-        </>
-      )}
+        <ConditionsBox mobileOnly />
+        <TrustBar />
+        <ConditionsBox />
+        <CustomerVoices />
+        <Steps />
+        <PersonalDataInfo />
+        <MatchingOffers />
+        <HeizoelSorten />
+        <ReferralBanner />
+        <HeizoelServiceIntro />
+        <TrustLinks />
+        <RegionalSeo />
+      </main>
+      <SiteFooter />
     </div>
   );
 }
