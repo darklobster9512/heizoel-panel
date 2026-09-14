@@ -1,4 +1,4 @@
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/telegram";
+const TELEGRAM_API_BASE = "https://api.telegram.org";
 
 const euro = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
 const number = new Intl.NumberFormat("de-DE");
@@ -8,25 +8,20 @@ function esc(value: string): string {
 }
 
 export async function sendTelegramMessage(chatId: string, text: string): Promise<void> {
-  const lovableKey = process.env["LOVABLE_API_KEY"];
-  const telegramKey = process.env["TELEGRAM_API_KEY"];
-  if (!lovableKey || !telegramKey) {
-    throw new Error("Telegram ist noch nicht verbunden.");
+  const botToken = process.env["TELEGRAM_BOT_TOKEN"];
+  if (!botToken) {
+    throw new Error("TELEGRAM_BOT_TOKEN ist nicht gesetzt.");
   }
 
-  const response = await fetch(`${GATEWAY_URL}/sendMessage`, {
+  const response = await fetch(`${TELEGRAM_API_BASE}/bot${botToken}/sendMessage`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": telegramKey,
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML", disable_web_page_preview: true }),
   });
 
   if (!response.ok) {
     const body = await response.text();
-    console.error(`[telegram] gateway error [${response.status}]: ${body}`);
+    console.error(`[telegram] api error [${response.status}]: ${body}`);
     throw new Error(`Telegram-Versand fehlgeschlagen [${response.status}]: ${body}`);
   }
 
