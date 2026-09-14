@@ -75,7 +75,7 @@ function hostname(domain: string | null, fallback: string) {
   }
 }
 
-function stars(size: number, color = GREEN) {
+function stars(size: number, color = GOLD) {
   return `<span style="font:700 ${size}px/${size + 4}px ${FONT};color:${color};letter-spacing:2px">&#9733;&#9733;&#9733;&#9733;&#9733;</span>`;
 }
 
