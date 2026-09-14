@@ -348,7 +348,6 @@ function AuthPage() {
               <span>INTERN · VERSION 2.4</span>
             </footer>
           </section>
-        </section>
         </div>
       </main>
     </div>
