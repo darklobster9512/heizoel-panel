@@ -134,8 +134,7 @@ function CryptoBoard({ compact = false }: { compact?: boolean }) {
           return (
             <div
               key={crypto.id}
-              className={`group flex items-center justify-between bg-ops-panel px-4 transition-colors hover:bg-ops-panel-strong ${compact ? "min-h-16 py-3" : "min-h-14 py-2.5"}`}
-              style={{ animationDelay: `${180 + index * 70}ms` }}
+              className={`group flex items-center justify-between bg-ops-panel px-4 transition-colors hover:bg-ops-panel-strong ${compact ? "min-h-16 py-3" : "min-h-14 py-2.5"} ${index > 0 ? "animate-ops-enter-delay" : "animate-ops-enter"}`}
             >
               <div className="flex min-w-0 items-center gap-3">
                 <span className="flex size-8 shrink-0 items-center justify-center border border-ops-line bg-ops-canvas text-sm font-bold text-brand-light transition-colors group-hover:border-brand/50">
