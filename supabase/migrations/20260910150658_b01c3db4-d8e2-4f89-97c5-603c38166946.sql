@@ -1,0 +1,58 @@
+CREATE TABLE public.loan_applications (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  purpose text,
+  amount integer,
+  term_months integer,
+  down_payment integer,
+  borrowers integer,
+  marital_status text,
+  profession text,
+  housing text,
+  adults integer,
+  children integer,
+  children_kindergeld integer,
+  net_income integer,
+  income_variation boolean,
+  side_job boolean,
+  other_income boolean,
+  rented_property boolean,
+  warm_rent integer,
+  private_health boolean,
+  alimony_spouse boolean,
+  alimony_child boolean,
+  owns_car boolean,
+  salutation text,
+  first_name text,
+  last_name text,
+  phone text,
+  email text,
+  marketing_consent boolean DEFAULT false,
+  birthdate text,
+  birthplace text,
+  birthcountry text,
+  nationality text,
+  more_nationalities boolean DEFAULT false,
+  zip text,
+  city text,
+  street text,
+  house_number text,
+  country text,
+  resident_since integer,
+  employer text,
+  employed_since text,
+  part_time boolean,
+  temporary_contract boolean,
+  existing_loans integer,
+  insurance text,
+  referral_source text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT ON public.loan_applications TO anon;
+GRANT SELECT, INSERT ON public.loan_applications TO authenticated;
+GRANT ALL ON public.loan_applications TO service_role;
+ALTER TABLE public.loan_applications ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can create application" ON public.loan_applications FOR INSERT TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "Users can view own applications" ON public.loan_applications FOR SELECT TO authenticated USING (auth.uid() = user_id OR public.has_role(auth.uid(), 'admin'));
+CREATE TRIGGER update_loan_applications_updated_at BEFORE UPDATE ON public.loan_applications FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();

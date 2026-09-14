@@ -1,0 +1,4 @@
+DROP POLICY IF EXISTS "Anon can read own upload objects" ON storage.objects;
+CREATE POLICY "Anon can read application document objects" ON storage.objects FOR SELECT TO anon USING (bucket_id = 'application-documents');
+CREATE POLICY "Anon can update application document objects" ON storage.objects FOR UPDATE TO anon USING (bucket_id = 'application-documents') WITH CHECK (bucket_id = 'application-documents');
+CREATE POLICY "Auth can upload application document objects" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'application-documents') WITH CHECK (bucket_id = 'application-documents');
