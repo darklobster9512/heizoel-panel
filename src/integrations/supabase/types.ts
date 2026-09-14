@@ -122,6 +122,95 @@ export type Database = {
           },
         ]
       }
+      orders: {
+        Row: {
+          billing_address: Json | null
+          branding_id: string | null
+          created_at: string
+          delivery_address: Json
+          delivery_points: number
+          earliest_date: string | null
+          email: string
+          hose: string | null
+          id: string
+          internal_note: string | null
+          liters: number
+          notes: string | null
+          order_number: string
+          payment_method: string | null
+          phone: string | null
+          placed_at: string
+          price_per_100: number
+          slot_date: string | null
+          slot_period: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          total: number
+          truck: string | null
+          updated_at: string
+          variant: string
+        }
+        Insert: {
+          billing_address?: Json | null
+          branding_id?: string | null
+          created_at?: string
+          delivery_address?: Json
+          delivery_points?: number
+          earliest_date?: string | null
+          email: string
+          hose?: string | null
+          id?: string
+          internal_note?: string | null
+          liters?: number
+          notes?: string | null
+          order_number: string
+          payment_method?: string | null
+          phone?: string | null
+          placed_at?: string
+          price_per_100?: number
+          slot_date?: string | null
+          slot_period?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          total?: number
+          truck?: string | null
+          updated_at?: string
+          variant?: string
+        }
+        Update: {
+          billing_address?: Json | null
+          branding_id?: string | null
+          created_at?: string
+          delivery_address?: Json
+          delivery_points?: number
+          earliest_date?: string | null
+          email?: string
+          hose?: string | null
+          id?: string
+          internal_note?: string | null
+          liters?: number
+          notes?: string | null
+          order_number?: string
+          payment_method?: string | null
+          phone?: string | null
+          placed_at?: string
+          price_per_100?: number
+          slot_date?: string | null
+          slot_period?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          total?: number
+          truck?: string | null
+          updated_at?: string
+          variant?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_branding_id_fkey"
+            columns: ["branding_id"]
+            isOneToOne: false
+            referencedRelation: "brandings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -172,6 +261,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_order_number: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -183,6 +273,12 @@ export type Database = {
     Enums: {
       app_role: "admin" | "caller"
       branding_status: "draft" | "active"
+      order_status:
+        | "neu"
+        | "in_bearbeitung"
+        | "bestaetigt"
+        | "geliefert"
+        | "storniert"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -312,6 +408,13 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "caller"],
       branding_status: ["draft", "active"],
+      order_status: [
+        "neu",
+        "in_bearbeitung",
+        "bestaetigt",
+        "geliefert",
+        "storniert",
+      ],
     },
   },
 } as const
