@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Check, Info, X } from "lucide-react";
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { Logo } from "./logo";
 import ntvAward from "@/assets/ntv-gesamtsieger-heizoel24-2025.png.asset.json";
 import bildAward from "@/assets/bild-empfehlung-2026.png.asset.json";
@@ -470,8 +469,8 @@ export function MatchingOffers() {
           </ul>
 
           <div className="mt-10 flex justify-center md:mt-8">
-            <Button asChild className="h-12 w-full max-w-[298px] text-[13px] font-bold !text-white shadow-md">
-              <Link to="/antrag/schritt-1" search={{}}>Jetzt Heizölpreise vergleichen</Link>
+            <Button className="h-12 w-full max-w-[298px] text-[13px] font-bold !text-white shadow-md">
+              Jetzt Heizölpreise vergleichen
             </Button>
           </div>
         </div>
@@ -765,15 +764,10 @@ export function TrustLinks() {
               <p className="text-[15px] leading-[1.45] text-footer-text">{card.title}</p>
               <ul className="mt-5 space-y-3">
                 {card.links.map((l) => {
-                  const hashIndex = l.href.indexOf("#");
-                  const path = hashIndex === -1 ? l.href : l.href.slice(0, hashIndex);
-                  const hash = hashIndex === -1 ? undefined : l.href.slice(hashIndex + 1);
                   return (
                   <li key={l.label}>
-                    <Link
-                      to={path}
-                      hash={hash ?? ""}
-                      className="group flex items-start gap-3 text-[15px] font-semibold text-brand-deep hover:underline"
+                    <span
+                      className="group flex items-start gap-3 text-[15px] font-semibold text-brand-deep"
                     >
                       <svg
                         aria-hidden="true"
@@ -788,7 +782,7 @@ export function TrustLinks() {
                         <path d="M9 6l6 6-6 6" />
                       </svg>
                       <span>{l.label}</span>
-                    </Link>
+                    </span>
                   </li>
                   );
                 })}
@@ -839,25 +833,11 @@ function FooterStars() {
 function FooterLinkList({ items }: { items: { label: string; href: string }[] }) {
   return (
     <ul className="mt-3 space-y-2">
-      {items.map((l) => {
-        const isInternal = l.href.startsWith("/") && !l.href.startsWith("//");
-        return (
-          <li key={l.label}>
-            {isInternal ? (
-              <Link
-                to={l.href}
-                className="inline-block text-[13px] leading-5 text-footer-text hover:underline"
-              >
-                {l.label}
-              </Link>
-            ) : (
-              <a href={l.href} className="text-[13px] leading-5 text-footer-text hover:underline">
-                {l.label}
-              </a>
-            )}
-          </li>
-        );
-      })}
+      {items.map((l) => (
+        <li key={l.label}>
+          <span className="inline-block text-[13px] leading-5 text-footer-text">{l.label}</span>
+        </li>
+      ))}
     </ul>
   );
 }
@@ -1012,8 +992,8 @@ export function ReferralBanner({ compact = false }: { compact?: boolean }) {
                 Schließen Sie sich <strong>25.000+ zufriedenen Kunden</strong> an und sparen Sie durchschnittlich €247
               </p>
               <div className="mt-7">
-                <Button asChild className="h-12 w-full max-w-[250px] text-[13px] font-bold !text-white shadow-md">
-                  <Link to="/antrag/schritt-1" search={{}}>Heizölpreis berechnen</Link>
+                <Button className="h-12 w-full max-w-[250px] text-[13px] font-bold !text-white shadow-md">
+                  Heizölpreis berechnen
                 </Button>
               </div>
               <p className="mt-4 max-w-[540px] text-[13px] leading-[1.6] text-muted-custom/70">
@@ -1040,8 +1020,8 @@ export function ReferralBanner({ compact = false }: { compact?: boolean }) {
             Schließen Sie sich <strong>25.000+ zufriedenen Kunden</strong> an und sparen Sie durchschnittlich €247
           </p>
           <div className="mt-6 flex justify-center">
-            <Button asChild className="h-12 w-full max-w-[280px] text-[13px] font-bold !text-white shadow-md">
-              <Link to="/antrag/schritt-1" search={{}}>Heizölpreis berechnen</Link>
+            <Button className="h-12 w-full max-w-[280px] text-[13px] font-bold !text-white shadow-md">
+              Heizölpreis berechnen
             </Button>
           </div>
           <p className="mt-4 px-2 text-[13px] leading-[1.6] text-muted-custom/70">
@@ -1135,15 +1115,13 @@ export function RegionalSeo() {
         </div>
         <div className="mt-6 grid grid-cols-2 gap-2 md:grid-cols-4">
           {REGIONAL_BUTTONS.map((item) => (
-            <Link
+            <span
               key={item.label}
-              to="/heizoelpreise/bundesland/$state"
-              params={{ state: item.state }}
               title={item.label}
-              className="rounded-lg border border-line bg-card px-3.5 py-2.5 text-left text-[13px] font-medium leading-snug text-conditions transition-colors hover:border-brand hover:text-brand"
+              className="block rounded-lg border border-line bg-card px-3.5 py-2.5 text-left text-[13px] font-medium leading-snug text-conditions"
             >
               {item.label}
-            </Link>
+            </span>
           ))}
         </div>
       </div>
@@ -1223,28 +1201,16 @@ export function CitySeo() {
         </h2>
         <SeoLinkGrid title="">
           {CITY_LINKS.map((item) => (
-            <Link
-              key={item.label}
-              to="/heizoelpreise/$city"
-              params={{ city: item.city }}
-              title={item.label}
-              className={seoLinkClass}
-            >
+            <span key={item.label} title={item.label} className={seoLinkClass}>
               {item.label}
-            </Link>
+            </span>
           ))}
         </SeoLinkGrid>
         <SeoLinkGrid title="Heizölpreise nach Bundesland">
           {STATE_LINKS.map((item) => (
-            <Link
-              key={item.label}
-              to="/heizoelpreise/bundesland/$state"
-              params={{ state: item.state }}
-              title={item.label}
-              className={seoLinkClass}
-            >
+            <span key={item.label} title={item.label} className={seoLinkClass}>
               {item.label}
-            </Link>
+            </span>
           ))}
         </SeoLinkGrid>
       </div>

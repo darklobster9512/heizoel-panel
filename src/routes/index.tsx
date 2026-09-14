@@ -1,13 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 
 import { SiteHeader } from "@/components/landing/site-header";
 import { Hero } from "@/components/landing/hero";
 import { CustomerVoices } from "@/components/landing/customer-voices";
-import {
-  PriceSearchLoading,
-  type PriceSearchValues,
-} from "@/components/landing/price-search-loading";
 import {
   ConditionsBox,
   HeizoelServiceIntro,
@@ -45,33 +40,25 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [searchValues, setSearchValues] = useState<PriceSearchValues | null>(null);
-
   return (
     <div className="min-h-screen bg-background font-body text-ink">
       <SiteHeader />
-      {searchValues ? (
-        <PriceSearchLoading values={searchValues} />
-      ) : (
-        <>
-          <main>
-            <Hero onSearch={setSearchValues} />
-            <ConditionsBox mobileOnly />
-            <TrustBar />
-            <ConditionsBox />
-            <CustomerVoices />
-            <Steps />
-            <PersonalDataInfo />
-            <MatchingOffers />
-            <HeizoelSorten />
-            <ReferralBanner />
-            <HeizoelServiceIntro />
-            <TrustLinks />
-            <RegionalSeo />
-          </main>
-          <SiteFooter />
-        </>
-      )}
+      <main>
+        <Hero onSearch={() => {}} />
+        <ConditionsBox mobileOnly />
+        <TrustBar />
+        <ConditionsBox />
+        <CustomerVoices />
+        <Steps />
+        <PersonalDataInfo />
+        <MatchingOffers />
+        <HeizoelSorten />
+        <ReferralBanner />
+        <HeizoelServiceIntro />
+        <TrustLinks />
+        <RegionalSeo />
+      </main>
+      <SiteFooter />
     </div>
   );
 }

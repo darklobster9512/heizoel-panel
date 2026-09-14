@@ -4,7 +4,7 @@ import welt from "@/assets/die-welt-service-champion-2025.png.asset.json";
 import dtgv from "@/assets/dtgv-testsieger.png.asset.json";
 import guarantee from "@/assets/guarantee.svg.asset.json";
 import { OfferCard } from "./offer-card";
-import type { PriceSearchValues } from "./price-search-loading";
+import type { PriceSearchValues } from "./price-search-types";
 
 const CHECKS = [
   { prefix: "Bis zu ", bold: "20% günstiger", suffix: " als der Marktdurchschnitt" },
