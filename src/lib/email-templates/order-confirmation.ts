@@ -292,7 +292,7 @@ ${section(`<div style="text-align:center;font:700 10px/14px ${FONT};color:${MUTE
   <td width="10">&nbsp;</td>
   <td style="padding:7px 14px;border:1px solid ${LINE};border-radius:20px;background:#ffffff;font:700 12px/16px ${FONT};color:${MUTED}">&#9733; Trusted Shops</td>
 </tr></table>
-<p style="margin:14px 0 0;text-align:center;font:400 12px/17px ${FONT};color:${MUTED}">${stars(12)} <strong style="color:${HEADING}">4,99 / 5</strong> — 33.000+ Bewertungen</p>`, "24px 32px", SURFACE)}
+<p style="margin:14px 0 0;text-align:center;font:400 12px/17px ${FONT};color:${MUTED}">${stars(12)} <strong style="color:${HEADING}">4,9 / 5</strong> — 25.000+ Bewertungen</p>`, "24px 32px", SURFACE)}
 
 ${section(`<div style="text-align:center">
   <table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr><td>${logoBlock(branding, shop, true)}</td></tr></table>
