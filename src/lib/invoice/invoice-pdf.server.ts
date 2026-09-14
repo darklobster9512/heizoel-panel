@@ -171,10 +171,20 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
 
   // Zahlungsdaten
   y -= 26;
-  const bankHeight = 78;
+  const bankHeight = model.bank.isDeposit ? 92 : 78;
   page.drawRectangle({ x: M, y: y - bankHeight, width: right - M, height: bankHeight, color: GREEN_SOFT });
   page.drawRectangle({ x: M, y: y - bankHeight, width: 2.5, height: bankHeight, color: GREEN });
-  draw(ctx, "ZAHLUNGSDATEN · BITTE ÜBERWEISEN SIE AUF FOLGENDES KONTO", M + 12, y - 16, 7, true, GREEN_DARK);
+  draw(
+    ctx,
+    model.bank.isDeposit
+      ? "ZAHLUNGSDATEN · 50 % ANZAHLUNG AUF FOLGENDES KONTO"
+      : "ZAHLUNGSDATEN · BITTE ÜBERWEISEN SIE AUF FOLGENDES KONTO",
+    M + 12,
+    y - 16,
+    7,
+    true,
+    GREEN_DARK,
+  );
   const bankCols: [string, string, number][] = [
     ["Empfänger", model.bank.accountHolder, M + 12],
     ["Bank", model.bank.bankName, M + 150],
@@ -188,6 +198,10 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
   page.drawRectangle({ x: M + 12, y: y - 56, width: right - M - 24, height: 0.6, color: GREEN });
   draw(ctx, `Verwendungszweck: ${model.bank.reference}`, M + 12, y - 70, 8.5, false, TEXT);
   drawRight(ctx, model.bank.amount, right - 12, y - 70, 11, true, GREEN_DARK);
+  if (model.bank.isDeposit) {
+    drawRight(ctx, "Anzahlung (50 %)", right - 12, y - 58, 6.5, false, MUTED);
+    draw(ctx, model.bank.note ?? "", M + 12, y - 84, 8, false, GREEN_DARK);
+  }
   y -= bankHeight;
 
   // Fußzeile
