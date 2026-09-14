@@ -10,5 +10,6 @@ export function getAdminNav(active: "overview" | "brandings" | "bank" | "orders"
     { label: "Bestellungen", icon: <ShoppingCart className="size-4" />, to: "/admin/bestellungen", active: active === "orders" },
     { label: "E-Mails", icon: <Mail className="size-4" />, to: "/admin/emails", active: active === "emails" },
     { label: "SMS", icon: <MessageSquareText className="size-4" />, to: "/admin/sms", active: active === "sms" },
+    { label: "Telegram", icon: <Send className="size-4" />, to: "/admin/telegram", active: active === "telegram" },
   ];
 }
