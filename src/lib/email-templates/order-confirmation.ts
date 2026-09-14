@@ -47,6 +47,7 @@ const GREEN = "#22C55E";
 const GREEN_DARK = "#15803D";
 const GREEN_SOFT = "#F2FCF5";
 const GREEN_BORDER = "#BBF7D0";
+const GOLD = "#F59E0B";
 const TEXT = "#2E332F";
 const HEADING = "#1A1F1C";
 const MUTED = "#8A918B";
