@@ -83,7 +83,11 @@ export function renderInvoiceHtml(model: InvoiceModel) {
     <div style="font:700 17px/24px ${FONT};color:${HEADING}">Rechnung <span style="font:400 12px/24px ${FONT};color:${MUTED}">Nr. ${esc(model.invoiceNumber)}</span></div>
     <p style="margin:10px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">${esc(model.salutation)},</p>
     <p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">vielen Dank für Ihre Bestellung. Mit der Vorauszahlung sichern Sie sich den heutigen Tagespreis.</p>
-    <p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Bitte überweisen Sie den Gesamtbetrag von <strong>${esc(model.bank.amount)}</strong> unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}).</p>
+    ${
+      model.bank.isDeposit
+        ? `<p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Wir bitten um eine Anzahlung von 50 % (<strong>${esc(model.bank.amount)}</strong>) unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}). Den Restbetrag von <strong>${esc(model.bank.remaining ?? "")}</strong> zahlen Sie ${model.paymentLabel === "EC-Karte" ? "bei Lieferung vor Ort per EC-Karte" : "bei Lieferung vor Ort in bar"}.</p>`
+        : `<p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Bitte überweisen Sie den Gesamtbetrag von <strong>${esc(model.bank.amount)}</strong> unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}).</p>`
+    }
   </div>
 
   <div style="margin-top:7mm;background:${GREEN_SOFT};border-left:3px solid ${GREEN};padding:12px 14px">
@@ -140,8 +144,12 @@ export function renderInvoiceHtml(model: InvoiceModel) {
     </div>
     <div style="margin-top:9px;padding-top:8px;border-top:1px solid ${GREEN}33;display:flex;justify-content:space-between;align-items:center">
       <div style="font:400 10px/16px ${FONT};color:${TEXT}">Verwendungszweck: <strong>${esc(model.bank.reference)}</strong></div>
-      <div style="font:700 13px/19px ${FONT};color:${GREEN_DARK}">${esc(model.bank.amount)}</div>
+      <div style="text-align:right">
+        <div style="font:700 13px/19px ${FONT};color:${GREEN_DARK}">${esc(model.bank.amount)}</div>
+        ${model.bank.isDeposit ? `<div style="font:400 8.5px/13px ${FONT};color:${MUTED}">Anzahlung (50 %)</div>` : ""}
+      </div>
     </div>
+    ${model.bank.note ? `<div style="margin-top:6px;font:400 9.5px/15px ${FONT};color:${GREEN_DARK}">${esc(model.bank.note)}</div>` : ""}
   </div>
 
   <div style="flex:1"></div>
