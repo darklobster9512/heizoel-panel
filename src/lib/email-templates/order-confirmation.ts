@@ -8,11 +8,11 @@ import {
   esc,
   euro,
   faq,
+  FONT as FONT_STACK,
   GREEN,
-  GREEN_BORDER,
-  GREEN_DARK,
   GREEN_SOFT,
   HEADING,
+  LINE as LINE_COLOR,
   MUTED,
   number,
   orderRow,
@@ -139,8 +139,3 @@ ${emailFooter(branding, r)}`;
     content,
   );
 }
-
-// Lokale Aliasse, damit die Template-Literal oben lesbar bleiben.
-import { FONT as FONT_STACK, LINE as LINE_COLOR } from "./email-shared";
-void GREEN_BORDER;
-void GREEN_DARK;
