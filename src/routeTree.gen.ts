@@ -17,6 +17,7 @@ import { Route as AuthenticatedCallerRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedWeiterleitungRouteImport } from './routes/_authenticated/weiterleitung'
 import { Route as AuthenticatedAdminBrandingsRouteImport } from './routes/_authenticated/admin_.brandings'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin_.emails'
+import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
 import { Route as AuthenticatedAdminBrandingsBrandingIdRouteImport } from './routes/_authenticated/admin_.brandings_.$brandingId'
 import { Route as AuthenticatedAdminBrandingsNeuRouteImport } from './routes/_authenticated/admin_.brandings_.neu'
 
@@ -62,6 +63,11 @@ const AuthenticatedAdminEmailsRoute =
     path: '/admin/emails',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicOrdersRoute = ApiPublicOrdersRouteImport.update({
+  id: '/api/public/orders',
+  path: '/api/public/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminBrandingsBrandingIdRoute =
   AuthenticatedAdminBrandingsBrandingIdRouteImport.update({
     id: '/admin_/brandings_/$brandingId',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/weiterleitung': typeof AuthenticatedWeiterleitungRoute
   '/admin/brandings': typeof AuthenticatedAdminBrandingsRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/api/public/orders': typeof ApiPublicOrdersRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/weiterleitung': typeof AuthenticatedWeiterleitungRoute
   '/admin/brandings': typeof AuthenticatedAdminBrandingsRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/api/public/orders': typeof ApiPublicOrdersRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/_authenticated/weiterleitung': typeof AuthenticatedWeiterleitungRoute
   '/_authenticated/admin_/brandings': typeof AuthenticatedAdminBrandingsRoute
   '/_authenticated/admin_/emails': typeof AuthenticatedAdminEmailsRoute
+  '/api/public/orders': typeof ApiPublicOrdersRoute
   '/_authenticated/admin_/brandings_/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/_authenticated/admin_/brandings_/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/weiterleitung'
     | '/admin/brandings'
     | '/admin/emails'
+    | '/api/public/orders'
     | '/admin/brandings/$brandingId'
     | '/admin/brandings/neu'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/weiterleitung'
     | '/admin/brandings'
     | '/admin/emails'
+    | '/api/public/orders'
     | '/admin/brandings/$brandingId'
     | '/admin/brandings/neu'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weiterleitung'
     | '/_authenticated/admin_/brandings'
     | '/_authenticated/admin_/emails'
+    | '/api/public/orders'
     | '/_authenticated/admin_/brandings_/$brandingId'
     | '/_authenticated/admin_/brandings_/neu'
   fileRoutesById: FileRoutesById
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicOrdersRoute: typeof ApiPublicOrdersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminEmailsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/orders': {
+      id: '/api/public/orders'
+      path: '/api/public/orders'
+      fullPath: '/api/public/orders'
+      preLoaderRoute: typeof ApiPublicOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin_/brandings_/$brandingId': {
       id: '/_authenticated/admin_/brandings_/$brandingId'
       path: '/admin/brandings/$brandingId'
@@ -256,6 +276,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicOrdersRoute: ApiPublicOrdersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
