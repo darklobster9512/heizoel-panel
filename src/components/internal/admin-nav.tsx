@@ -1,4 +1,4 @@
-import { Building2, Fuel, LayoutDashboard, Mail, Settings, ShoppingCart, Tags, Users } from "lucide-react";
+import { Building2, LayoutDashboard, Mail, ShoppingCart } from "lucide-react";
 
 import type { NavItem } from "@/components/internal/app-shell";
 
@@ -8,10 +8,5 @@ export function getAdminNav(active: "overview" | "brandings" | "orders" | "email
     { label: "Brandings", icon: <Building2 className="size-4" />, to: "/admin/brandings", active: active === "brandings" },
     { label: "Bestellungen", icon: <ShoppingCart className="size-4" />, to: "/admin/bestellungen", active: active === "orders" },
     { label: "E-Mails", icon: <Mail className="size-4" />, to: "/admin/emails", active: active === "emails" },
-    { label: "Anfragen", icon: <Fuel className="size-4" /> },
-
-    { label: "Mitarbeiter", icon: <Users className="size-4" /> },
-    { label: "Preise", icon: <Tags className="size-4" /> },
-    { label: "Einstellungen", icon: <Settings className="size-4" /> },
   ];
 }
