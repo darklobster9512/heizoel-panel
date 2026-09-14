@@ -284,7 +284,7 @@ ${section(`<div style="text-align:center;font:700 10px/14px ${FONT};color:${MUTE
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
   ${infoChip("Registriert", register)}
   ${infoChip("USt-IdNr.", vat)}
-  ${infoChip("Bewertungen", `${stars(11)} 4,99 / 5`)}
+  ${infoChip("Bewertungen", `${stars(11)} 4,9 / 5`)}
 </tr></table>
 <p style="margin:16px 0 18px;text-align:center;font:400 11px/18px ${FONT};color:#A3A9A4">Bei Neukunden kann je nach Zahlungsart eine Teilzahlung vor Lieferung anfallen. Details besprechen wir mit Ihnen persönlich im Bestätigungsgespräch.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>
