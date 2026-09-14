@@ -5,17 +5,13 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   Euro,
-  Fuel,
-  LayoutDashboard,
   Loader2,
   Phone,
-  Settings,
-  Tags,
-  Users,
 } from "lucide-react";
 import { useEffect } from "react";
 
 import { InternalShell } from "@/components/internal/app-shell";
+import { getAdminNav } from "@/components/internal/admin-nav";
 import { getMyAccount } from "@/lib/roles.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -129,13 +125,7 @@ function AdminPage() {
       role="Admin"
       name={data.fullName ?? "Admin"}
       email={data.email ?? ""}
-      nav={[
-        { label: "Übersicht", icon: <LayoutDashboard className="size-4" />, active: true },
-        { label: "Anfragen", icon: <Fuel className="size-4" /> },
-        { label: "Mitarbeiter", icon: <Users className="size-4" /> },
-        { label: "Preise", icon: <Tags className="size-4" /> },
-        { label: "Einstellungen", icon: <Settings className="size-4" /> },
-      ]}
+      nav={getAdminNav("overview")}
     >
       <div>
         <h1 className="text-[22px] font-bold text-hero-text">Übersicht</h1>
