@@ -236,8 +236,8 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:6px"><tr>
   ${trustCell("Festpreis", "Preisgarantie", "Ihr Preis bleibt fest", false)}
-  ${trustCell(stars(13), "33.000+ Kunden", "4,99 von 5 Sternen", true)}
-  ${trustCell("ab 500 Liter", "Lieferung inklusive", "Deutschlandweit", true)}
+  ${trustCell(stars(13), "25.000+ Kunden", "4,9 von 5 Sternen", true)}
+  ${trustCell("ab 1500 Liter", "Lieferung inklusive", "Deutschlandweit", true)}
 </tr></table>`, "0 32px 26px")}
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
