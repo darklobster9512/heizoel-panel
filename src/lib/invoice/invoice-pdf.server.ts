@@ -199,7 +199,7 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
   draw(ctx, `Verwendungszweck: ${model.bank.reference}`, M + 12, y - 70, 8.5, false, TEXT);
   drawRight(ctx, model.bank.amount, right - 12, y - 70, 11, true, GREEN_DARK);
   if (model.bank.isDeposit) {
-    drawRight(ctx, "Anzahlung (50 %)", right - 12, y - 58, 6.5, false, MUTED);
+    drawRight(ctx, "Anzahlung (50 %)", right - 12, y - 81, 6.5, false, MUTED);
     draw(ctx, model.bank.note ?? "", M + 12, y - 84, 8, false, GREEN_DARK);
   }
   y -= bankHeight;
