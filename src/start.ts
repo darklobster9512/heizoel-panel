@@ -24,6 +24,23 @@ const csrfMiddleware = createCsrfMiddleware({
   filter: (ctx) => ctx.handlerType === "serverFn",
 });
 
+// Hängt das Supabase-Zugriffstoken an jeden Server-Funktionsaufruf.
+const attachSupabaseAuth = createMiddleware({ type: "function" }).client(async ({ next }) => {
+  if (typeof window === "undefined") return next();
+  try {
+    const { supabase } = await import("./integrations/supabase/client");
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (token) {
+      return next({ headers: { Authorization: `Bearer ${token}` } });
+    }
+  } catch (error) {
+    console.error("[auth] Token konnte nicht angehängt werden", error);
+  }
+  return next();
+});
+
 export const startInstance = createStart(() => ({
   requestMiddleware: [errorMiddleware, csrfMiddleware],
+  functionMiddleware: [attachSupabaseAuth],
 }));
