@@ -80,10 +80,10 @@ function bankFrom(branding: EmailBranding): BankDetails {
   return { accountHolder, iban, bic: bic || DEMO_BANK.bic };
 }
 
-function bankRow(label: string, value: string, mono = false) {
+function bankRow(label: string, value: string) {
   return `<tr>
     <td width="38%" style="padding:8px 16px;font:400 13px/18px ${FONT};color:${GREEN_DARK}">${label}</td>
-    <td style="padding:8px 16px;font:${mono ? "700 14px/18px 'Courier New',monospace" : `700 13px/18px ${FONT}`};color:${HEADING}">${value}</td>
+    <td style="padding:8px 16px;font:700 13px/18px ${FONT};color:${HEADING}">${value}</td>
   </tr>`;
 }
 
