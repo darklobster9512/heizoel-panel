@@ -27,9 +27,9 @@ const brandingInputSchema = z.object({
   registryCourt: nullableText(160),
   commercialRegisterNumber: nullableText(80),
   managingDirector: nullableText(160),
-  vatId: nullableText(40),
+  vatId: z.union([z.string().trim().regex(/^DE[0-9]{9}$/i), z.literal(""), z.null()]).optional(),
   email: z.union([z.string().trim().email().max(255), z.literal(""), z.null()]).optional(),
-  domain: nullableText(255),
+  domain: z.union([z.string().trim().url().max(255), z.literal(""), z.null()]).optional(),
   resendApiKey: nullableText(500),
   resendSenderEmail: z.union([z.string().trim().email().max(255), z.literal(""), z.null()]).optional(),
   resendSenderName: nullableText(160),
@@ -57,9 +57,11 @@ export type Branding = {
   email: string | null;
   domain: string | null;
   resendApiKey: string | null;
+  resendConfigured: boolean;
   resendSenderEmail: string | null;
   resendSenderName: string | null;
   sevenApiKey: string | null;
+  sevenConfigured: boolean;
   sevenSenderName: string | null;
   createdAt: string;
   updatedAt: string;
@@ -112,10 +114,12 @@ async function withLogoUrl(
     vatId: typeof row.vat_id === "string" ? row.vat_id : null,
     email: typeof row.email === "string" ? row.email : null,
     domain: typeof row.domain === "string" ? row.domain : null,
-    resendApiKey: typeof row.resend_api_key === "string" ? row.resend_api_key : null,
+    resendApiKey: null,
+    resendConfigured: Boolean(row.resend_api_key),
     resendSenderEmail: typeof row.resend_sender_email === "string" ? row.resend_sender_email : null,
     resendSenderName: typeof row.resend_sender_name === "string" ? row.resend_sender_name : null,
-    sevenApiKey: typeof row.seven_api_key === "string" ? row.seven_api_key : null,
+    sevenApiKey: null,
+    sevenConfigured: Boolean(row.seven_api_key),
     sevenSenderName: typeof row.seven_sender_name === "string" ? row.seven_sender_name : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
@@ -153,6 +157,18 @@ export const saveBranding = createServerFn({ method: "POST" })
   .inputValidator((input: BrandingInput) => brandingInputSchema.parse(input))
   .handler(async ({ data, context }): Promise<{ id: string; publicId: string }> => {
     await requireAdmin(context);
+    let savedResendApiKey = data.resendApiKey;
+    let savedSevenApiKey = data.sevenApiKey;
+    if (data.id && (!savedResendApiKey || !savedSevenApiKey)) {
+      const { data: existing, error: existingError } = await context.supabase
+        .from("brandings")
+        .select("resend_api_key, seven_api_key")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (existingError) throw new Error("Bestehende Konfiguration konnte nicht geladen werden.");
+      if (!savedResendApiKey) savedResendApiKey = existing?.resend_api_key ?? null;
+      if (!savedSevenApiKey) savedSevenApiKey = existing?.seven_api_key ?? null;
+    }
     const payload = {
       status: data.status,
       logo_path: data.logoPath,
@@ -167,10 +183,10 @@ export const saveBranding = createServerFn({ method: "POST" })
       vat_id: data.vatId,
       email: data.email || null,
       domain: data.domain,
-      resend_api_key: data.resendApiKey,
+      resend_api_key: savedResendApiKey,
       resend_sender_email: data.resendSenderEmail || null,
       resend_sender_name: data.resendSenderName,
-      seven_api_key: data.sevenApiKey,
+      seven_api_key: savedSevenApiKey,
       seven_sender_name: data.sevenSenderName,
       updated_by: context.userId,
     };

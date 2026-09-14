@@ -51,8 +51,8 @@ function BrandingsPage() {
               <div className="grid gap-4 p-5 sm:grid-cols-2">
                 <Info icon={<MapPin />} label="Anschrift" value={[branding.streetAddress, [branding.postalCode, branding.city].filter(Boolean).join(" ")].filter(Boolean).join(", ") || "Noch nicht hinterlegt"} />
                 <Info icon={<Globe2 />} label="Domain" value={branding.domain || "Noch nicht hinterlegt"} />
-                <Info icon={<Mail />} label="Resend" value={branding.resendApiKey ? "Konfiguriert" : "Nicht konfiguriert"} success={Boolean(branding.resendApiKey)} />
-                <Info icon={<MessageSquare />} label="Seven.io" value={branding.sevenApiKey ? "Konfiguriert" : "Nicht konfiguriert"} success={Boolean(branding.sevenApiKey)} />
+                <Info icon={<Mail />} label="Resend" value={branding.resendConfigured ? "Konfiguriert" : "Nicht konfiguriert"} success={branding.resendConfigured} />
+                <Info icon={<MessageSquare />} label="Seven.io" value={branding.sevenConfigured ? "Konfiguriert" : "Nicht konfiguriert"} success={branding.sevenConfigured} />
               </div>
               <div className="border-t border-line bg-surface/60 px-5 py-4"><p className="text-[10px] font-semibold tracking-wide text-muted-custom uppercase">Public Branding ID</p><div className="mt-1.5 flex items-center gap-2"><code className="min-w-0 flex-1 truncate text-[12px] text-conditions">{branding.publicId}</code><Button size="icon" variant="ghost" title="Branding-ID kopieren" aria-label="Branding-ID kopieren" onClick={() => { void navigator.clipboard.writeText(branding.publicId); toast.success("Branding-ID kopiert."); }}><Copy /></Button></div></div>
               <div className="flex items-center justify-between border-t border-line px-5 py-3"><span className="text-[11px] text-muted-custom">Geändert {new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(branding.updatedAt))}</span><Button asChild variant="outline" size="sm"><Link to="/admin/brandings/$brandingId" params={{ brandingId: branding.id }}><Edit3 /> Bearbeiten</Link></Button></div>
