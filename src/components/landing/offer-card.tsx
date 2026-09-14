@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import type { PriceSearchValues } from "./price-search-loading";
+import type { PriceSearchValues } from "./price-search-types";
 
 const DELIVERY_POINTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
