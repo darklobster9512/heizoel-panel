@@ -6,14 +6,14 @@ import {
   Eye,
   EyeOff,
   Headphones,
-  KeyRound,
   Loader2,
   Lock,
   Mail,
   Radio,
-  Server,
+  RefreshCw,
   ShieldCheck,
-  User,
+  TrendingDown,
+  TrendingUp,
 } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
@@ -46,12 +46,142 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const SYSTEM_CHECKS = [
-  { label: "Identitätsdienst", value: "Bereit", Icon: KeyRound },
-  { label: "Datenverbindung", value: "Geschützt", Icon: ShieldCheck },
-  { label: "Anfrage-System", value: "Online", Icon: Server },
-];
+const CRYPTO_CONFIG = [
+  { id: "bitcoin", name: "Bitcoin", symbol: "BTC", mark: "₿" },
+  { id: "ethereum", name: "Ethereum", symbol: "ETH", mark: "Ξ" },
+  { id: "monero", name: "Monero", symbol: "XMR", mark: "M" },
+  { id: "solana", name: "Solana", symbol: "SOL", mark: "S" },
+] as const;
 
+type CryptoId = (typeof CRYPTO_CONFIG)[number]["id"];
+type CryptoPrice = { eur: number; eur_24h_change: number };
+type CryptoPrices = Partial<Record<CryptoId, CryptoPrice>>;
+
+const EURO_PRICE = new Intl.NumberFormat("de-DE", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 2,
+});
+
+const PERCENT_CHANGE = new Intl.NumberFormat("de-DE", {
+  signDisplay: "always",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+function useCryptoPrices() {
+  const [prices, setPrices] = useState<CryptoPrices>({});
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadPrices() {
+      try {
+        const response = await fetch(
+          "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,monero,solana&vs_currencies=eur&include_24hr_change=true",
+          { signal: controller.signal },
+        );
+        if (!response.ok) throw new Error("Kursabruf fehlgeschlagen");
+        const data = (await response.json()) as CryptoPrices;
+        setPrices(data);
+        setUpdatedAt(new Date());
+        setFailed(false);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setFailed(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void loadPrices();
+    const interval = window.setInterval(() => void loadPrices(), 60_000);
+    return () => {
+      controller.abort();
+      window.clearInterval(interval);
+    };
+  }, []);
+
+  return { prices, loading, failed, updatedAt };
+}
+
+function CryptoBoard({
+  compact = false,
+  prices,
+  loading,
+  failed,
+  updatedAt,
+}: {
+  compact?: boolean;
+  prices: CryptoPrices;
+  loading: boolean;
+  failed: boolean;
+  updatedAt: Date | null;
+}) {
+
+  return (
+    <div className={compact ? "border-y border-ops-line py-4 lg:hidden" : "border border-ops-line bg-ops-panel/80"}>
+      <div className={`flex items-center justify-between ${compact ? "mb-3" : "border-b border-ops-line px-4 py-3"}`}>
+        <div className="flex items-center gap-2">
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand-light opacity-50" />
+            <span className="relative inline-flex size-2 rounded-full bg-brand-light" />
+          </span>
+          <span className="text-[10px] font-bold text-brand-light">LIVE-KURSE · EUR</span>
+        </div>
+        <span className="flex items-center gap-1.5 text-[9px] text-ops-muted">
+          <RefreshCw className={`size-3 ${loading ? "animate-spin" : ""}`} />
+          {updatedAt
+            ? `${updatedAt.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} UHR`
+            : failed
+              ? "NICHT VERFÜGBAR"
+              : "SYNCHRONISIERT"}
+        </span>
+      </div>
+
+      <div className={compact ? "grid grid-cols-2 gap-px bg-ops-line" : "divide-y divide-ops-line"}>
+        {CRYPTO_CONFIG.map((crypto, index) => {
+          const price = prices[crypto.id];
+          const positive = (price?.eur_24h_change ?? 0) >= 0;
+          const TrendIcon = positive ? TrendingUp : TrendingDown;
+          return (
+            <div
+              key={crypto.id}
+              className={`group flex items-center justify-between bg-ops-panel px-4 transition-colors hover:bg-ops-panel-strong ${compact ? "min-h-16 py-3" : "min-h-14 py-2.5"} ${index > 0 ? "animate-ops-enter-delay" : "animate-ops-enter"}`}
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex size-8 shrink-0 items-center justify-center border border-ops-line bg-ops-canvas text-sm font-bold text-brand-light transition-colors group-hover:border-brand/50">
+                  {crypto.mark}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-[12px] font-semibold text-ops-text">{compact ? crypto.symbol : crypto.name}</p>
+                  <p className="text-[9px] text-ops-muted">{compact ? "EUR" : `${crypto.symbol} / EUR`}</p>
+                </div>
+              </div>
+              <div className="ml-2 text-right tabular">
+                {loading && !price ? (
+                  <div className="h-3 w-16 animate-pulse bg-ops-line" />
+                ) : price ? (
+                  <>
+                    <p className="text-[11px] font-semibold text-ops-text">{EURO_PRICE.format(price.eur)}</p>
+                    <p className={`mt-0.5 flex items-center justify-end gap-1 text-[9px] ${positive ? "text-brand-light" : "text-destructive"}`}>
+                      <TrendIcon className="size-2.5" /> {PERCENT_CHANGE.format(price.eur_24h_change)}%
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-[10px] text-ops-muted">—</p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 function translateError(message: string): string {
   const m = message.toLowerCase();
   if (m.includes("invalid login credentials")) return "E-Mail oder Passwort ist nicht korrekt.";
@@ -68,11 +198,11 @@ function translateError(message: string): string {
 
 function AuthPage() {
   const navigate = useNavigate();
+  const crypto = useCryptoPrices();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordRepeat, setPasswordRepeat] = useState("");
-  const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -118,7 +248,6 @@ function AuthPage() {
           password,
           options: {
             emailRedirectTo: window.location.origin + "/auth",
-            data: { full_name: fullName.trim() },
           },
         });
         if (error) throw error;
@@ -165,8 +294,9 @@ function AuthPage() {
 
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-[1320px] items-center px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
         <div className="grid w-full animate-ops-enter overflow-hidden rounded-[6px] border border-ops-line bg-ops-panel-strong shadow-2xl lg:min-h-[720px] lg:grid-cols-12">
-          <section className="relative hidden overflow-hidden border-r border-ops-line p-10 lg:col-span-5 lg:flex lg:flex-col lg:justify-between xl:p-12">
+          <section className="relative hidden overflow-hidden border-r border-ops-line p-8 lg:col-span-5 lg:flex lg:flex-col xl:p-10">
             <div className="ops-grid pointer-events-none absolute inset-0 opacity-40" />
+            <div className="ops-scan pointer-events-none absolute inset-x-0 top-0 z-0 h-24" />
             <div className="pointer-events-none absolute top-0 left-0 h-24 w-px bg-brand" />
             <div className="pointer-events-none absolute top-0 left-0 h-px w-24 bg-brand" />
 
@@ -175,53 +305,32 @@ function AuthPage() {
                 <span className="size-2 animate-ops-pulse rounded-full bg-brand-light" />
                 LIVE-BETRIEB · ZENTRALE 01
               </div>
-              <p className="mt-16 text-[12px] font-medium text-ops-muted">INTERNER ZUGANG</p>
-              <h2 className="mt-4 max-w-md text-[42px] leading-[1.08] font-light text-ops-text xl:text-[48px]">
-                Die Zentrale für <span className="font-bold text-brand-light">sichere Abläufe.</span>
+              <p className="mt-8 text-[11px] font-medium text-ops-muted">INTERNER ZUGANG</p>
+              <h2 className="mt-3 max-w-md text-[34px] leading-[1.08] font-light text-ops-text xl:text-[40px]">
+                Märkte im Blick. <span className="font-bold text-brand-light">Abläufe im Griff.</span>
               </h2>
-              <p className="mt-6 max-w-md text-[15px] leading-7 text-ops-muted">
-                Ein zentraler Zugang für Anfragen, Kundendaten und die tägliche Disposition. Nur für
-                freigeschaltete Mitarbeiter.
+              <p className="mt-4 max-w-md text-[13px] leading-6 text-ops-muted">
+                Sicherer Zugang zur täglichen Disposition und zu aktuellen Marktsignalen. Nur für freigeschaltete Mitarbeiter.
               </p>
             </div>
 
-            <div className="relative z-10 animate-ops-enter-delay space-y-5">
-              <div className="border border-ops-line bg-ops-panel/80 p-5">
-                <div className="mb-4 flex items-center justify-between text-[11px] font-medium">
-                  <span className="text-ops-muted">SICHERE VERBINDUNG</span>
-                  <span className="flex items-center gap-1.5 text-brand-light">
-                    <Check className="size-3.5" /> AKTIV
-                  </span>
-                </div>
-                <div className="h-1 overflow-hidden bg-ops-canvas">
-                  <div className="h-full w-[88%] origin-left animate-ops-progress bg-brand-light" />
-                </div>
-                <div className="mt-5 grid grid-cols-3 divide-x divide-ops-line border-t border-ops-line pt-4">
-                  <div>
-                    <p className="text-[10px] text-ops-muted">STATUS</p>
-                    <p className="mt-1 text-xs font-semibold text-ops-text">Bereit</p>
-                  </div>
-                  <div className="pl-4">
-                    <p className="text-[10px] text-ops-muted">ZUGRIFF</p>
-                    <p className="mt-1 text-xs font-semibold text-ops-text">Intern</p>
-                  </div>
-                  <div className="pl-4">
-                    <p className="text-[10px] text-ops-muted">KANAL</p>
-                    <p className="mt-1 text-xs font-semibold text-ops-text">TLS</p>
-                  </div>
-                </div>
-              </div>
+            <div className="relative z-10 mt-7 flex-1 animate-ops-enter-delay">
+              <CryptoBoard {...crypto} />
+            </div>
 
-              <ul className="space-y-3">
-                {SYSTEM_CHECKS.map(({ label, value, Icon }) => (
-                  <li key={label} className="flex items-center justify-between text-[12px]">
-                    <span className="flex items-center gap-2.5 text-ops-muted">
-                      <Icon className="size-3.5 text-brand-light" /> {label}
-                    </span>
-                    <span className="text-ops-text">{value}</span>
-                  </li>
-                ))}
-              </ul>
+            <div className="relative z-10 mt-5 grid grid-cols-3 divide-x divide-ops-line border border-ops-line bg-ops-canvas/70 px-4 py-3">
+              <div>
+                <p className="text-[9px] text-ops-muted">STATUS</p>
+                <p className="mt-1 flex items-center gap-1.5 text-[11px] font-semibold text-ops-text"><Check className="size-3 text-brand-light" /> Bereit</p>
+              </div>
+              <div className="pl-4">
+                <p className="text-[9px] text-ops-muted">ZUGRIFF</p>
+                <p className="mt-1 text-[11px] font-semibold text-ops-text">Intern</p>
+              </div>
+              <div className="pl-4">
+                <p className="text-[9px] text-ops-muted">KANAL</p>
+                <p className="mt-1 text-[11px] font-semibold text-ops-text">TLS 1.3</p>
+              </div>
             </div>
           </section>
 
@@ -240,6 +349,7 @@ function AuthPage() {
                     <Activity className="size-4 text-brand-light" />
                     <span className="text-[11px] font-bold text-brand-light">SYSTEM ONLINE</span>
                   </div>
+                  <CryptoBoard compact {...crypto} />
                   <p className="text-[11px] font-bold text-brand-light">MITARBEITERPORTAL</p>
                   <h1 className="mt-3 text-[30px] leading-tight font-bold text-ops-text sm:text-[36px]">
                     {mode === "signin" ? "Willkommen zurück." : "Zugang beantragen."}
@@ -285,18 +395,6 @@ function AuthPage() {
                 ) : null}
 
                 <form className="mt-7 min-h-[290px] space-y-5" onSubmit={handleSubmit}>
-                  {mode === "signup" ? (
-                    <div className="space-y-2 animate-ops-enter">
-                      <Label htmlFor="fullName" className="text-[11px] font-bold text-ops-muted">
-                        VOR- UND NACHNAME
-                      </Label>
-                      <div className="relative">
-                        <User className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-ops-muted" />
-                        <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Max Mustermann" autoComplete="name" required className="h-12 rounded-[3px] border-ops-line bg-ops-canvas pl-11 text-ops-text shadow-none placeholder:text-ops-muted/60 focus-visible:border-brand focus-visible:ring-brand/30" />
-                      </div>
-                    </div>
-                  ) : null}
-
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-[11px] font-bold text-ops-muted">E-MAIL-ADRESSE</Label>
                     <div className="relative">
