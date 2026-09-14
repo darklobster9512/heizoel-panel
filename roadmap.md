@@ -19,3 +19,9 @@
 - [x] Zahlungsbereich einheitlich grün und ohne Trennlinien gestalten
 - [x] Zahlungsziel von 14 Tagen aus der Rechnung entfernen
 - [x] Typecheck und Vorschau-Build prüfen
+
+## 2026-09-14 Bestellungen im Adminbereich
+- [x] Tabelle orders mit eindeutiger Bestellnummer (Format 2609-74568)
+- [x] Reiter „Bestellungen" mit Tabelle, Suche und Filtern
+- [x] Detailseite mit Status und interner Notiz
+- [x] Öffentliche Bestellschnittstelle ohne Schlüssel
