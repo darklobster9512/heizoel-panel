@@ -2,6 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
+
+type BrandingRow = Database["public"]["Tables"]["brandings"]["Row"];
 
 const nullableText = (max: number) =>
   z
@@ -86,7 +89,7 @@ async function checkAdmin(
 
 async function withLogoUrl(
   supabase: { storage: { from: (bucket: string) => { createSignedUrl: (path: string, expiresIn: number) => Promise<{ data: { signedUrl: string } | null }> } } },
-  row: Record<string, unknown>,
+  row: BrandingRow,
 ): Promise<Branding> {
   const logoPath = typeof row.logo_path === "string" ? row.logo_path : null;
   const signed = logoPath

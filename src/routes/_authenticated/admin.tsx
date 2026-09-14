@@ -5,8 +5,10 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   Euro,
+  Fuel,
   Loader2,
   Phone,
+  Tags,
 } from "lucide-react";
 import { useEffect } from "react";
 
