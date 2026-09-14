@@ -6,7 +6,7 @@ import { Logo } from "@/components/landing/logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
-export type NavItem = { label: string; icon: ReactNode; to?: "/admin" | "/admin/brandings" | "/admin/emails"; active?: boolean };
+export type NavItem = { label: string; icon: ReactNode; to?: "/admin" | "/admin/brandings" | "/admin/bestellungen" | "/admin/emails"; active?: boolean };
 
 export function InternalShell({
   role,
