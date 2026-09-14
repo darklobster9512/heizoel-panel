@@ -47,6 +47,7 @@ const GREEN = "#22C55E";
 const GREEN_DARK = "#15803D";
 const GREEN_SOFT = "#F2FCF5";
 const GREEN_BORDER = "#BBF7D0";
+const GOLD = "#F59E0B";
 const TEXT = "#2E332F";
 const HEADING = "#1A1F1C";
 const MUTED = "#8A918B";
@@ -74,7 +75,7 @@ function hostname(domain: string | null, fallback: string) {
   }
 }
 
-function stars(size: number, color = GREEN) {
+function stars(size: number, color = GOLD) {
   return `<span style="font:700 ${size}px/${size + 4}px ${FONT};color:${color};letter-spacing:2px">&#9733;&#9733;&#9733;&#9733;&#9733;</span>`;
 }
 
@@ -86,7 +87,7 @@ function logoBlock(branding: EmailBranding, shop: string, big: boolean) {
     <td valign="middle" style="padding-right:12px"><div style="width:${big ? 14 : 12}px;height:${big ? 58 : 48}px;border-radius:3px;background:${GREEN};font-size:0;line-height:0">&nbsp;</div></td>
     <td valign="middle">
       <div style="font:700 ${big ? 34 : 28}px/${big ? 36 : 30}px ${FONT};color:${HEADING};letter-spacing:-.5px;text-transform:uppercase">${shop}</div>
-      <div style="margin-top:4px">${stars(big ? 17 : 15)} <span style="font:700 ${big ? 17 : 15}px/20px ${FONT};color:${HEADING}">4,99</span></div>
+      <div style="margin-top:4px">${stars(big ? 17 : 15)} <span style="font:700 ${big ? 17 : 15}px/20px ${FONT};color:${HEADING}">4,9</span></div>
     </td>
   </tr></table>`;
 }
@@ -235,8 +236,8 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:6px"><tr>
   ${trustCell("Festpreis", "Preisgarantie", "Ihr Preis bleibt fest", false)}
-  ${trustCell(stars(13), "33.000+ Kunden", "4,99 von 5 Sternen", true)}
-  ${trustCell("ab 500 Liter", "Lieferung inklusive", "Deutschlandweit", true)}
+  ${trustCell(stars(13), "25.000+ Kunden", "4,9 von 5 Sternen", true)}
+  ${trustCell("ab 1500 Liter", "Lieferung inklusive", "Deutschlandweit", true)}
 </tr></table>`, "0 32px 26px")}
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
@@ -283,7 +284,7 @@ ${section(`<div style="text-align:center;font:700 10px/14px ${FONT};color:${MUTE
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
   ${infoChip("Registriert", register)}
   ${infoChip("USt-IdNr.", vat)}
-  ${infoChip("Bewertungen", `${stars(11)} 4,99 / 5`)}
+  ${infoChip("Bewertungen", `${stars(11)} 4,9 / 5`)}
 </tr></table>
 <p style="margin:16px 0 18px;text-align:center;font:400 11px/18px ${FONT};color:#A3A9A4">Bei Neukunden kann je nach Zahlungsart eine Teilzahlung vor Lieferung anfallen. Details besprechen wir mit Ihnen persönlich im Bestätigungsgespräch.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>
@@ -291,7 +292,7 @@ ${section(`<div style="text-align:center;font:700 10px/14px ${FONT};color:${MUTE
   <td width="10">&nbsp;</td>
   <td style="padding:7px 14px;border:1px solid ${LINE};border-radius:20px;background:#ffffff;font:700 12px/16px ${FONT};color:${MUTED}">&#9733; Trusted Shops</td>
 </tr></table>
-<p style="margin:14px 0 0;text-align:center;font:400 12px/17px ${FONT};color:${MUTED}">${stars(12)} <strong style="color:${HEADING}">4,99 / 5</strong> — 33.000+ Bewertungen</p>`, "24px 32px", SURFACE)}
+<p style="margin:14px 0 0;text-align:center;font:400 12px/17px ${FONT};color:${MUTED}">${stars(12)} <strong style="color:${HEADING}">4,9 / 5</strong> — 25.000+ Bewertungen</p>`, "24px 32px", SURFACE)}
 
 ${section(`<div style="text-align:center">
   <table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr><td>${logoBlock(branding, shop, true)}</td></tr></table>
