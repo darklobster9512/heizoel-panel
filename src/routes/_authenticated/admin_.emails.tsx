@@ -8,6 +8,7 @@ import { AdminPageShell } from "@/components/internal/admin-page-shell";
 import { Button } from "@/components/ui/button";
 import { listBrandings } from "@/lib/brandings.functions";
 import { DEMO_ORDER, renderOrderConfirmationEmail, type EmailBranding } from "@/lib/email-templates/order-confirmation";
+import { DEMO_INVOICE, renderOrderInvoiceEmail } from "@/lib/email-templates/order-invoice";
 
 export const Route = createFileRoute("/_authenticated/admin_/emails")({
   head: () => ({ meta: [
@@ -35,14 +36,24 @@ const FALLBACK: EmailBranding = {
   email: "info@heizoel-online.com",
   domain: "https://heizoel-online.com",
   logoUrl: null,
+  accountHolder: null,
+  iban: null,
+  bankName: null,
+  bic: null,
 };
 
-const TEMPLATES = [{ id: "order-confirmation", label: "Auftragsbestätigung", hint: "Wird direkt nach dem Absenden der Bestellung versendet." }] as const;
+type TemplateId = "order-confirmation" | "order-invoice";
+
+const TEMPLATES: { id: TemplateId; label: string; hint: string }[] = [
+  { id: "order-confirmation", label: "Auftragsbestätigung", hint: "Wird direkt nach dem Absenden der Bestellung versendet." },
+  { id: "order-invoice", label: "Rechnung", hint: "Mit Rechnungsübersicht und Überweisungsdaten (Bankverbindung aus dem Branding)." },
+];
 
 function EmailsPage() {
   const fetchBrandings = useServerFn(listBrandings);
   const { data, isPending, isError, refetch } = useQuery({ queryKey: ["brandings"], queryFn: () => fetchBrandings({}) });
   const [brandingId, setBrandingId] = useState<string>("demo");
+  const [templateId, setTemplateId] = useState<TemplateId>("order-confirmation");
   const [width, setWidth] = useState<"desktop" | "mobile">("desktop");
 
   const selected = useMemo<EmailBranding>(() => {
@@ -50,7 +61,14 @@ function EmailsPage() {
     return branding ?? FALLBACK;
   }, [data, brandingId]);
 
-  const html = useMemo(() => renderOrderConfirmationEmail(selected, DEMO_ORDER), [selected]);
+  const html = useMemo(
+    () => (templateId === "order-invoice" ? renderOrderInvoiceEmail(selected, DEMO_INVOICE) : renderOrderConfirmationEmail(selected, DEMO_ORDER)),
+    [selected, templateId],
+  );
+
+  const subject = templateId === "order-invoice"
+    ? `Rechnung ${DEMO_INVOICE.invoiceNumber} — ${selected.shopName ?? "Heizöl Shop"}`
+    : `Bestellbestätigung ${DEMO_ORDER.orderNumber} — ${selected.shopName ?? "Heizöl Shop"}`;
 
   return (
     <AdminPageShell active="emails">
@@ -71,12 +89,20 @@ function EmailsPage() {
           <div className="rounded-lg border border-line bg-card p-4">
             <p className="text-[10px] font-semibold tracking-wide text-muted-custom uppercase">Vorlage</p>
             <div className="mt-3 space-y-2">
-              {TEMPLATES.map((template) => (
-                <div key={template.id} className="rounded-md border border-brand/40 bg-brand-soft/50 p-3">
-                  <p className="flex items-center gap-2 text-[13px] font-bold text-conditions"><Mail className="size-4 text-brand-hover" /> {template.label}</p>
-                  <p className="mt-1 text-[12px] text-muted-custom">{template.hint}</p>
-                </div>
-              ))}
+              {TEMPLATES.map((template) => {
+                const active = templateId === template.id;
+                return (
+                  <button
+                    key={template.id}
+                    type="button"
+                    onClick={() => setTemplateId(template.id)}
+                    className={`w-full rounded-md border p-3 text-left transition ${active ? "border-brand/40 bg-brand-soft/50" : "border-line bg-background hover:border-brand/40"}`}
+                  >
+                    <p className="flex items-center gap-2 text-[13px] font-bold text-conditions"><Mail className={`size-4 ${active ? "text-brand-hover" : "text-muted-custom"}`} /> {template.label}</p>
+                    <p className="mt-1 text-[12px] text-muted-custom">{template.hint}</p>
+                  </button>
+                );
+              })}
               <p className="px-1 text-[11px] text-muted-custom">Weitere Vorlagen folgen.</p>
             </div>
           </div>
@@ -106,7 +132,7 @@ function EmailsPage() {
 
         <div className="overflow-hidden rounded-lg border border-line bg-surface">
           <div className="flex items-center justify-between border-b border-line bg-card px-4 py-2.5">
-            <p className="text-[12px] font-semibold text-conditions">Betreff: Bestellbestätigung {DEMO_ORDER.orderNumber} — {selected.shopName ?? "Heizöl Shop"}</p>
+            <p className="text-[12px] font-semibold text-conditions">Betreff: {subject}</p>
             <span className="text-[11px] text-muted-custom">{width === "desktop" ? "640 px" : "390 px"}</span>
           </div>
           <div className="flex justify-center p-4">
