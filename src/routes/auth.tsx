@@ -69,7 +69,7 @@ const PERCENT_CHANGE = new Intl.NumberFormat("de-DE", {
   maximumFractionDigits: 2,
 });
 
-function CryptoBoard({ compact = false }: { compact?: boolean }) {
+function useCryptoPrices() {
   const [prices, setPrices] = useState<CryptoPrices>({});
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
@@ -104,6 +104,23 @@ function CryptoBoard({ compact = false }: { compact?: boolean }) {
       window.clearInterval(interval);
     };
   }, []);
+
+  return { prices, loading, failed, updatedAt };
+}
+
+function CryptoBoard({
+  compact = false,
+  prices,
+  loading,
+  failed,
+  updatedAt,
+}: {
+  compact?: boolean;
+  prices: CryptoPrices;
+  loading: boolean;
+  failed: boolean;
+  updatedAt: Date | null;
+}) {
 
   return (
     <div className={compact ? "border-y border-ops-line py-4 lg:hidden" : "border border-ops-line bg-ops-panel/80"}>
@@ -140,8 +157,8 @@ function CryptoBoard({ compact = false }: { compact?: boolean }) {
                   {crypto.mark}
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-[12px] font-semibold text-ops-text">{crypto.name}</p>
-                  <p className="text-[9px] text-ops-muted">{crypto.symbol} / EUR</p>
+                  <p className="truncate text-[12px] font-semibold text-ops-text">{compact ? crypto.symbol : crypto.name}</p>
+                  <p className="text-[9px] text-ops-muted">{compact ? "EUR" : `${crypto.symbol} / EUR`}</p>
                 </div>
               </div>
               <div className="ml-2 text-right tabular">
@@ -181,6 +198,7 @@ function translateError(message: string): string {
 
 function AuthPage() {
   const navigate = useNavigate();
+  const crypto = useCryptoPrices();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -297,7 +315,7 @@ function AuthPage() {
             </div>
 
             <div className="relative z-10 mt-7 flex-1 animate-ops-enter-delay">
-              <CryptoBoard />
+              <CryptoBoard {...crypto} />
             </div>
 
             <div className="relative z-10 mt-5 grid grid-cols-3 divide-x divide-ops-line border border-ops-line bg-ops-canvas/70 px-4 py-3">
@@ -331,7 +349,7 @@ function AuthPage() {
                     <Activity className="size-4 text-brand-light" />
                     <span className="text-[11px] font-bold text-brand-light">SYSTEM ONLINE</span>
                   </div>
-                  <CryptoBoard compact />
+                  <CryptoBoard compact {...crypto} />
                   <p className="text-[11px] font-bold text-brand-light">MITARBEITERPORTAL</p>
                   <h1 className="mt-3 text-[30px] leading-tight font-bold text-ops-text sm:text-[36px]">
                     {mode === "signin" ? "Willkommen zurück." : "Zugang beantragen."}
