@@ -12,12 +12,22 @@ export type InvoiceCompany = {
   shopName: string;
 };
 
+export type InvoiceBank = {
+  accountHolder: string;
+  bankName: string;
+  iban: string;
+  bic: string;
+  amount: string;
+  reference: string;
+};
+
 export type InvoiceModel = {
   invoiceNumber: string;
   customerNumber: string;
   date: string;
   paymentLabel: string;
   company: InvoiceCompany;
+  bank: InvoiceBank;
   recipientLines: string[];
   salutation: string;
   deliveryWindow: string;
@@ -43,6 +53,10 @@ export type InvoiceBranding = {
   vatId: string | null;
   email: string | null;
   logoUrl: string | null;
+  accountHolder: string | null;
+  iban: string | null;
+  bankName: string | null;
+  bic: string | null;
 };
 
 export const INVOICE_FALLBACK_BRANDING: InvoiceBranding = {
@@ -56,6 +70,10 @@ export const INVOICE_FALLBACK_BRANDING: InvoiceBranding = {
   vatId: "DE289578199",
   email: "info@heizoel-online.com",
   logoUrl: null,
+  accountHolder: "Muster-Energie GmbH",
+  iban: "DE89 3704 0044 0532 0130 00",
+  bankName: "Commerzbank AG",
+  bic: "COBADEFFXXX",
 };
 
 export const euro = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
