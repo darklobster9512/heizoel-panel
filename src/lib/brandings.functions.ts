@@ -35,6 +35,10 @@ const brandingInputSchema = z.object({
   resendSenderName: nullableText(160),
   sevenApiKey: nullableText(500),
   sevenSenderName: nullableText(11),
+  accountHolder: nullableText(160),
+  iban: nullableText(40),
+  bankName: nullableText(160),
+  bic: nullableText(20),
 });
 
 export type BrandingInput = z.input<typeof brandingInputSchema>;
@@ -63,6 +67,10 @@ export type Branding = {
   sevenApiKey: string | null;
   sevenConfigured: boolean;
   sevenSenderName: string | null;
+  accountHolder: string | null;
+  iban: string | null;
+  bankName: string | null;
+  bic: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -121,6 +129,10 @@ async function withLogoUrl(
     sevenApiKey: null,
     sevenConfigured: Boolean(row.seven_api_key),
     sevenSenderName: typeof row.seven_sender_name === "string" ? row.seven_sender_name : null,
+    accountHolder: typeof row.account_holder === "string" ? row.account_holder : null,
+    iban: typeof row.iban === "string" ? row.iban : null,
+    bankName: typeof row.bank_name === "string" ? row.bank_name : null,
+    bic: typeof row.bic === "string" ? row.bic : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -188,6 +200,10 @@ export const saveBranding = createServerFn({ method: "POST" })
       resend_sender_name: data.resendSenderName,
       seven_api_key: savedSevenApiKey,
       seven_sender_name: data.sevenSenderName,
+      account_holder: data.accountHolder,
+      iban: data.iban,
+      bank_name: data.bankName,
+      bic: data.bic,
       updated_by: context.userId,
     };
 

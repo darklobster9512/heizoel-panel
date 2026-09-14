@@ -16,6 +16,9 @@ export type Database = {
     Tables: {
       brandings: {
         Row: {
+          account_holder: string | null
+          bank_name: string | null
+          bic: string | null
           city: string | null
           commercial_register_number: string | null
           company_name: string | null
@@ -23,6 +26,7 @@ export type Database = {
           created_by: string | null
           domain: string | null
           email: string | null
+          iban: string | null
           id: string
           logo_path: string | null
           managing_director: string | null
@@ -42,6 +46,9 @@ export type Database = {
           vat_id: string | null
         }
         Insert: {
+          account_holder?: string | null
+          bank_name?: string | null
+          bic?: string | null
           city?: string | null
           commercial_register_number?: string | null
           company_name?: string | null
@@ -49,6 +56,7 @@ export type Database = {
           created_by?: string | null
           domain?: string | null
           email?: string | null
+          iban?: string | null
           id?: string
           logo_path?: string | null
           managing_director?: string | null
@@ -68,6 +76,9 @@ export type Database = {
           vat_id?: string | null
         }
         Update: {
+          account_holder?: string | null
+          bank_name?: string | null
+          bic?: string | null
           city?: string | null
           commercial_register_number?: string | null
           company_name?: string | null
@@ -75,6 +86,7 @@ export type Database = {
           created_by?: string | null
           domain?: string | null
           email?: string | null
+          iban?: string | null
           id?: string
           logo_path?: string | null
           managing_director?: string | null

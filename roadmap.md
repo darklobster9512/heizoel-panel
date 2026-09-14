@@ -8,3 +8,8 @@
 - [x] Branding-Übersicht mit detaillierten Shop-Karten bauen
 - [x] Branding als Entwurf anlegen und später bearbeiten
 - [x] Admin-Navigation, Zugriffsschutz und mobile Darstellung prüfen
+## 2026-09-14 Rechnungs-E-Mail-Vorlage
+- [x] Bankdaten-Felder (Kontoinhaber, IBAN, Bank, BIC) in brandings-Tabelle, Formular und Serverfunktionen
+- [x] Gemeinsame E-Mail-Bausteine in email-shared.ts ausgelagert
+- [x] Neue Vorlage „Rechnung" mit Überweisungsdaten + Auswahl auf /admin/emails
+- [x] Typecheck und Build OK
