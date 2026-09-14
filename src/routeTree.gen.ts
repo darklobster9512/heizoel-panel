@@ -16,6 +16,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedCallerRouteImport } from './routes/_authenticated/caller'
 import { Route as AuthenticatedWeiterleitungRouteImport } from './routes/_authenticated/weiterleitung'
 import { Route as AuthenticatedAdminBrandingsRouteImport } from './routes/_authenticated/admin_.brandings'
+import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin_.emails'
 import { Route as AuthenticatedAdminBrandingsBrandingIdRouteImport } from './routes/_authenticated/admin_.brandings_.$brandingId'
 import { Route as AuthenticatedAdminBrandingsNeuRouteImport } from './routes/_authenticated/admin_.brandings_.neu'
 
@@ -55,6 +56,12 @@ const AuthenticatedAdminBrandingsRoute =
     path: '/admin/brandings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminEmailsRoute =
+  AuthenticatedAdminEmailsRouteImport.update({
+    id: '/admin_/emails',
+    path: '/admin/emails',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminBrandingsBrandingIdRoute =
   AuthenticatedAdminBrandingsBrandingIdRouteImport.update({
     id: '/admin_/brandings_/$brandingId',
@@ -75,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/caller': typeof AuthenticatedCallerRoute
   '/weiterleitung': typeof AuthenticatedWeiterleitungRoute
   '/admin/brandings': typeof AuthenticatedAdminBrandingsRoute
+  '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -85,6 +93,7 @@ export interface FileRoutesByTo {
   '/caller': typeof AuthenticatedCallerRoute
   '/weiterleitung': typeof AuthenticatedWeiterleitungRoute
   '/admin/brandings': typeof AuthenticatedAdminBrandingsRoute
+  '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -97,6 +106,7 @@ export interface FileRoutesById {
   '/_authenticated/caller': typeof AuthenticatedCallerRoute
   '/_authenticated/weiterleitung': typeof AuthenticatedWeiterleitungRoute
   '/_authenticated/admin_/brandings': typeof AuthenticatedAdminBrandingsRoute
+  '/_authenticated/admin_/emails': typeof AuthenticatedAdminEmailsRoute
   '/_authenticated/admin_/brandings_/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/_authenticated/admin_/brandings_/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/caller'
     | '/weiterleitung'
     | '/admin/brandings'
+    | '/admin/emails'
     | '/admin/brandings/$brandingId'
     | '/admin/brandings/neu'
   fileRoutesByTo: FileRoutesByTo
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/caller'
     | '/weiterleitung'
     | '/admin/brandings'
+    | '/admin/emails'
     | '/admin/brandings/$brandingId'
     | '/admin/brandings/neu'
   id:
@@ -130,6 +142,7 @@ export interface FileRouteTypes {
     | '/_authenticated/caller'
     | '/_authenticated/weiterleitung'
     | '/_authenticated/admin_/brandings'
+    | '/_authenticated/admin_/emails'
     | '/_authenticated/admin_/brandings_/$brandingId'
     | '/_authenticated/admin_/brandings_/neu'
   fileRoutesById: FileRoutesById
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBrandingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/emails': {
+      id: '/_authenticated/admin_/emails'
+      path: '/admin/emails'
+      fullPath: '/admin/emails'
+      preLoaderRoute: typeof AuthenticatedAdminEmailsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/brandings_/$brandingId': {
       id: '/_authenticated/admin_/brandings_/$brandingId'
       path: '/admin/brandings/$brandingId'
@@ -213,6 +233,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCallerRoute: typeof AuthenticatedCallerRoute
   AuthenticatedWeiterleitungRoute: typeof AuthenticatedWeiterleitungRoute
   AuthenticatedAdminBrandingsRoute: typeof AuthenticatedAdminBrandingsRoute
+  AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
   AuthenticatedAdminBrandingsBrandingIdRoute: typeof AuthenticatedAdminBrandingsBrandingIdRoute
   AuthenticatedAdminBrandingsNeuRoute: typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -222,6 +243,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCallerRoute: AuthenticatedCallerRoute,
   AuthenticatedWeiterleitungRoute: AuthenticatedWeiterleitungRoute,
   AuthenticatedAdminBrandingsRoute: AuthenticatedAdminBrandingsRoute,
+  AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
   AuthenticatedAdminBrandingsBrandingIdRoute:
     AuthenticatedAdminBrandingsBrandingIdRoute,
   AuthenticatedAdminBrandingsNeuRoute: AuthenticatedAdminBrandingsNeuRoute,
