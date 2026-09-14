@@ -8,7 +8,7 @@ import { getAdminNav } from "@/components/internal/admin-nav";
 import { InternalShell } from "@/components/internal/app-shell";
 import { getMyAccount } from "@/lib/roles.functions";
 
-export function AdminPageShell({ children, active = "brandings" }: { children: ReactNode; active?: "overview" | "brandings" | "bank" | "orders" | "emails" | "sms" }) {
+export function AdminPageShell({ children, active = "brandings" }: { children: ReactNode; active?: "overview" | "brandings" | "bank" | "orders" | "emails" | "sms" | "telegram" }) {
   const navigate = useNavigate();
   const fetchAccount = useServerFn(getMyAccount);
   const { data, isPending } = useQuery({ queryKey: ["my-account"], queryFn: () => fetchAccount({}) });

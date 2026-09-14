@@ -81,7 +81,7 @@ export const Route = createFileRoute("/api/public/orders")({
 
         const { data: branding, error: brandingError } = await supabaseAdmin
           .from("brandings")
-          .select("id")
+          .select("id, shop_name, company_name")
           .or(`public_id.eq.${data.brandingId},id.eq.${data.brandingId}`)
           .maybeSingle();
         if (brandingError) return json({ ok: false, error: "Branding konnte nicht geprüft werden." }, 500);
@@ -116,6 +116,27 @@ export const Route = createFileRoute("/api/public/orders")({
             .select("id, order_number")
             .single();
           if (!error && saved) {
+            try {
+              const { sendOrderNotification } = await import("@/lib/telegram/notify.server");
+              const addr = data.deliveryAddress;
+              const customerName = [addr.firstName, addr.lastName].filter(Boolean).join(" ") || addr.company || null;
+              await sendOrderNotification({
+                orderNumber: String(saved.order_number),
+                brandingId: String(branding.id),
+                brandingName: branding.shop_name ?? branding.company_name ?? null,
+                customerName,
+                email: data.email,
+                phone: data.phone ?? null,
+                liters: data.liters,
+                variant: data.variant,
+                total: data.total,
+                pricePer100: data.pricePer100,
+                postalCode: addr.plz ?? null,
+                city: addr.city ?? null,
+              });
+            } catch (notifyError) {
+              console.error("[orders] telegram notification failed", notifyError);
+            }
             return json({ ok: true, orderNumber: saved.order_number, orderId: saved.id }, 201);
           }
           if (error && error.code !== "23505") {
