@@ -31,14 +31,12 @@ import {
 export type BankDetails = {
   accountHolder: string;
   iban: string;
-  bankName: string;
   bic: string;
 };
 
 export const DEMO_BANK: BankDetails = {
   accountHolder: "Muster-Energie GmbH",
   iban: "DE89 3704 0044 0532 0130 00",
-  bankName: "Musterbank",
   bic: "COBADEFFXXX",
 };
 
@@ -77,10 +75,9 @@ export const DEMO_INVOICE: OrderInvoiceData = {
 function bankFrom(branding: EmailBranding): BankDetails {
   const iban = (branding.iban ?? "").trim();
   const accountHolder = (branding.accountHolder ?? branding.companyName ?? "").trim();
-  const bankName = (branding.bankName ?? "").trim();
   const bic = (branding.bic ?? "").trim();
-  if (!iban || !accountHolder || !bankName) return DEMO_BANK;
-  return { accountHolder, iban, bankName, bic: bic || DEMO_BANK.bic };
+  if (!iban || !accountHolder) return DEMO_BANK;
+  return { accountHolder, iban, bic: bic || DEMO_BANK.bic };
 }
 
 function bankRow(label: string, value: string, mono = false) {
