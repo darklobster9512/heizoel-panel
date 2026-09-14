@@ -108,8 +108,8 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
   const paragraphs = [
     `${model.salutation},`,
     "vielen Dank für Ihre Bestellung. Mit der Vorauszahlung sichern Sie sich den heutigen Tagespreis.",
-    "Diese Übersicht fasst Ihre Bestellung zusammen. Die Zahlungsdaten senden wir Ihnen im Anschluss",
-    "per E-Mail zu — bitte überweisen Sie erst dann.",
+    `Bitte überweisen Sie den Gesamtbetrag von ${model.bank.amount} unter Angabe der`,
+    `Rechnungsnummer ${model.invoiceNumber} auf das unten genannte Konto (IBAN ${model.bank.iban}).`,
   ];
   for (const line of paragraphs) {
     draw(ctx, line, M, y, 9.5, false, TEXT);
@@ -159,13 +159,34 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
   drawRight(ctx, "Gesamtbetrag inkl. MwSt.", right - 118, y, 11, true, HEADING);
   drawRight(ctx, euro.format(model.gross), right, y, 11.5, true, HEADING);
 
+  // Zahlungsdaten
+  y -= 26;
+  const bankHeight = 78;
+  page.drawRectangle({ x: M, y: y - bankHeight, width: right - M, height: bankHeight, color: GREEN_SOFT });
+  page.drawRectangle({ x: M, y: y - bankHeight, width: 2.5, height: bankHeight, color: GREEN });
+  draw(ctx, "ZAHLUNGSDATEN · BITTE ÜBERWEISEN SIE AUF FOLGENDES KONTO", M + 12, y - 16, 7, true, GREEN_DARK);
+  const bankCols: [string, string, number][] = [
+    ["Empfänger", model.bank.accountHolder, M + 12],
+    ["Bank", model.bank.bankName, M + 150],
+    ["IBAN", model.bank.iban, M + 270],
+    ["BIC", model.bank.bic, M + 430],
+  ];
+  for (const [label, value, x] of bankCols) {
+    draw(ctx, label, x, y - 34, 7, false, MUTED);
+    draw(ctx, value, x, y - 47, 9, true, HEADING);
+  }
+  page.drawRectangle({ x: M + 12, y: y - 56, width: right - M - 24, height: 0.6, color: GREEN });
+  draw(ctx, `Verwendungszweck: ${model.bank.reference}`, M + 12, y - 70, 8.5, false, TEXT);
+  drawRight(ctx, model.bank.amount, right - 12, y - 70, 11, true, GREEN_DARK);
+  y -= bankHeight;
+
   // Fußzeile
   const fy = M + 52;
   page.drawRectangle({ x: M, y: fy, width: right - M, height: 0.6, color: LINE });
   const cols: [number, string[]][] = [
     [M, [model.company.name, model.company.street, model.company.zipCity, model.company.email]],
     [M + 165, ["Handelsregister", model.company.registryCourt, model.company.registerNumber, `USt-IdNr. ${model.company.vatId}`]],
-    [M + 330, ["Zahlung", "Die Zahlungsdaten erhalten Sie", "mit der Zahlungsaufforderung", "per E-Mail."]],
+    [M + 330, ["Zahlung", model.bank.accountHolder, model.bank.bankName, `IBAN ${model.bank.iban}`]],
   ];
   for (const [x, lines] of cols) {
     let cy = fy - 12;
