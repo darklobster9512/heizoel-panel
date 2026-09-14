@@ -83,7 +83,11 @@ export function renderInvoiceHtml(model: InvoiceModel) {
     <div style="font:700 17px/24px ${FONT};color:${HEADING}">Rechnung <span style="font:400 12px/24px ${FONT};color:${MUTED}">Nr. ${esc(model.invoiceNumber)}</span></div>
     <p style="margin:10px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">${esc(model.salutation)},</p>
     <p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">vielen Dank für Ihre Bestellung. Mit der Vorauszahlung sichern Sie sich den heutigen Tagespreis.</p>
-    <p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Bitte überweisen Sie den Gesamtbetrag von <strong>${esc(model.bank.amount)}</strong> unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}).</p>
+    ${
+      model.bank.isDeposit
+        ? `<p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Wir bitten um eine Anzahlung von 50 % (<strong>${esc(model.bank.amount)}</strong>) unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}). Den Restbetrag von <strong>${esc(model.bank.remaining ?? "")}</strong> zahlen Sie ${model.paymentLabel === "EC-Karte" ? "bei Lieferung vor Ort per EC-Karte" : "bei Lieferung vor Ort in bar"}.</p>`
+        : `<p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Bitte überweisen Sie den Gesamtbetrag von <strong>${esc(model.bank.amount)}</strong> unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}).</p>`
+    }
   </div>
 
   <div style="margin-top:7mm;background:${GREEN_SOFT};border-left:3px solid ${GREEN};padding:12px 14px">
