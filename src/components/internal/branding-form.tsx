@@ -67,7 +67,7 @@ function Field({ id, label, value, onChange, required, type = "text", placeholde
   onChange: (key: keyof FormValues, value: string) => void;
   required?: boolean;
   type?: string;
-  placeholder?: string;
+  placeholder?: string | undefined;
   maxLength?: number;
 }) {
   return (
