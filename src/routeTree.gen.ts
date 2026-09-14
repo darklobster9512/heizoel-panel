@@ -15,9 +15,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCallerRouteImport } from './routes/_authenticated/caller'
 import { Route as AuthenticatedWeiterleitungRouteImport } from './routes/_authenticated/weiterleitung'
+import { Route as AuthenticatedAdminBestellungenRouteImport } from './routes/_authenticated/admin_.bestellungen'
 import { Route as AuthenticatedAdminBrandingsRouteImport } from './routes/_authenticated/admin_.brandings'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin_.emails'
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
+import { Route as AuthenticatedAdminBestellungenOrderIdRouteImport } from './routes/_authenticated/admin_.bestellungen_.$orderId'
 import { Route as AuthenticatedAdminBrandingsBrandingIdRouteImport } from './routes/_authenticated/admin_.brandings_.$brandingId'
 import { Route as AuthenticatedAdminBrandingsNeuRouteImport } from './routes/_authenticated/admin_.brandings_.neu'
 
@@ -51,6 +53,12 @@ const AuthenticatedWeiterleitungRoute =
     path: '/weiterleitung',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminBestellungenRoute =
+  AuthenticatedAdminBestellungenRouteImport.update({
+    id: '/admin_/bestellungen',
+    path: '/admin/bestellungen',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminBrandingsRoute =
   AuthenticatedAdminBrandingsRouteImport.update({
     id: '/admin_/brandings',
@@ -68,6 +76,12 @@ const ApiPublicOrdersRoute = ApiPublicOrdersRouteImport.update({
   path: '/api/public/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminBestellungenOrderIdRoute =
+  AuthenticatedAdminBestellungenOrderIdRouteImport.update({
+    id: '/admin_/bestellungen_/$orderId',
+    path: '/admin/bestellungen/$orderId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminBrandingsBrandingIdRoute =
   AuthenticatedAdminBrandingsBrandingIdRouteImport.update({
     id: '/admin_/brandings_/$brandingId',
@@ -87,9 +101,11 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/caller': typeof AuthenticatedCallerRoute
   '/weiterleitung': typeof AuthenticatedWeiterleitungRoute
+  '/admin/bestellungen': typeof AuthenticatedAdminBestellungenRoute
   '/admin/brandings': typeof AuthenticatedAdminBrandingsRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
+  '/admin/bestellungen/$orderId': typeof AuthenticatedAdminBestellungenOrderIdRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -99,9 +115,11 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/caller': typeof AuthenticatedCallerRoute
   '/weiterleitung': typeof AuthenticatedWeiterleitungRoute
+  '/admin/bestellungen': typeof AuthenticatedAdminBestellungenRoute
   '/admin/brandings': typeof AuthenticatedAdminBrandingsRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
+  '/admin/bestellungen/$orderId': typeof AuthenticatedAdminBestellungenOrderIdRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -113,9 +131,11 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/caller': typeof AuthenticatedCallerRoute
   '/_authenticated/weiterleitung': typeof AuthenticatedWeiterleitungRoute
+  '/_authenticated/admin_/bestellungen': typeof AuthenticatedAdminBestellungenRoute
   '/_authenticated/admin_/brandings': typeof AuthenticatedAdminBrandingsRoute
   '/_authenticated/admin_/emails': typeof AuthenticatedAdminEmailsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
+  '/_authenticated/admin_/bestellungen_/$orderId': typeof AuthenticatedAdminBestellungenOrderIdRoute
   '/_authenticated/admin_/brandings_/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/_authenticated/admin_/brandings_/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -127,9 +147,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/caller'
     | '/weiterleitung'
+    | '/admin/bestellungen'
     | '/admin/brandings'
     | '/admin/emails'
     | '/api/public/orders'
+    | '/admin/bestellungen/$orderId'
     | '/admin/brandings/$brandingId'
     | '/admin/brandings/neu'
   fileRoutesByTo: FileRoutesByTo
@@ -139,9 +161,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/caller'
     | '/weiterleitung'
+    | '/admin/bestellungen'
     | '/admin/brandings'
     | '/admin/emails'
     | '/api/public/orders'
+    | '/admin/bestellungen/$orderId'
     | '/admin/brandings/$brandingId'
     | '/admin/brandings/neu'
   id:
@@ -152,9 +176,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/caller'
     | '/_authenticated/weiterleitung'
+    | '/_authenticated/admin_/bestellungen'
     | '/_authenticated/admin_/brandings'
     | '/_authenticated/admin_/emails'
     | '/api/public/orders'
+    | '/_authenticated/admin_/bestellungen_/$orderId'
     | '/_authenticated/admin_/brandings_/$brandingId'
     | '/_authenticated/admin_/brandings_/neu'
   fileRoutesById: FileRoutesById
@@ -210,6 +236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWeiterleitungRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/bestellungen': {
+      id: '/_authenticated/admin_/bestellungen'
+      path: '/admin/bestellungen'
+      fullPath: '/admin/bestellungen'
+      preLoaderRoute: typeof AuthenticatedAdminBestellungenRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/brandings': {
       id: '/_authenticated/admin_/brandings'
       path: '/admin/brandings'
@@ -230,6 +263,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/orders'
       preLoaderRoute: typeof ApiPublicOrdersRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin_/bestellungen_/$orderId': {
+      id: '/_authenticated/admin_/bestellungen_/$orderId'
+      path: '/admin/bestellungen/$orderId'
+      fullPath: '/admin/bestellungen/$orderId'
+      preLoaderRoute: typeof AuthenticatedAdminBestellungenOrderIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin_/brandings_/$brandingId': {
       id: '/_authenticated/admin_/brandings_/$brandingId'
@@ -252,8 +292,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedCallerRoute: typeof AuthenticatedCallerRoute
   AuthenticatedWeiterleitungRoute: typeof AuthenticatedWeiterleitungRoute
+  AuthenticatedAdminBestellungenRoute: typeof AuthenticatedAdminBestellungenRoute
   AuthenticatedAdminBrandingsRoute: typeof AuthenticatedAdminBrandingsRoute
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
+  AuthenticatedAdminBestellungenOrderIdRoute: typeof AuthenticatedAdminBestellungenOrderIdRoute
   AuthenticatedAdminBrandingsBrandingIdRoute: typeof AuthenticatedAdminBrandingsBrandingIdRoute
   AuthenticatedAdminBrandingsNeuRoute: typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -262,8 +304,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedCallerRoute: AuthenticatedCallerRoute,
   AuthenticatedWeiterleitungRoute: AuthenticatedWeiterleitungRoute,
+  AuthenticatedAdminBestellungenRoute: AuthenticatedAdminBestellungenRoute,
   AuthenticatedAdminBrandingsRoute: AuthenticatedAdminBrandingsRoute,
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
+  AuthenticatedAdminBestellungenOrderIdRoute:
+    AuthenticatedAdminBestellungenOrderIdRoute,
   AuthenticatedAdminBrandingsBrandingIdRoute:
     AuthenticatedAdminBrandingsBrandingIdRoute,
   AuthenticatedAdminBrandingsNeuRoute: AuthenticatedAdminBrandingsNeuRoute,
