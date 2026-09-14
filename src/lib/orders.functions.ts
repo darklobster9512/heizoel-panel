@@ -76,7 +76,32 @@ async function requireAdmin(context: {
   if (data !== true) throw new Error("Kein Zugriff auf die Bestellverwaltung.");
 }
 
-type Row = Record<string, unknown> & { brandings?: { shop_name: string | null; company_name: string | null } | null };
+type Row = {
+  id: unknown;
+  order_number: unknown;
+  branding_id: unknown;
+  variant: unknown;
+  liters: unknown;
+  delivery_points: unknown;
+  hose: unknown;
+  truck: unknown;
+  price_per_100: unknown;
+  total: unknown;
+  earliest_date: unknown;
+  slot_date: unknown;
+  slot_period: unknown;
+  email: unknown;
+  phone: unknown;
+  delivery_address: unknown;
+  billing_address: unknown;
+  notes: unknown;
+  payment_method: unknown;
+  status: unknown;
+  internal_note: unknown;
+  placed_at: unknown;
+  created_at: unknown;
+  brandings?: { shop_name: string | null; company_name: string | null } | null;
+};
 
 const text = (value: unknown): string | null => (typeof value === "string" && value ? value : null);
 const num = (value: unknown): number => (typeof value === "number" ? value : Number(value ?? 0) || 0);
