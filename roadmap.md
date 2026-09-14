@@ -7,4 +7,4 @@
 - [x] Branding-Datenmodell und privaten Logo-Speicher einrichten
 - [x] Branding-Übersicht mit detaillierten Shop-Karten bauen
 - [x] Branding als Entwurf anlegen und später bearbeiten
-- [ ] Admin-Navigation, Zugriffsschutz und mobile Darstellung prüfen
+- [x] Admin-Navigation, Zugriffsschutz und mobile Darstellung prüfen

@@ -96,6 +96,18 @@ export function InternalShell({
 
         <main className="min-w-0 flex-1 space-y-6">{children}</main>
       </div>
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-1 overflow-x-auto border-t border-line bg-background px-3 py-2 lg:hidden">
+        {nav.filter((item) => item.to).map((item) => (
+          <Link
+            key={item.label}
+            to={item.to ?? "/admin"}
+            className={`flex min-w-24 flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-[12px] ${item.active ? "bg-brand-soft font-semibold text-brand-hover" : "text-muted-custom"}`}
+          >
+            {item.icon}
+            {item.label}
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 }

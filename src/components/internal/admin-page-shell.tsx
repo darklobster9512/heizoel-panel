@@ -21,5 +21,5 @@ export function AdminPageShell({ children, active = "brandings" }: { children: R
     return <div className="flex min-h-screen items-center justify-center bg-surface"><Loader2 className="size-6 animate-spin text-brand" /></div>;
   }
 
-  return <InternalShell role="Admin" name={data.fullName ?? "Admin"} email={data.email ?? ""} nav={getAdminNav(active)}>{children}</InternalShell>;
+  return <InternalShell role="Admin" name={data.fullName ?? "Admin"} email={data.email ?? ""} nav={getAdminNav(active)}><div className="pb-16 lg:pb-0">{children}</div></InternalShell>;
 }
