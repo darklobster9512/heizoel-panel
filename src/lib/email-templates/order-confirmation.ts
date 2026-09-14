@@ -87,7 +87,7 @@ function logoBlock(branding: EmailBranding, shop: string, big: boolean) {
     <td valign="middle" style="padding-right:12px"><div style="width:${big ? 14 : 12}px;height:${big ? 58 : 48}px;border-radius:3px;background:${GREEN};font-size:0;line-height:0">&nbsp;</div></td>
     <td valign="middle">
       <div style="font:700 ${big ? 34 : 28}px/${big ? 36 : 30}px ${FONT};color:${HEADING};letter-spacing:-.5px;text-transform:uppercase">${shop}</div>
-      <div style="margin-top:4px">${stars(big ? 17 : 15)} <span style="font:700 ${big ? 17 : 15}px/20px ${FONT};color:${HEADING}">4,99</span></div>
+      <div style="margin-top:4px">${stars(big ? 17 : 15)} <span style="font:700 ${big ? 17 : 15}px/20px ${FONT};color:${HEADING}">4,9</span></div>
     </td>
   </tr></table>`;
 }
