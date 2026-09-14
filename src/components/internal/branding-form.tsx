@@ -204,13 +204,13 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
         </Section>
 
         <Section icon={<Mail className="size-4" />} title="Resend" description="Optionaler E-Mail-Versand für dieses Branding.">
-          <Field id="resendApiKey" label={branding?.resendConfigured ? "Resend API Key · hinterlegt" : "Resend API Key"} value={values.resendApiKey ?? ""} onChange={setValue} type="password" placeholder={branding?.resendConfigured ? "Leer lassen, um Schlüssel beizubehalten" : undefined} />
+          <Field id="resendApiKey" label={branding?.resendConfigured ? "Resend API Key · hinterlegt" : "Resend API Key"} value={values.resendApiKey ?? ""} onChange={setValue} placeholder={branding?.resendConfigured ? "Leer lassen, um Schlüssel beizubehalten" : undefined} />
           <Field id="resendSenderEmail" label="Absender-E-Mail" value={values.resendSenderEmail ?? ""} onChange={setValue} type="email" />
           <Field id="resendSenderName" label="Absendername" value={values.resendSenderName ?? ""} onChange={setValue} />
         </Section>
 
         <Section icon={<MessageSquare className="size-4" />} title="Seven.io" description="Optionaler SMS-Versand für dieses Branding.">
-          <Field id="sevenApiKey" label={branding?.sevenConfigured ? "Seven.io API Key · hinterlegt" : "Seven.io API Key"} value={values.sevenApiKey ?? ""} onChange={setValue} type="password" placeholder={branding?.sevenConfigured ? "Leer lassen, um Schlüssel beizubehalten" : undefined} />
+          <Field id="sevenApiKey" label={branding?.sevenConfigured ? "Seven.io API Key · hinterlegt" : "Seven.io API Key"} value={values.sevenApiKey ?? ""} onChange={setValue} placeholder={branding?.sevenConfigured ? "Leer lassen, um Schlüssel beizubehalten" : undefined} />
           <Field id="sevenSenderName" label="Absendername" value={values.sevenSenderName ?? ""} onChange={setValue} maxLength={11} placeholder="Max. 11 Zeichen" />
         </Section>
       </div>
