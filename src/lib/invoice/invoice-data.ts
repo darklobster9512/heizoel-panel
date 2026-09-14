@@ -147,6 +147,31 @@ function salutationFor(address: OrderAddress) {
   return "Sehr geehrte Damen und Herren";
 }
 
+function bankFor(order: Order, branding: InvoiceBranding, gross: number): InvoiceBank {
+  const deposit = order.paymentMethod === "ec" || order.paymentMethod === "barzahlung";
+  const half = Math.round((gross / 2) * 100) / 100;
+  const restLabel =
+    order.paymentMethod === "ec"
+      ? "bei Lieferung vor Ort per EC-Karte"
+      : order.paymentMethod === "barzahlung"
+        ? "bei Lieferung vor Ort in bar"
+        : null;
+  return {
+    accountHolder: value(branding.accountHolder, value(branding.companyName, "Muster-Energie GmbH")),
+    bankName: value(branding.bankName, "Commerzbank AG"),
+    iban: value(branding.iban, "DE89 3704 0044 0532 0130 00"),
+    bic: value(branding.bic, "COBADEFFXXX"),
+    amount: euro.format(deposit ? half : gross),
+    reference: order.orderNumber,
+    isDeposit: deposit,
+    remaining: deposit && restLabel ? euro.format(gross - half) : null,
+    note:
+      deposit && restLabel
+        ? `Anzahlung (50 % von ${euro.format(gross)}) — Restbetrag ${euro.format(gross - half)} ${restLabel}`
+        : null,
+  };
+}
+
 export function buildInvoiceModel(order: Order, branding: InvoiceBranding): InvoiceModel {
   const billing = order.billingAddress ?? order.deliveryAddress;
   const gross = order.total;
