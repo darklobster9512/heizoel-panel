@@ -83,7 +83,7 @@ export function renderInvoiceHtml(model: InvoiceModel) {
     <div style="font:700 17px/24px ${FONT};color:${HEADING}">Rechnung <span style="font:400 12px/24px ${FONT};color:${MUTED}">Nr. ${esc(model.invoiceNumber)}</span></div>
     <p style="margin:10px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">${esc(model.salutation)},</p>
     <p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">vielen Dank für Ihre Bestellung. Mit der Vorauszahlung sichern Sie sich den heutigen Tagespreis.</p>
-    <p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Diese Übersicht fasst Ihre Bestellung zusammen. Die Zahlungsdaten senden wir Ihnen im Anschluss per E-Mail zu — bitte überweisen Sie erst dann.</p>
+    <p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Bitte überweisen Sie den Gesamtbetrag von <strong>${esc(model.bank.amount)}</strong> unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}).</p>
   </div>
 
   <div style="margin-top:7mm;background:${GREEN_SOFT};border-left:3px solid ${GREEN};padding:12px 14px">
@@ -118,6 +118,32 @@ export function renderInvoiceHtml(model: InvoiceModel) {
     ${sumRow("Gesamtbetrag inkl. MwSt.", euro.format(model.gross), true)}
   </table>
 
+  <div style="margin-top:7mm;background:${GREEN_SOFT};border-left:3px solid ${GREEN};padding:12px 14px">
+    <div style="font:700 8.5px/13px ${FONT};color:${GREEN_DARK};letter-spacing:.8px;text-transform:uppercase">Zahlungsdaten · Bitte überweisen Sie auf folgendes Konto</div>
+    <div style="margin-top:8px;display:flex;gap:24px">
+      <div style="flex:1">
+        <div style="font:400 8.5px/13px ${FONT};color:${MUTED}">Empfänger</div>
+        <div style="font:700 11px/17px ${FONT};color:${HEADING}">${esc(model.bank.accountHolder)}</div>
+      </div>
+      <div style="flex:1">
+        <div style="font:400 8.5px/13px ${FONT};color:${MUTED}">Bank</div>
+        <div style="font:700 11px/17px ${FONT};color:${HEADING}">${esc(model.bank.bankName)}</div>
+      </div>
+      <div style="flex:1.4">
+        <div style="font:400 8.5px/13px ${FONT};color:${MUTED}">IBAN</div>
+        <div style="font:700 11px/17px ${FONT};color:${HEADING}">${esc(model.bank.iban)}</div>
+      </div>
+      <div style="flex:1">
+        <div style="font:400 8.5px/13px ${FONT};color:${MUTED}">BIC</div>
+        <div style="font:700 11px/17px ${FONT};color:${HEADING}">${esc(model.bank.bic)}</div>
+      </div>
+    </div>
+    <div style="margin-top:9px;padding-top:8px;border-top:1px solid ${GREEN}33;display:flex;justify-content:space-between;align-items:center">
+      <div style="font:400 10px/16px ${FONT};color:${TEXT}">Verwendungszweck: <strong>${esc(model.bank.reference)}</strong></div>
+      <div style="font:700 13px/19px ${FONT};color:${GREEN_DARK}">${esc(model.bank.amount)}</div>
+    </div>
+  </div>
+
   <div style="flex:1"></div>
 
   <div style="border-top:1px solid ${LINE};padding-top:9px;display:flex;gap:18px">
@@ -131,7 +157,7 @@ export function renderInvoiceHtml(model: InvoiceModel) {
     </div>
     <div style="flex:1;font:400 8px/13px ${FONT};color:${MUTED}">
       <div style="font:700 8.5px/13px ${FONT};color:${HEADING}">Zahlung</div>
-      <div>Die Zahlungsdaten erhalten Sie</div><div>mit der Zahlungsaufforderung</div><div>per E-Mail.</div>
+      <div>${esc(model.bank.accountHolder)}</div><div>${esc(model.bank.bankName)}</div><div>IBAN ${esc(model.bank.iban)}</div>
     </div>
   </div>
 
