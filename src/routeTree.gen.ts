@@ -18,6 +18,7 @@ import { Route as AuthenticatedWeiterleitungRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminBestellungenRouteImport } from './routes/_authenticated/admin_.bestellungen'
 import { Route as AuthenticatedAdminBrandingsRouteImport } from './routes/_authenticated/admin_.brandings'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin_.emails'
+import { Route as AuthenticatedAdminSmsRouteImport } from './routes/_authenticated/admin_.sms'
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
 import { Route as AuthenticatedAdminBestellungenOrderIdRouteImport } from './routes/_authenticated/admin_.bestellungen_.$orderId'
 import { Route as AuthenticatedAdminBrandingsBrandingIdRouteImport } from './routes/_authenticated/admin_.brandings_.$brandingId'
@@ -71,6 +72,11 @@ const AuthenticatedAdminEmailsRoute =
     path: '/admin/emails',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminSmsRoute = AuthenticatedAdminSmsRouteImport.update({
+  id: '/admin_/sms',
+  path: '/admin/sms',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiPublicOrdersRoute = ApiPublicOrdersRouteImport.update({
   id: '/api/public/orders',
   path: '/api/public/orders',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/admin/bestellungen': typeof AuthenticatedAdminBestellungenRoute
   '/admin/brandings': typeof AuthenticatedAdminBrandingsRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/admin/sms': typeof AuthenticatedAdminSmsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/admin/bestellungen/$orderId': typeof AuthenticatedAdminBestellungenOrderIdRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/admin/bestellungen': typeof AuthenticatedAdminBestellungenRoute
   '/admin/brandings': typeof AuthenticatedAdminBrandingsRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/admin/sms': typeof AuthenticatedAdminSmsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/admin/bestellungen/$orderId': typeof AuthenticatedAdminBestellungenOrderIdRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/bestellungen': typeof AuthenticatedAdminBestellungenRoute
   '/_authenticated/admin_/brandings': typeof AuthenticatedAdminBrandingsRoute
   '/_authenticated/admin_/emails': typeof AuthenticatedAdminEmailsRoute
+  '/_authenticated/admin_/sms': typeof AuthenticatedAdminSmsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/_authenticated/admin_/bestellungen_/$orderId': typeof AuthenticatedAdminBestellungenOrderIdRoute
   '/_authenticated/admin_/brandings_/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/admin/bestellungen'
     | '/admin/brandings'
     | '/admin/emails'
+    | '/admin/sms'
     | '/api/public/orders'
     | '/admin/bestellungen/$orderId'
     | '/admin/brandings/$brandingId'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/admin/bestellungen'
     | '/admin/brandings'
     | '/admin/emails'
+    | '/admin/sms'
     | '/api/public/orders'
     | '/admin/bestellungen/$orderId'
     | '/admin/brandings/$brandingId'
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/bestellungen'
     | '/_authenticated/admin_/brandings'
     | '/_authenticated/admin_/emails'
+    | '/_authenticated/admin_/sms'
     | '/api/public/orders'
     | '/_authenticated/admin_/bestellungen_/$orderId'
     | '/_authenticated/admin_/brandings_/$brandingId'
@@ -257,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminEmailsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/sms': {
+      id: '/_authenticated/admin_/sms'
+      path: '/admin/sms'
+      fullPath: '/admin/sms'
+      preLoaderRoute: typeof AuthenticatedAdminSmsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/orders': {
       id: '/api/public/orders'
       path: '/api/public/orders'
@@ -295,6 +314,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminBestellungenRoute: typeof AuthenticatedAdminBestellungenRoute
   AuthenticatedAdminBrandingsRoute: typeof AuthenticatedAdminBrandingsRoute
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
+  AuthenticatedAdminSmsRoute: typeof AuthenticatedAdminSmsRoute
   AuthenticatedAdminBestellungenOrderIdRoute: typeof AuthenticatedAdminBestellungenOrderIdRoute
   AuthenticatedAdminBrandingsBrandingIdRoute: typeof AuthenticatedAdminBrandingsBrandingIdRoute
   AuthenticatedAdminBrandingsNeuRoute: typeof AuthenticatedAdminBrandingsNeuRoute
@@ -307,6 +327,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminBestellungenRoute: AuthenticatedAdminBestellungenRoute,
   AuthenticatedAdminBrandingsRoute: AuthenticatedAdminBrandingsRoute,
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
+  AuthenticatedAdminSmsRoute: AuthenticatedAdminSmsRoute,
   AuthenticatedAdminBestellungenOrderIdRoute:
     AuthenticatedAdminBestellungenOrderIdRoute,
   AuthenticatedAdminBrandingsBrandingIdRoute:

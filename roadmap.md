@@ -25,3 +25,9 @@
 - [x] Reiter „Bestellungen" mit Tabelle, Suche und Filtern
 - [x] Detailseite mit Status und interner Notiz
 - [x] Öffentliche Bestellschnittstelle ohne Schlüssel
+
+## 2026-09-14 SMS-Vorlagen im Adminbereich
+- [x] Reiter /admin/sms mit Vorlagen- und Branding-Auswahl
+- [x] Kurze SMS-Texte: Bestellbestätigung + Rechnung (verweist auf E-Mail, keine Bankdaten)
+- [x] Handy-Vorschau, Zeichenzähler und Kopier-Button
+- [x] Typecheck und Vorschau-Build prüfen
