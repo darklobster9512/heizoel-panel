@@ -147,8 +147,8 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
   <tr><td style="padding:4px 2px 8px">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
       ${bankRow("Zahlungsempfänger", esc(bank.accountHolder))}
-      ${bankRow("IBAN", esc(bank.iban), true)}
-      ${bankRow("BIC", esc(bank.bic), true)}
+      ${bankRow("IBAN", esc(bank.iban))}
+      ${bankRow("BIC", esc(bank.bic))}
       <tr>
         <td style="padding:8px 16px;font:400 13px/18px ${FONT};color:${GREEN_DARK}">Verwendungszweck</td>
         <td style="padding:8px 16px"><span style="display:inline-block;padding:4px 10px;border-radius:5px;background:${GREEN_BORDER};font:700 14px/18px 'Courier New',monospace;color:${GREEN_DARK}">${esc(invoice.orderNumber)}</span></td>
