@@ -81,7 +81,7 @@ export const Route = createFileRoute("/api/public/orders")({
 
         const { data: branding, error: brandingError } = await supabaseAdmin
           .from("brandings")
-          .select("id")
+          .select("id, shop_name, company_name")
           .or(`public_id.eq.${data.brandingId},id.eq.${data.brandingId}`)
           .maybeSingle();
         if (brandingError) return json({ ok: false, error: "Branding konnte nicht geprüft werden." }, 500);
