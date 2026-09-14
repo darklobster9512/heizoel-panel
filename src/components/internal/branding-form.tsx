@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Building2, Check, ImagePlus, Loader2, Mail, MapPin, MessageSquare, Save, ShieldCheck } from "lucide-react";
-import { useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import { useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -78,7 +78,7 @@ function Field({ id, label, value, onChange, required, type = "text", placeholde
   );
 }
 
-function Section({ icon, title, description, children }: { icon: React.ReactNode; title: string; description: string; children: React.ReactNode }) {
+function Section({ icon, title, description, children }: { icon: ReactNode; title: string; description: string; children: ReactNode }) {
   return (
     <section className="border-b border-line py-7 first:pt-0 last:border-0 last:pb-0">
       <div className="mb-5 flex gap-3">
