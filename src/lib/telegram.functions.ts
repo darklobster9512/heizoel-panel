@@ -65,7 +65,7 @@ export const listTelegramRecipients = createServerFn({ method: "GET" })
       .select("*")
       .order("created_at", { ascending: false });
     if (error) throw new Error("Telegram-Empfänger konnten nicht geladen werden.");
-    const connected = Boolean(process.env["LOVABLE_API_KEY"] && process.env["TELEGRAM_API_KEY"]);
+    const connected = Boolean(process.env["TELEGRAM_BOT_TOKEN"]);
     return { recipients: (data ?? []).map(mapRow), connected };
   });
 

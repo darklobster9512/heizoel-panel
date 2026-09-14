@@ -1,4 +1,4 @@
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/telegram";
+const TELEGRAM_API_BASE = "https://api.telegram.org";
 
 const euro = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
 const number = new Intl.NumberFormat("de-DE");
