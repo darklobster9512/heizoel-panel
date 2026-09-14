@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Building2, Check, Copy, Edit3, Globe2, Mail, MapPin, MessageSquare, Plus, RefreshCw } from "lucide-react";
+import type { ReactNode } from "react";
 import { toast } from "sonner";
 
 import { AdminPageShell } from "@/components/internal/admin-page-shell";
@@ -63,7 +64,7 @@ function BrandingsPage() {
   );
 }
 
-function Info({ icon, label, value, success }: { icon: React.ReactNode; label: string; value: string; success?: boolean }) {
+function Info({ icon, label, value, success }: { icon: ReactNode; label: string; value: string; success?: boolean }) {
   return <div className="flex min-w-0 gap-3 text-muted-custom"><span className="mt-0.5 [&>svg]:size-4">{icon}</span><div className="min-w-0"><p className="text-[10px] font-semibold tracking-wide uppercase">{label}</p><p className={`mt-1 truncate text-[13px] ${success ? "text-brand-hover" : "text-conditions"}`}>{success ? <Check className="mr-1 inline size-3" /> : null}{value}</p></div></div>;
 }
 

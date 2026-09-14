@@ -15,6 +15,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCallerRouteImport } from './routes/_authenticated/caller'
 import { Route as AuthenticatedWeiterleitungRouteImport } from './routes/_authenticated/weiterleitung'
+import { Route as AuthenticatedAdminBrandingsRouteImport } from './routes/_authenticated/admin_.brandings'
+import { Route as AuthenticatedAdminBrandingsBrandingIdRouteImport } from './routes/_authenticated/admin_.brandings_.$brandingId'
+import { Route as AuthenticatedAdminBrandingsNeuRouteImport } from './routes/_authenticated/admin_.brandings_.neu'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +49,24 @@ const AuthenticatedWeiterleitungRoute =
     path: '/weiterleitung',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminBrandingsRoute =
+  AuthenticatedAdminBrandingsRouteImport.update({
+    id: '/admin_/brandings',
+    path: '/admin/brandings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminBrandingsBrandingIdRoute =
+  AuthenticatedAdminBrandingsBrandingIdRouteImport.update({
+    id: '/admin_/brandings_/$brandingId',
+    path: '/admin/brandings/$brandingId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminBrandingsNeuRoute =
+  AuthenticatedAdminBrandingsNeuRouteImport.update({
+    id: '/admin_/brandings_/neu',
+    path: '/admin/brandings/neu',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,6 +74,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/caller': typeof AuthenticatedCallerRoute
   '/weiterleitung': typeof AuthenticatedWeiterleitungRoute
+  '/admin/brandings': typeof AuthenticatedAdminBrandingsRoute
+  '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
+  '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -60,6 +84,9 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/caller': typeof AuthenticatedCallerRoute
   '/weiterleitung': typeof AuthenticatedWeiterleitungRoute
+  '/admin/brandings': typeof AuthenticatedAdminBrandingsRoute
+  '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
+  '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,12 +96,31 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/caller': typeof AuthenticatedCallerRoute
   '/_authenticated/weiterleitung': typeof AuthenticatedWeiterleitungRoute
+  '/_authenticated/admin_/brandings': typeof AuthenticatedAdminBrandingsRoute
+  '/_authenticated/admin_/brandings_/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
+  '/_authenticated/admin_/brandings_/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/admin' | '/caller' | '/weiterleitung'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/caller'
+    | '/weiterleitung'
+    | '/admin/brandings'
+    | '/admin/brandings/$brandingId'
+    | '/admin/brandings/neu'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/admin' | '/caller' | '/weiterleitung'
+  to:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/caller'
+    | '/weiterleitung'
+    | '/admin/brandings'
+    | '/admin/brandings/$brandingId'
+    | '/admin/brandings/neu'
   id:
     | '__root__'
     | '/'
@@ -83,6 +129,9 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/caller'
     | '/_authenticated/weiterleitung'
+    | '/_authenticated/admin_/brandings'
+    | '/_authenticated/admin_/brandings_/$brandingId'
+    | '/_authenticated/admin_/brandings_/neu'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -135,6 +184,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWeiterleitungRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/brandings': {
+      id: '/_authenticated/admin_/brandings'
+      path: '/admin/brandings'
+      fullPath: '/admin/brandings'
+      preLoaderRoute: typeof AuthenticatedAdminBrandingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin_/brandings_/$brandingId': {
+      id: '/_authenticated/admin_/brandings_/$brandingId'
+      path: '/admin/brandings/$brandingId'
+      fullPath: '/admin/brandings/$brandingId'
+      preLoaderRoute: typeof AuthenticatedAdminBrandingsBrandingIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin_/brandings_/neu': {
+      id: '/_authenticated/admin_/brandings_/neu'
+      path: '/admin/brandings/neu'
+      fullPath: '/admin/brandings/neu'
+      preLoaderRoute: typeof AuthenticatedAdminBrandingsNeuRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -142,12 +212,19 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedCallerRoute: typeof AuthenticatedCallerRoute
   AuthenticatedWeiterleitungRoute: typeof AuthenticatedWeiterleitungRoute
+  AuthenticatedAdminBrandingsRoute: typeof AuthenticatedAdminBrandingsRoute
+  AuthenticatedAdminBrandingsBrandingIdRoute: typeof AuthenticatedAdminBrandingsBrandingIdRoute
+  AuthenticatedAdminBrandingsNeuRoute: typeof AuthenticatedAdminBrandingsNeuRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedCallerRoute: AuthenticatedCallerRoute,
   AuthenticatedWeiterleitungRoute: AuthenticatedWeiterleitungRoute,
+  AuthenticatedAdminBrandingsRoute: AuthenticatedAdminBrandingsRoute,
+  AuthenticatedAdminBrandingsBrandingIdRoute:
+    AuthenticatedAdminBrandingsBrandingIdRoute,
+  AuthenticatedAdminBrandingsNeuRoute: AuthenticatedAdminBrandingsNeuRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
