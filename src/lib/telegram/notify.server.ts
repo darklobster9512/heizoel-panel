@@ -21,7 +21,7 @@ export async function sendTelegramMessage(chatId: string, text: string): Promise
 
   if (!response.ok) {
     const body = await response.text();
-    console.error(`[telegram] gateway error [${response.status}]: ${body}`);
+    console.error(`[telegram] api error [${response.status}]: ${body}`);
     throw new Error(`Telegram-Versand fehlgeschlagen [${response.status}]: ${body}`);
   }
 

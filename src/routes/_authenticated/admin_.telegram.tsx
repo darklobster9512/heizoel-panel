@@ -140,7 +140,7 @@ function TelegramPage() {
 
       {data && !data.connected ? (
         <div className="rounded-lg border border-line bg-brand-soft px-4 py-3 text-[13px] text-conditions">
-          Der Telegram-Bot ist noch nicht verbunden. Empfänger lassen sich bereits anlegen, Nachrichten werden aber erst nach dem Verbinden versendet.
+          Es ist noch kein Bot-Token hinterlegt. Empfänger lassen sich bereits anlegen, Nachrichten werden aber erst nach dem Hinterlegen des Tokens versendet.
         </div>
       ) : null}
 
