@@ -144,8 +144,12 @@ export function renderInvoiceHtml(model: InvoiceModel) {
     </div>
     <div style="margin-top:9px;padding-top:8px;border-top:1px solid ${GREEN}33;display:flex;justify-content:space-between;align-items:center">
       <div style="font:400 10px/16px ${FONT};color:${TEXT}">Verwendungszweck: <strong>${esc(model.bank.reference)}</strong></div>
-      <div style="font:700 13px/19px ${FONT};color:${GREEN_DARK}">${esc(model.bank.amount)}</div>
+      <div style="text-align:right">
+        <div style="font:700 13px/19px ${FONT};color:${GREEN_DARK}">${esc(model.bank.amount)}</div>
+        ${model.bank.isDeposit ? `<div style="font:400 8.5px/13px ${FONT};color:${MUTED}">Anzahlung (50 %)</div>` : ""}
+      </div>
     </div>
+    ${model.bank.note ? `<div style="margin-top:6px;font:400 9.5px/15px ${FONT};color:${GREEN_DARK}">${esc(model.bank.note)}</div>` : ""}
   </div>
 
   <div style="flex:1"></div>

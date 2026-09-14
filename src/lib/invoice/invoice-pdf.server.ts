@@ -105,11 +105,21 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
   draw(ctx, `Nr. ${model.invoiceNumber}`, M + ctx.bold.widthOfTextAtSize("Rechnung", 15) + 7, y + 1, 10, false, MUTED);
 
   y -= 24;
+  const restText =
+    model.paymentLabel === "EC-Karte" ? "bei Lieferung vor Ort per EC-Karte" : "bei Lieferung vor Ort in bar";
   const paragraphs = [
     `${model.salutation},`,
     "vielen Dank für Ihre Bestellung. Mit der Vorauszahlung sichern Sie sich den heutigen Tagespreis.",
-    `Bitte überweisen Sie den Gesamtbetrag von ${model.bank.amount} unter Angabe der`,
-    `Rechnungsnummer ${model.invoiceNumber} auf das unten genannte Konto (IBAN ${model.bank.iban}).`,
+    ...(model.bank.isDeposit
+      ? [
+          `Wir bitten um eine Anzahlung von 50 % (${model.bank.amount}) unter Angabe der Rechnungsnummer`,
+          `${model.invoiceNumber} auf das unten genannte Konto (IBAN ${model.bank.iban}).`,
+          `Den Restbetrag von ${model.bank.remaining ?? ""} zahlen Sie ${restText}.`,
+        ]
+      : [
+          `Bitte überweisen Sie den Gesamtbetrag von ${model.bank.amount} unter Angabe der`,
+          `Rechnungsnummer ${model.invoiceNumber} auf das unten genannte Konto (IBAN ${model.bank.iban}).`,
+        ]),
   ];
   for (const line of paragraphs) {
     draw(ctx, line, M, y, 9.5, false, TEXT);
