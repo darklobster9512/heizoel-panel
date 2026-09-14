@@ -97,11 +97,13 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
   const [logoUrl, setLogoUrl] = useState(branding?.logoUrl ?? null);
   const [saving, setSaving] = useState<"draft" | "active" | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const complete = useMemo(() => REQUIRED.every((key) => Boolean(values[key]?.trim())), [values]);
 
   function setValue(key: keyof FormValues, value: string) {
     setValues((current) => ({ ...current, [key]: value }));
+    setDirty(true);
   }
 
   async function uploadLogo(event: ChangeEvent<HTMLInputElement>) {
@@ -127,6 +129,7 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
     else {
       setValues((current) => ({ ...current, logoPath: path }));
       setLogoUrl(URL.createObjectURL(file));
+      setDirty(true);
     }
     setUploading(false);
   }
@@ -144,6 +147,7 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
     setSaving(status);
     try {
       const result = await save({ data: { ...values, id: branding?.id, status } });
+      setDirty(false);
       toast.success(status === "active" ? "Branding wurde aktiviert." : "Entwurf wurde gespeichert.");
       navigate({ to: "/admin/brandings/$brandingId", params: { brandingId: result.id }, replace: true });
     } catch {
@@ -212,7 +216,8 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
       </div>
 
       {error ? <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-[13px] text-destructive">{error}</p> : null}
-      <div className="sticky bottom-4 flex flex-col-reverse gap-3 rounded-lg border border-line bg-background/95 p-4 shadow-lg backdrop-blur-sm sm:flex-row sm:justify-end">
+      <div className="sticky bottom-4 flex flex-col-reverse gap-3 rounded-lg border border-line bg-background/95 p-4 shadow-lg backdrop-blur-sm sm:flex-row sm:items-center sm:justify-end">
+        <span className="mr-auto text-[12px] text-muted-custom">{dirty ? "Ungespeicherte Änderungen" : branding ? "Alle Änderungen gespeichert" : "Neues Branding"}</span>
         <Button type="button" variant="outline" disabled={saving !== null || uploading} onClick={() => navigate({ to: "/admin/brandings" })}>Abbrechen</Button>
         <Button type="submit" variant="outline" disabled={saving !== null || uploading}>{saving === "draft" ? <Loader2 className="animate-spin" /> : <Save />} Als Entwurf speichern</Button>
         <Button type="button" disabled={saving !== null || uploading} onClick={() => void submit("active")}>{saving === "active" ? <Loader2 className="animate-spin" /> : <Check />} Branding aktivieren</Button>

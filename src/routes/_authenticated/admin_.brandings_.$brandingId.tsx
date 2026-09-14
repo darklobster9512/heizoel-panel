@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
@@ -27,5 +27,5 @@ function EditBrandingPage() {
   const { data, isPending } = useQuery({ queryKey: ["branding", brandingId], queryFn: () => fetchBranding({ data: { id: brandingId } }) });
   if (isPending) return <AdminPageShell><div className="flex min-h-72 items-center justify-center"><Loader2 className="size-6 animate-spin text-brand" /></div></AdminPageShell>;
   if (!data) throw notFound();
-  return <AdminPageShell><div><Button asChild variant="ghost" size="sm" className="-ml-3 mb-3"><a href="/admin/brandings"><ArrowLeft /> Zurück zu Brandings</a></Button><div className="flex flex-wrap items-center gap-3"><h1 className="text-[24px] font-bold text-hero-text">Branding bearbeiten</h1><span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${data.status === "active" ? "bg-brand-soft text-brand-hover" : "bg-surface text-muted-custom"}`}>{data.status === "active" ? "Aktiv" : "Entwurf"}</span></div><p className="mt-1 text-[14px] text-muted-custom">Firmendaten, Logo und Versandkonfiguration aktualisieren.</p></div><BrandingForm branding={data} /></AdminPageShell>;
+  return <AdminPageShell><div><Button asChild variant="ghost" size="sm" className="-ml-3 mb-3"><Link to="/admin/brandings"><ArrowLeft /> Zurück zu Brandings</Link></Button><div className="flex flex-wrap items-center gap-3"><h1 className="text-[24px] font-bold text-hero-text">Branding bearbeiten</h1><span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${data.status === "active" ? "bg-brand-soft text-brand-hover" : "bg-surface text-muted-custom"}`}>{data.status === "active" ? "Aktiv" : "Entwurf"}</span></div><p className="mt-1 text-[14px] text-muted-custom">Firmendaten, Logo und Versandkonfiguration aktualisieren.</p></div><BrandingForm branding={data} /></AdminPageShell>;
 }

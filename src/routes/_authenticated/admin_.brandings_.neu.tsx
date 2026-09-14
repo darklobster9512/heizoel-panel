@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
 import { AdminPageShell } from "@/components/internal/admin-page-shell";
@@ -19,5 +19,5 @@ export const Route = createFileRoute("/_authenticated/admin_/brandings_/neu")({
 });
 
 function NewBrandingPage() {
-  return <AdminPageShell><div><Button asChild variant="ghost" size="sm" className="-ml-3 mb-3"><a href="/admin/brandings"><ArrowLeft /> Zurück zu Brandings</a></Button><h1 className="text-[24px] font-bold text-hero-text">Branding hinzufügen</h1><p className="mt-1 text-[14px] text-muted-custom">Du kannst jederzeit unvollständig als Entwurf speichern.</p></div><BrandingForm /></AdminPageShell>;
+  return <AdminPageShell><div><Button asChild variant="ghost" size="sm" className="-ml-3 mb-3"><Link to="/admin/brandings"><ArrowLeft /> Zurück zu Brandings</Link></Button><h1 className="text-[24px] font-bold text-hero-text">Branding hinzufügen</h1><p className="mt-1 text-[14px] text-muted-custom">Du kannst jederzeit unvollständig als Entwurf speichern.</p></div><BrandingForm /></AdminPageShell>;
 }
