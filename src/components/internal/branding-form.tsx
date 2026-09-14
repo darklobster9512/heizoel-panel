@@ -181,36 +181,36 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
             </label>
             <input id="logo" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="sr-only" disabled={uploading} onChange={uploadLogo} />
           </div>
-          <Field id="companyName" label="Unternehmensname" value={values.companyName ?? ""} onChange={setValue} required />
-          <Field id="shopName" label="Shopname" value={values.shopName ?? ""} onChange={setValue} required />
+          <Field id="companyName" label="Unternehmensname" value={values.companyName ?? ""} onChange={setValue} required placeholder="Musterheizöl GmbH" />
+          <Field id="shopName" label="Shopname" value={values.shopName ?? ""} onChange={setValue} required placeholder="Heizöl-Shop Musterstadt" />
         </Section>
 
         <Section icon={<MapPin className="size-4" />} title="Firmensitz" description="Vollständige Geschäftsanschrift des Unternehmens.">
-          <Field id="streetAddress" label="Straße & Hausnummer" value={values.streetAddress ?? ""} onChange={setValue} required />
-          <Field id="postalCode" label="PLZ" value={values.postalCode ?? ""} onChange={setValue} required maxLength={10} />
-          <Field id="city" label="Stadt" value={values.city ?? ""} onChange={setValue} required />
+          <Field id="streetAddress" label="Straße & Hausnummer" value={values.streetAddress ?? ""} onChange={setValue} required placeholder="Industriestraße 12" />
+          <Field id="postalCode" label="PLZ" value={values.postalCode ?? ""} onChange={setValue} required maxLength={10} placeholder="12345" />
+          <Field id="city" label="Stadt" value={values.city ?? ""} onChange={setValue} required placeholder="Musterstadt" />
         </Section>
 
         <Section icon={<ShieldCheck className="size-4" />} title="Rechtliches" description="Angaben für Impressum und geschäftliche Dokumente.">
-          <Field id="registryCourt" label="Amtsgericht" value={values.registryCourt ?? ""} onChange={setValue} required />
-          <Field id="commercialRegisterNumber" label="Handelsregisternummer" value={values.commercialRegisterNumber ?? ""} onChange={setValue} required />
-          <Field id="managingDirector" label="Geschäftsführer" value={values.managingDirector ?? ""} onChange={setValue} required />
+          <Field id="registryCourt" label="Amtsgericht" value={values.registryCourt ?? ""} onChange={setValue} required placeholder="Musterstadt" />
+          <Field id="commercialRegisterNumber" label="Handelsregisternummer" value={values.commercialRegisterNumber ?? ""} onChange={setValue} required placeholder="HRB 12345" />
+          <Field id="managingDirector" label="Geschäftsführer" value={values.managingDirector ?? ""} onChange={setValue} required placeholder="Max Mustermann" />
           <Field id="vatId" label="USt-ID" value={values.vatId ?? ""} onChange={setValue} required placeholder="DE123456789" />
         </Section>
 
         <Section icon={<Mail className="size-4" />} title="Kontakt" description="Zentrale Erreichbarkeit und Shop-Domain.">
-          <Field id="email" label="E-Mail" value={values.email ?? ""} onChange={setValue} required type="email" />
+          <Field id="email" label="E-Mail" value={values.email ?? ""} onChange={setValue} required type="email" placeholder="info@muster-shop.de" />
           <Field id="domain" label="Domain" value={values.domain ?? ""} onChange={setValue} required type="url" placeholder="https://mein-shop.de" />
         </Section>
 
         <Section icon={<Mail className="size-4" />} title="Resend" description="Optionaler E-Mail-Versand für dieses Branding.">
-          <Field id="resendApiKey" label={branding?.resendConfigured ? "Resend API Key · hinterlegt" : "Resend API Key"} value={values.resendApiKey ?? ""} onChange={setValue} placeholder={branding?.resendConfigured ? "Leer lassen, um Schlüssel beizubehalten" : undefined} />
-          <Field id="resendSenderEmail" label="Absender-E-Mail" value={values.resendSenderEmail ?? ""} onChange={setValue} type="email" />
-          <Field id="resendSenderName" label="Absendername" value={values.resendSenderName ?? ""} onChange={setValue} />
+          <Field id="resendApiKey" label={branding?.resendConfigured ? "Resend API Key · hinterlegt" : "Resend API Key"} value={values.resendApiKey ?? ""} onChange={setValue} placeholder={branding?.resendConfigured ? "Leer lassen, um Schlüssel beizubehalten" : "re_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"} />
+          <Field id="resendSenderEmail" label="Absender-E-Mail" value={values.resendSenderEmail ?? ""} onChange={setValue} type="email" placeholder="noreply@muster-shop.de" />
+          <Field id="resendSenderName" label="Absendername" value={values.resendSenderName ?? ""} onChange={setValue} placeholder="Musterheizöl" />
         </Section>
 
         <Section icon={<MessageSquare className="size-4" />} title="Seven.io" description="Optionaler SMS-Versand für dieses Branding.">
-          <Field id="sevenApiKey" label={branding?.sevenConfigured ? "Seven.io API Key · hinterlegt" : "Seven.io API Key"} value={values.sevenApiKey ?? ""} onChange={setValue} placeholder={branding?.sevenConfigured ? "Leer lassen, um Schlüssel beizubehalten" : undefined} />
+          <Field id="sevenApiKey" label={branding?.sevenConfigured ? "Seven.io API Key · hinterlegt" : "Seven.io API Key"} value={values.sevenApiKey ?? ""} onChange={setValue} placeholder={branding?.sevenConfigured ? "Leer lassen, um Schlüssel beizubehalten" : "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"} />
           <Field id="sevenSenderName" label="Absendername" value={values.sevenSenderName ?? ""} onChange={setValue} maxLength={11} placeholder="Max. 11 Zeichen" />
         </Section>
       </div>
