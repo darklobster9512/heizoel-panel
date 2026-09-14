@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import {
   Activity,
   ArrowRight,
-  Bitcoin,
   Check,
   Eye,
   EyeOff,
@@ -166,8 +165,6 @@ function CryptoBoard({ compact = false }: { compact?: boolean }) {
     </div>
   );
 }
-];
-
 function translateError(message: string): string {
   const m = message.toLowerCase();
   if (m.includes("invalid login credentials")) return "E-Mail oder Passwort ist nicht korrekt.";
