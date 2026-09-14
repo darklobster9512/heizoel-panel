@@ -19,6 +19,9 @@ export type InvoiceBank = {
   bic: string;
   amount: string;
   reference: string;
+  isDeposit: boolean;
+  remaining: string | null;
+  note: string | null;
 };
 
 export type InvoiceModel = {
@@ -171,14 +174,7 @@ export function buildInvoiceModel(order: Order, branding: InvoiceBranding): Invo
       logoUrl: branding.logoUrl,
       shopName: value(branding.shopName, value(branding.companyName, "Heizöl Online")),
     },
-    bank: {
-      accountHolder: value(branding.accountHolder, value(branding.companyName, "Muster-Energie GmbH")),
-      bankName: value(branding.bankName, "Commerzbank AG"),
-      iban: value(branding.iban, "DE89 3704 0044 0532 0130 00"),
-      bic: value(branding.bic, "COBADEFFXXX"),
-      amount: euro.format(gross),
-      reference: order.orderNumber,
-    },
+    bank: bankFor(order, branding, gross),
     recipientLines: addressLines(billing),
     salutation: salutationFor(billing),
     deliveryWindow: weekday ? [weekday, period].filter(Boolean).join(" ") : "Termin wird abgestimmt",
