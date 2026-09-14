@@ -62,11 +62,7 @@ export const Route = createFileRoute("/api/public/orders")({
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
       POST: async ({ request }) => {
-        const apiKey = process.env["ORDERS_API_KEY"];
-        if (!apiKey) return json({ ok: false, error: "Server nicht konfiguriert." }, 500);
-        if (request.headers.get("x-api-key") !== apiKey) {
-          return json({ ok: false, error: "Nicht autorisiert." }, 401);
-        }
+
 
         let raw: unknown;
         try {
