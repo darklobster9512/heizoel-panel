@@ -4,7 +4,7 @@ import { z } from "zod";
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "content-type, x-api-key",
+  "Access-Control-Allow-Headers": "content-type",
 };
 
 const json = (body: unknown, status = 200) =>
