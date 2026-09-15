@@ -68,6 +68,15 @@ export function flagBar(big: boolean) {
   </div>`;
 }
 
+function shopLogoText(shop: string) {
+  const match = shop.match(/^(.*?)(online)(.*)$/i);
+  if (!match) return esc(shop);
+  const prefix = match[1] ?? "";
+  const online = match[2] ?? "";
+  const suffix = match[3] ?? "";
+  return `${esc(prefix)}<span style="font-weight:300">${esc(online)}</span>${esc(suffix)}`;
+}
+
 export function logoBlock(branding: EmailBranding, shop: string, big: boolean) {
   if (branding.logoUrl) {
     return `<img src="${esc(branding.logoUrl)}" alt="${shop}" width="${big ? 210 : 180}" style="display:block;max-width:${big ? 210 : 180}px;height:auto;border:0" />`;
@@ -75,7 +84,7 @@ export function logoBlock(branding: EmailBranding, shop: string, big: boolean) {
   return `<table role="presentation" cellpadding="0" cellspacing="0"><tr>
     <td valign="middle" style="padding-right:12px">${flagBar(big)}</td>
     <td valign="middle">
-      <div style="font:700 ${big ? 34 : 28}px/${big ? 36 : 30}px ${FONT};color:${HEADING};letter-spacing:-.5px;text-transform:uppercase">${shop}</div>
+      <div style="font:700 ${big ? 34 : 28}px/${big ? 36 : 30}px ${FONT};color:${HEADING};letter-spacing:-.5px;text-transform:uppercase">${shopLogoText(shop)}</div>
       <div style="margin-top:4px">${stars(big ? 17 : 15)} <span style="font:700 ${big ? 17 : 15}px/20px ${FONT};color:${HEADING}">4,9</span></div>
     </td>
   </tr></table>`;
