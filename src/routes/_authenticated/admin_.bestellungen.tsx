@@ -105,14 +105,14 @@ export function paymentMethodLabel(order: Order) {
 }
 
 export const STATUS_STYLE: Record<OrderStatus, string> = {
-  neu: "bg-status-info-bg text-status-info-text",
+  neu: "bg-status-gray-bg text-status-gray-text",
   mailbox: "bg-status-warning-bg text-status-warning-text",
-  kein_interesse: "bg-surface text-muted-custom",
-  moechte_rechnung: "bg-status-info-bg text-status-info-text",
-  rechnung_versendet: "bg-status-success-bg text-status-success-text",
-  ueberwiesen: "bg-status-success-bg text-status-success-text",
-  angekommen: "bg-status-success-bg text-status-success-text",
-  exchanged: "bg-status-danger-bg text-status-danger-text",
+  kein_interesse: "bg-status-red-bg text-status-red-text",
+  moechte_rechnung: "bg-status-orange-bg text-status-orange-text",
+  rechnung_versendet: "bg-status-blue-bg text-status-blue-text",
+  ueberwiesen: "bg-status-greenish-bg text-status-greenish-text",
+  angekommen: "bg-status-green-bg text-status-green-text",
+  exchanged: "status-rainbow",
 };
 
 function StatusCell({ order }: { order: Order }) {
