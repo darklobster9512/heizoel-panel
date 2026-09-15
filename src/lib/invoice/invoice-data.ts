@@ -1,4 +1,4 @@
-import { cleanRegisterNumber, formatIban } from "@/lib/iban";
+import { cleanRegisterNumber, formatIban, invoiceNumberFor } from "@/lib/iban";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
 
 export type InvoiceCompany = {
