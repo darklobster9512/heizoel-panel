@@ -74,7 +74,7 @@ export function InternalShell({
         <aside className="hidden w-max shrink-0 lg:block">
           <nav className="sticky top-22 space-y-1">
             {nav.map((item) => {
-              const className = `flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] transition-colors ${
+              const className = `flex items-center gap-3 whitespace-nowrap rounded-lg px-3 py-2.5 text-[14px] transition-colors ${
                 item.active
                   ? "bg-background font-semibold text-conditions shadow-sm"
                   : "text-muted-custom hover:bg-background/70"
