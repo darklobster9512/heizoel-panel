@@ -35,7 +35,7 @@ function RedirectPage() {
   useEffect(() => {
     if (!data) return;
     if (data.role === "admin") navigate({ to: "/admin", replace: true });
-    else if (data.role === "caller") navigate({ to: "/caller", replace: true });
+    else if (data.role === "caller") navigate({ to: "/admin/bestellungen", replace: true });
   }, [data, navigate]);
 
   async function handleSignOut() {

@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { listBrandings } from "@/lib/brandings.functions";
+import { getMyAccount } from "@/lib/roles.functions";
 import { generateInvoice, getBankAccountUsage, listInvoices } from "@/lib/invoices.functions";
 import {
   ORDER_STATUSES,
@@ -175,9 +176,12 @@ function OrdersPage() {
   const fetchOrders = useServerFn(listOrders);
   const fetchBrandings = useServerFn(listBrandings);
   const fetchInvoices = useServerFn(listInvoices);
+  const fetchAccount = useServerFn(getMyAccount);
+  const account = useQuery({ queryKey: ["my-account"], queryFn: () => fetchAccount({}) });
+  const isAdmin = account.data?.role === "admin";
   const { data, isPending, isError, refetch } = useQuery({ queryKey: ["orders"], queryFn: () => fetchOrders({}) });
-  const brandings = useQuery({ queryKey: ["brandings"], queryFn: () => fetchBrandings({}) });
-  const invoices = useQuery({ queryKey: ["invoices"], queryFn: () => fetchInvoices({}) });
+  const brandings = useQuery({ queryKey: ["brandings"], queryFn: () => fetchBrandings({}), enabled: isAdmin });
+  const invoices = useQuery({ queryKey: ["invoices"], queryFn: () => fetchInvoices({}), enabled: isAdmin });
 
   const invoicedOrderIds = useMemo(
     () => new Set((invoices.data ?? []).map((entry) => entry.orderId)),
@@ -216,7 +220,7 @@ function OrdersPage() {
   }, [data, search, status, branding, showNoInterest]);
 
   return (
-    <AdminPageShell active="orders">
+    <AdminPageShell active="orders" allowCaller>
       <div>
         <p className="text-[12px] font-semibold tracking-wide text-brand-hover uppercase">Vertrieb</p>
         <h1 className="mt-1 text-[24px] font-bold text-hero-text">Bestellungen</h1>
@@ -228,12 +232,14 @@ function OrdersPage() {
           <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-custom" />
           <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Bestellnummer, Name oder Ort suchen" className="pl-9" />
         </div>
-        <select value={branding} onChange={(event) => setBranding(event.target.value)} className="h-9 rounded-md border border-line bg-background px-3 text-[13px] text-conditions">
-          <option value="alle">Alle Brandings</option>
-          {(brandings.data ?? []).map((item) => (
-            <option key={item.id} value={item.id}>{item.shopName || item.companyName || "Unbenannt"}</option>
-          ))}
-        </select>
+        {isAdmin ? (
+          <select value={branding} onChange={(event) => setBranding(event.target.value)} className="h-9 rounded-md border border-line bg-background px-3 text-[13px] text-conditions">
+            <option value="alle">Alle Brandings</option>
+            {(brandings.data ?? []).map((item) => (
+              <option key={item.id} value={item.id}>{item.shopName || item.companyName || "Unbenannt"}</option>
+            ))}
+          </select>
+        ) : null}
         <select value={status} onChange={(event) => setStatus(event.target.value as OrderStatus | "alle")} className="h-9 rounded-md border border-line bg-background px-3 text-[13px] text-conditions">
           <option value="alle">Alle Status</option>
           {ORDER_STATUSES.map((value) => (
@@ -286,7 +292,7 @@ function OrdersPage() {
                     <th className="px-4 py-3 font-semibold">Branding</th>
                     <th className="px-4 py-3 font-semibold">Zahlungsart</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
-                    <th className="px-4 py-3 font-semibold">Aktionen</th>
+                    {isAdmin ? <th className="px-4 py-3 font-semibold">Aktionen</th> : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -338,19 +344,21 @@ function OrdersPage() {
                       <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
                         <StatusCell order={order} />
                       </td>
-                      <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
-                        <button
-                          type="button"
-                          onClick={() => setInvoiceOrder(order)}
-                          title={invoicedOrderIds.has(order.id) ? "Rechnung neu generieren" : "Rechnung generieren"}
-                          className={cn(
-                            "inline-flex size-8 cursor-pointer items-center justify-center rounded-md border border-line hover:bg-surface",
-                            invoicedOrderIds.has(order.id) ? "text-brand-hover" : "text-muted-custom",
-                          )}
-                        >
-                          <FileText className="size-4" />
-                        </button>
-                      </td>
+                      {isAdmin ? (
+                        <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
+                          <button
+                            type="button"
+                            onClick={() => setInvoiceOrder(order)}
+                            title={invoicedOrderIds.has(order.id) ? "Rechnung neu generieren" : "Rechnung generieren"}
+                            className={cn(
+                              "inline-flex size-8 cursor-pointer items-center justify-center rounded-md border border-line hover:bg-surface",
+                              invoicedOrderIds.has(order.id) ? "text-brand-hover" : "text-muted-custom",
+                            )}
+                          >
+                            <FileText className="size-4" />
+                          </button>
+                        </td>
+                      ) : null}
                     </tr>
                   ))}
                 </tbody>
@@ -420,11 +428,13 @@ function OrdersPage() {
                       <Copy className="size-3.5" /> {order.phone}
                     </span>
                   ) : null}
-                  <span onClick={(event) => event.stopPropagation()}>
-                    <Button size="sm" variant="outline" onClick={() => setInvoiceOrder(order)}>
-                      <FileText /> Rechnung
-                    </Button>
-                  </span>
+                  {isAdmin ? (
+                    <span onClick={(event) => event.stopPropagation()}>
+                      <Button size="sm" variant="outline" onClick={() => setInvoiceOrder(order)}>
+                        <FileText /> Rechnung
+                      </Button>
+                    </span>
+                  ) : null}
                 </div>
               </div>
             ))}
@@ -433,7 +443,7 @@ function OrdersPage() {
       ) : null}
 
       <OrderDetailDialog orderId={selectedId} onClose={() => setSelectedId(null)} />
-      <GenerateInvoiceDialog order={invoiceOrder} onClose={() => setInvoiceOrder(null)} />
+      {isAdmin ? <GenerateInvoiceDialog order={invoiceOrder} onClose={() => setInvoiceOrder(null)} /> : null}
     </AdminPageShell>
   );
 }
