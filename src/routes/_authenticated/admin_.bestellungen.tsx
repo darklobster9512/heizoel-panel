@@ -182,10 +182,22 @@ function OrdersPage() {
   const [branding, setBranding] = useState<string>("alle");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [invoiceOrder, setInvoiceOrder] = useState<Order | null>(null);
+  const [showNoInterest, setShowNoInterest] = useState(false);
+
+  const noInterestCount = useMemo(
+    () => (data ?? []).filter((order) => order.status === "kein_interesse").length,
+    [data],
+  );
 
   const rows = useMemo(() => {
     const needle = search.trim().toLowerCase();
     return (data ?? []).filter((order) => {
+      const isNoInterest = order.status === "kein_interesse";
+      if (showNoInterest) {
+        if (!isNoInterest) return false;
+      } else if (isNoInterest && status !== "kein_interesse") {
+        return false;
+      }
       if (status !== "alle" && order.status !== status) return false;
       if (branding !== "alle" && order.brandingId !== branding) return false;
       if (!needle) return true;
@@ -194,7 +206,7 @@ function OrdersPage() {
         .toLowerCase()
         .includes(needle);
     });
-  }, [data, search, status, branding]);
+  }, [data, search, status, branding, showNoInterest]);
 
   return (
     <AdminPageShell active="orders">
