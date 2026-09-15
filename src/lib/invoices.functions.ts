@@ -269,7 +269,72 @@ export const generateInvoice = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error("Die Rechnung konnte nicht gespeichert werden.");
 
-    return { id: String(saved.id), invoiceNumber: order.orderNumber };
+    const warnings: string[] = [];
+    let emailSent = false;
+    let smsSent = false;
+
+    // E-Mail mit Rechnung über Resend-Daten des Brandings
+    const resendKey = str(brandingRaw?.["resend_api_key"]);
+    const resendFrom = str(brandingRaw?.["resend_sender_email"]);
+    if (!resendKey || !resendFrom) {
+      warnings.push("E-Mail nicht versendet: Resend-Daten fehlen beim Branding.");
+    } else if (!order.email) {
+      warnings.push("E-Mail nicht versendet: Die Bestellung hat keine E-Mail-Adresse.");
+    } else {
+      try {
+        const { sendResendEmail, senderLine, toBase64 } = await import("@/lib/notify/resend.server");
+        const emailBranding = emailBrandingFrom(brandingRaw, brandingLogoUrl);
+        const html = renderOrderInvoiceEmail(emailBranding, invoiceDataFrom(order, order.orderNumber), {
+          accountHolder: String(bankRow.name),
+          iban: String(bankRow.iban),
+          bic: String(bankRow.bic),
+        });
+        await sendResendEmail({
+          apiKey: resendKey,
+          from: senderLine(str(brandingRaw?.["resend_sender_name"]), resendFrom),
+          to: order.email,
+          subject: `Ihre Rechnung ${order.orderNumber}`,
+          html,
+          replyTo: str(brandingRaw?.["email"]),
+          attachments: [{ filename: `Rechnung_${order.orderNumber}.pdf`, content: toBase64(bytes) }],
+        });
+        emailSent = true;
+      } catch (caught) {
+        console.error("[invoice] email failed", caught);
+        warnings.push("Die Rechnungs-E-Mail konnte nicht versendet werden.");
+      }
+    }
+
+    // SMS über Seven.io-Daten des Brandings
+    const sevenKey = str(brandingRaw?.["seven_api_key"]);
+    if (!sevenKey) {
+      warnings.push("SMS nicht versendet: Seven.io-Daten fehlen beim Branding.");
+    } else if (!order.phone) {
+      warnings.push("SMS nicht versendet: Die Bestellung hat keine Telefonnummer.");
+    } else {
+      try {
+        const { sendSevenSms } = await import("@/lib/notify/seven.server");
+        const smsBranding = smsBrandingFrom(brandingRaw);
+        await sendSevenSms({
+          apiKey: sevenKey,
+          to: order.phone,
+          from: smsSender(smsBranding),
+          text: renderOrderConfirmationSms(smsBranding, smsDataFrom(order)),
+        });
+        smsSent = true;
+      } catch (caught) {
+        console.error("[invoice] sms failed", caught);
+        warnings.push("Die SMS konnte nicht versendet werden.");
+      }
+    }
+
+    const { error: statusError } = await context.supabase
+      .from("orders")
+      .update({ status: "rechnung_versendet" })
+      .eq("id", order.id);
+    if (statusError) warnings.push("Der Status konnte nicht aktualisiert werden.");
+
+    return { id: String(saved.id), invoiceNumber: order.orderNumber, emailSent, smsSent, warnings };
   });
 
 export const downloadInvoice = createServerFn({ method: "POST" })
