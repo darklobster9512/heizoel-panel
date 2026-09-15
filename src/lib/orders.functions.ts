@@ -6,6 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const ORDER_STATUSES = [
   "neu",
   "mailbox",
+  "kein_interesse",
   "moechte_rechnung",
   "rechnung_versendet",
   "ueberwiesen",
@@ -18,6 +19,7 @@ export type OrderStatus = (typeof ORDER_STATUSES)[number];
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   neu: "Neu",
   mailbox: "Mailbox",
+  kein_interesse: "Kein Interesse",
   moechte_rechnung: "Möchte Rechnung",
   rechnung_versendet: "Rechnung versendet",
   ueberwiesen: "Überwiesen",

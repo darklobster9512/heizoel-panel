@@ -107,6 +107,7 @@ export function paymentMethodLabel(order: Order) {
 export const STATUS_STYLE: Record<OrderStatus, string> = {
   neu: "bg-brand-soft text-brand-hover",
   mailbox: "bg-surface text-conditions",
+  kein_interesse: "bg-surface text-muted-custom",
   moechte_rechnung: "bg-surface text-conditions",
   rechnung_versendet: "bg-brand-soft text-brand-hover",
   ueberwiesen: "bg-brand-soft text-brand-hover",
