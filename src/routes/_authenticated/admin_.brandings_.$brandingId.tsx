@@ -10,10 +10,10 @@ import { getBranding } from "@/lib/brandings.functions";
 
 export const Route = createFileRoute("/_authenticated/admin_/brandings_/$brandingId")({
   head: () => ({ meta: [
-    { title: "Branding bearbeiten — Klaro Heizöl" },
+    { title: "Branding bearbeiten — HEIZKING" },
     { name: "description", content: "Heizöl-Shop-Branding bearbeiten." },
     { name: "robots", content: "noindex, nofollow" },
-    { property: "og:title", content: "Branding bearbeiten — Klaro Heizöl" },
+    { property: "og:title", content: "Branding bearbeiten — HEIZKING" },
     { property: "og:description", content: "Heizöl-Shop-Branding bearbeiten." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

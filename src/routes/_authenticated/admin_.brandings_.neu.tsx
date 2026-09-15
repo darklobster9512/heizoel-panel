@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/admin_/brandings_/neu")({
   head: () => ({ meta: [
-    { title: "Branding hinzufügen — Klaro Heizöl" },
+    { title: "Branding hinzufügen — HEIZKING" },
     { name: "description", content: "Neues Heizöl-Shop-Branding anlegen." },
     { name: "robots", content: "noindex, nofollow" },
-    { property: "og:title", content: "Branding hinzufügen — Klaro Heizöl" },
+    { property: "og:title", content: "Branding hinzufügen — HEIZKING" },
     { property: "og:description", content: "Neues Heizöl-Shop-Branding anlegen." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

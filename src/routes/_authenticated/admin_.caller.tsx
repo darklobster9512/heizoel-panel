@@ -23,10 +23,10 @@ import {
 export const Route = createFileRoute("/_authenticated/admin_/caller")({
   head: () => ({
     meta: [
-      { title: "Caller-Konten — Klaro Heizöl" },
+      { title: "Caller-Konten — HEIZKING" },
       { name: "description", content: "Mitarbeiter-Konten mit Caller-Rang anlegen und verwalten." },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Caller-Konten — Klaro Heizöl" },
+      { property: "og:title", content: "Caller-Konten — HEIZKING" },
       { property: "og:description", content: "Mitarbeiter-Konten mit Caller-Rang anlegen und verwalten." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

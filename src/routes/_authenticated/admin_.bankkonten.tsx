@@ -18,10 +18,10 @@ import { ORDER_STATUS_LABEL, updateOrder } from "@/lib/orders.functions";
 
 export const Route = createFileRoute("/_authenticated/admin_/bankkonten")({
   head: () => ({ meta: [
-    { title: "Bankkonten verwalten — Klaro Heizöl" },
+    { title: "Bankkonten verwalten — HEIZKING" },
     { name: "description", content: "Interne Verwaltung der Bankkonten." },
     { name: "robots", content: "noindex, nofollow" },
-    { property: "og:title", content: "Bankkonten verwalten — Klaro Heizöl" },
+    { property: "og:title", content: "Bankkonten verwalten — HEIZKING" },
     { property: "og:description", content: "Interne Verwaltung der Bankkonten." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

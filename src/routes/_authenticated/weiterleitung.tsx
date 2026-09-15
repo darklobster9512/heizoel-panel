@@ -12,10 +12,10 @@ import { getMyAccount } from "@/lib/roles.functions";
 export const Route = createFileRoute("/_authenticated/weiterleitung")({
   head: () => ({
     meta: [
-      { title: "Anmeldung wird geprüft — Klaro Heizöl" },
+      { title: "Anmeldung wird geprüft — HEIZKING" },
       { name: "description", content: "Interner Zwischenschritt nach der Anmeldung." },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Anmeldung wird geprüft — Klaro Heizöl" },
+      { property: "og:title", content: "Anmeldung wird geprüft — HEIZKING" },
       { property: "og:description", content: "Interner Zwischenschritt nach der Anmeldung." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

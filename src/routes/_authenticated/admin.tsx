@@ -24,13 +24,13 @@ import { getMyAccount } from "@/lib/roles.functions";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Admin-Bereich — Klaro Heizöl" },
+      { title: "Admin-Bereich — HEIZKING" },
       {
         name: "description",
-        content: "Interne Übersicht über Bestellungen, Umsatz und Brandings im Klaro Heizöl-System.",
+        content: "Interne Übersicht über Bestellungen, Umsatz und Brandings im HEIZKING-System.",
       },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Admin-Bereich — Klaro Heizöl" },
+      { property: "og:title", content: "Admin-Bereich — HEIZKING" },
       {
         property: "og:description",
         content: "Interne Übersicht über Bestellungen, Umsatz und Brandings.",

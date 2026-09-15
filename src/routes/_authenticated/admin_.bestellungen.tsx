@@ -29,10 +29,10 @@ import {
 
 export const Route = createFileRoute("/_authenticated/admin_/bestellungen")({
   head: () => ({ meta: [
-    { title: "Bestellungen verwalten — Klaro Heizöl" },
+    { title: "Bestellungen verwalten — HEIZKING" },
     { name: "description", content: "Interne Übersicht aller eingegangenen Heizöl-Bestellungen." },
     { name: "robots", content: "noindex, nofollow" },
-    { property: "og:title", content: "Bestellungen verwalten — Klaro Heizöl" },
+    { property: "og:title", content: "Bestellungen verwalten — HEIZKING" },
     { property: "og:description", content: "Interne Übersicht aller eingegangenen Heizöl-Bestellungen." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

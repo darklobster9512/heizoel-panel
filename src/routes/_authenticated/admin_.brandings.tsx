@@ -11,10 +11,10 @@ import { listBrandings } from "@/lib/brandings.functions";
 
 export const Route = createFileRoute("/_authenticated/admin_/brandings")({
   head: () => ({ meta: [
-    { title: "Brandings verwalten — Klaro Heizöl" },
+    { title: "Brandings verwalten — HEIZKING" },
     { name: "description", content: "Interne Verwaltung der Heizöl-Shop-Brandings." },
     { name: "robots", content: "noindex, nofollow" },
-    { property: "og:title", content: "Brandings verwalten — Klaro Heizöl" },
+    { property: "og:title", content: "Brandings verwalten — HEIZKING" },
     { property: "og:description", content: "Interne Verwaltung der Heizöl-Shop-Brandings." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
