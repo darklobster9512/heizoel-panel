@@ -108,7 +108,7 @@ export const STATUS_STYLE: Record<OrderStatus, string> = {
   neu: "bg-status-gray-bg text-status-gray-text",
   mailbox: "bg-status-warning-bg text-status-warning-text",
   kein_interesse: "bg-status-red-bg text-status-red-text",
-  moechte_rechnung: "bg-status-orange-bg text-status-orange-text",
+  moechte_rechnung: "bg-status-purple-bg text-status-purple-text",
   rechnung_versendet: "bg-status-blue-bg text-status-blue-text",
   ueberwiesen: "bg-status-greenish-bg text-status-greenish-text",
   angekommen: "bg-status-green-bg text-status-green-text",
