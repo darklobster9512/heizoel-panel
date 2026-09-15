@@ -16,7 +16,7 @@ import {
   smsDataFrom,
 } from "@/lib/notify/order-payloads";
 import { renderOrderInvoiceSms, smsSender } from "@/lib/sms-templates";
-import type { Order, OrderAddress } from "@/lib/orders.functions";
+import type { Order, OrderAddress, OrderStatus } from "@/lib/orders.functions";
 
 export type GenerateInvoiceResult = {
   id: string;
@@ -48,7 +48,21 @@ export type BankAccountUsage = {
   limitAmount: number;
   usedAmount: number;
   invoiceCount: number;
+  isActive: boolean;
 };
+
+export type BankAccountOrder = {
+  invoiceId: string;
+  orderId: string;
+  orderNumber: string;
+  invoiceNumber: string;
+  amount: number;
+  customer: string;
+  status: OrderStatus;
+  placedAt: string;
+  createdAt: string;
+};
+
 
 async function requireAdmin(context: {
   supabase: {
@@ -131,8 +145,7 @@ export const getBankAccountUsage = createServerFn({ method: "GET" })
     const [accounts, invoices] = await Promise.all([
       context.supabase
         .from("bank_accounts")
-        .select("id, name, iban, bic, bank_name, limit_amount")
-        .eq("is_active", true)
+        .select("id, name, iban, bic, bank_name, limit_amount, is_active")
         .order("created_at", { ascending: true }),
       context.supabase.from("invoices").select("bank_account_id, amount"),
     ]);
@@ -160,9 +173,63 @@ export const getBankAccountUsage = createServerFn({ method: "GET" })
         limitAmount: num(row.limit_amount),
         usedAmount: stats.amount,
         invoiceCount: stats.count,
+        isActive: (row as { is_active?: unknown }).is_active !== false,
       };
     });
   });
+
+export const listBankAccountOrders = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { bankAccountId: string }) =>
+    z.object({ bankAccountId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }): Promise<BankAccountOrder[]> => {
+    await requireAdmin(context);
+    const { data: rows, error } = await context.supabase
+      .from("invoices")
+      .select(
+        "id, order_id, invoice_number, amount, created_at, orders(order_number, email, total, status, placed_at, delivery_address, billing_address)",
+      )
+      .eq("bank_account_id", data.bankAccountId)
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) throw new Error("Bestellungen konnten nicht geladen werden.");
+
+    return (rows ?? []).map((raw) => {
+      const row = raw as unknown as {
+        id: string;
+        order_id: string;
+        invoice_number: string;
+        amount: unknown;
+        created_at: string;
+        orders: {
+          order_number: string | null;
+          email: string | null;
+          total: unknown;
+          status: string | null;
+          placed_at: string | null;
+          delivery_address: unknown;
+          billing_address: unknown;
+        } | null;
+      };
+      return {
+        invoiceId: String(row.id),
+        orderId: String(row.order_id),
+        orderNumber: row.orders?.order_number ?? row.invoice_number,
+        invoiceNumber: String(row.invoice_number),
+        amount: num(row.amount),
+        customer: customerFrom(
+          address(row.orders?.delivery_address),
+          row.orders?.billing_address ? address(row.orders.billing_address) : null,
+          row.orders?.email ?? "",
+        ),
+        status: (row.orders?.status ?? "neu") as OrderStatus,
+        placedAt: String(row.orders?.placed_at ?? row.created_at),
+        createdAt: String(row.created_at),
+      };
+    });
+  });
+
 
 export const generateInvoice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
