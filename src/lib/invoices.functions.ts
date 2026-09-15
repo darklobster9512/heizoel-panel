@@ -10,13 +10,12 @@ import {
 } from "@/lib/invoice/invoice-data";
 import { renderOrderInvoiceEmail } from "@/lib/email-templates/order-invoice";
 import {
-  confirmationDataFrom,
   emailBrandingFrom,
   invoiceDataFrom,
   smsBrandingFrom,
   smsDataFrom,
 } from "@/lib/notify/order-payloads";
-import { renderOrderConfirmationSms, smsSender } from "@/lib/sms-templates";
+import { renderOrderInvoiceSms, smsSender } from "@/lib/sms-templates";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
 
 export type GenerateInvoiceResult = {
@@ -291,8 +290,8 @@ export const generateInvoice = createServerFn({ method: "POST" })
     let smsSent = false;
 
     // E-Mail mit Rechnung über Resend-Daten des Brandings
-    const resendKey = str(brandingRaw?.["resend_api_key"]);
-    const resendFrom = str(brandingRaw?.["resend_sender_email"]);
+    const resendKey = text(brandingRaw?.["resend_api_key"]);
+    const resendFrom = text(brandingRaw?.["resend_sender_email"]);
     if (!resendKey || !resendFrom) {
       warnings.push("E-Mail nicht versendet: Resend-Daten fehlen beim Branding.");
     } else if (!order.email) {
@@ -308,11 +307,11 @@ export const generateInvoice = createServerFn({ method: "POST" })
         });
         await sendResendEmail({
           apiKey: resendKey,
-          from: senderLine(str(brandingRaw?.["resend_sender_name"]), resendFrom),
+          from: senderLine(text(brandingRaw?.["resend_sender_name"]), resendFrom),
           to: order.email,
           subject: `Ihre Rechnung ${order.orderNumber}`,
           html,
-          replyTo: str(brandingRaw?.["email"]),
+          replyTo: text(brandingRaw?.["email"]),
           attachments: [{ filename: `Rechnung_${order.orderNumber}.pdf`, content: toBase64(bytes) }],
         });
         emailSent = true;
@@ -323,7 +322,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
     }
 
     // SMS über Seven.io-Daten des Brandings
-    const sevenKey = str(brandingRaw?.["seven_api_key"]);
+    const sevenKey = text(brandingRaw?.["seven_api_key"]);
     if (!sevenKey) {
       warnings.push("SMS nicht versendet: Seven.io-Daten fehlen beim Branding.");
     } else if (!order.phone) {
@@ -336,7 +335,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
           apiKey: sevenKey,
           to: order.phone,
           from: smsSender(smsBranding),
-          text: renderOrderConfirmationSms(smsBranding, smsDataFrom(order)),
+          text: renderOrderInvoiceSms(smsBranding, smsDataFrom(order)),
         });
         smsSent = true;
       } catch (caught) {
