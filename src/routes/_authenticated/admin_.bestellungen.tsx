@@ -816,9 +816,16 @@ function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClo
                   {dirty ? <span className="text-[12px] text-muted-custom">Ungespeicherte Änderungen</span> : null}
                 </>
               ) : (
-                <Button size="sm" variant="outline" onClick={() => setEditing(true)} title="Werte bearbeiten">
-                  <Pencil /> Bearbeiten
-                </Button>
+                <>
+                  {dirty ? (
+                    <Button size="sm" onClick={handleSave} disabled={mutation.isPending}>
+                      {mutation.isPending ? <Loader2 className="animate-spin" /> : <Save />} Speichern
+                    </Button>
+                  ) : null}
+                  <Button size="sm" variant="outline" onClick={() => setEditing(true)} title="Werte bearbeiten">
+                    <Pencil /> Bearbeiten
+                  </Button>
+                </>
               )}
             </div>
 
