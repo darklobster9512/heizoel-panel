@@ -182,11 +182,36 @@ function BankkontenPage() {
                     <dd className="mt-0.5 text-[13px] font-medium text-conditions">{euro.format(account.limitAmount)}</dd>
                   </div>
                 </div>
+                {(() => {
+                  const usage = usageById.get(account.id);
+                  const used = usage?.usedAmount ?? 0;
+                  const count = usage?.invoiceCount ?? 0;
+                  const percent = account.limitAmount > 0 ? (used / account.limitAmount) * 100 : 0;
+                  const over = percent >= 100;
+                  return (
+                    <div>
+                      <dt className="text-[10px] font-semibold tracking-wide text-muted-custom uppercase">Limit-Auslastung</dt>
+                      <dd className="mt-1.5">
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-surface">
+                          <div
+                            className={`h-full rounded-full ${over ? "bg-destructive" : "bg-brand"}`}
+                            style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+                          />
+                        </div>
+                        <p className="mt-1.5 text-[12px] text-muted-custom">
+                          {euro.format(used)} von {euro.format(account.limitAmount)} verwendet ({Math.round(percent)} %) · {count} {count === 1 ? "Rechnung" : "Rechnungen"}
+                        </p>
+                      </dd>
+                    </div>
+                  );
+                })()}
               </dl>
               <div className="flex items-center justify-between border-t border-line px-5 py-3">
                 <span className="text-[11px] text-muted-custom">Geändert {new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" }).format(new Date(account.updatedAt))}</span>
                 <div className="flex gap-1">
+                  <Button size="icon" variant="ghost" title="Zugewiesene Bestellungen" aria-label="Zugewiesene Bestellungen anzeigen" onClick={() => setOrdersFor(account)}><Eye /></Button>
                   <Button size="icon" variant="ghost" title="Bearbeiten" aria-label="Bankkonto bearbeiten" onClick={() => openEdit(account)}><Edit3 /></Button>
+
                   <Button
                     size="icon"
                     variant="ghost"
