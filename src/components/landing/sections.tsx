@@ -46,7 +46,7 @@ const STATS = [
 
 export function TrustBar() {
   return (
-    <section aria-label="Klaro in Zahlen" className="bg-background">
+    <section aria-label="HEIZKING in Zahlen" className="bg-background">
       <div className="h-[3px] w-full bg-brand" />
       <div className="mx-auto max-w-6xl px-5 py-6 md:py-8">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-6">
@@ -445,7 +445,7 @@ export function MatchingOffers() {
             id="matching-offers-title"
             className="text-center text-[25px] font-bold leading-[1.25] text-conditions md:text-[28px]"
           >
-            Mit Klaro zum günstigsten Heizölpreis
+            Mit HEIZKING zum günstigsten Heizölpreis
           </h2>
 
           <ul className="mt-8 grid gap-x-[72px] gap-y-8 sm:grid-cols-2 md:-ml-[94px] md:w-[calc(100%+94px)]">
@@ -751,7 +751,7 @@ export function TrustLinks() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <div className="pr-4">
             <h2 className="text-[26px] font-bold leading-[1.25] text-conditions">
-              Vertrauen Sie auf Klaro – Ihr Heizöl-Preisvergleich
+              Vertrauen Sie auf HEIZKING – Ihr Heizöl-Preisvergleich
             </h2>
             <p className="mt-5 text-[15px] leading-[1.6] text-conditions">
               Entdecken Sie jetzt weitere Themen und Vergleichsmöglichkeiten rund um
@@ -851,7 +851,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1283px] px-5 py-10 md:px-[66px] md:py-12">
         <div className="grid gap-8 md:grid-cols-[1.25fr_0.9fr_0.9fr_1.15fr] md:gap-10">
           <div>
-            <a href="#top" aria-label="Klaro Startseite" className="inline-block text-smava-logo">
+            <a href="#top" aria-label="HEIZKING Startseite" className="inline-block text-smava-logo">
               <Logo />
             </a>
             <p className="mt-3 max-w-[280px] text-[13px] leading-[1.5] text-footer-text">
@@ -951,7 +951,7 @@ export function SiteFooter() {
       </div>
 
       <div className="mx-auto flex max-w-[1283px] flex-col gap-2 px-5 py-4 text-[12px] text-footer-text md:flex-row md:items-center md:justify-between md:px-[66px]">
-        <p>© 2026 Klaro GmbH | Heizöl online günstig bestellen</p>
+        <p>© 2026 HEIZKING GmbH | Heizöl online günstig bestellen</p>
         <div className="flex gap-5">
           <a href="#" className="hover:underline">
             Impressum
@@ -980,7 +980,7 @@ export function ReferralBanner({ compact = false }: { compact?: boolean }) {
             <div className="relative">
               <img
                 src={smavaHero.url}
-                alt="Klaro Beraterin mit Tablet"
+                alt="HEIZKING Beraterin mit Tablet"
                 className="absolute bottom-0 left-[40px] h-[350px] w-auto object-contain object-bottom"
               />
             </div>
@@ -1008,7 +1008,7 @@ export function ReferralBanner({ compact = false }: { compact?: boolean }) {
         <div className={`flex justify-center bg-white ${compact ? "pt-2" : "pt-6"}`}>
           <img
             src={smavaHero.url}
-            alt="Klaro Beraterin mit Tablet"
+            alt="HEIZKING Beraterin mit Tablet"
             className="h-[240px] w-auto object-contain"
           />
         </div>

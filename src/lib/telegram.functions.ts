@@ -116,7 +116,7 @@ export const sendTelegramTest = createServerFn({ method: "POST" })
     if (error || !row) throw new Error("Empfänger wurde nicht gefunden.");
 
     const { sendTelegramMessage, renderOrderNotification } = await import("@/lib/telegram/notify.server");
-    const text = `✅ <b>Testnachricht aus dem Klaro-Backend</b>\n\n${renderOrderNotification({
+    const text = `✅ <b>Testnachricht aus dem HEIZKING-Backend</b>\n\n${renderOrderNotification({
       orderNumber: "2609-74568",
       brandingId: null,
       brandingName: "Heizöl Online",

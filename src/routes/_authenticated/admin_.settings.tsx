@@ -22,10 +22,10 @@ export const Route = createFileRoute("/_authenticated/admin_/settings")({
   },
   head: () => ({
     meta: [
-      { title: "Einstellungen — Klaro Heizöl" },
+      { title: "Einstellungen — HEIZKING" },
       { name: "description", content: "Rechnung, E-Mails, SMS und Telegram an einem Ort." },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Einstellungen — Klaro Heizöl" },
+      { property: "og:title", content: "Einstellungen — HEIZKING" },
       { property: "og:description", content: "Rechnung, E-Mails, SMS und Telegram an einem Ort." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

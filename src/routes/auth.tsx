@@ -27,17 +27,17 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Mitarbeiter-Login — Klaro Heizöl" },
+      { title: "Mitarbeiter-Login — HEIZKING" },
       {
         name: "description",
         content:
-          "Interner Zugang für Admins und Caller des Klaro Heizöl-Systems. Anmelden oder Zugang beantragen.",
+          "Interner Zugang für Admins und Caller des HEIZKING Heizöl-Systems. Anmelden oder Zugang beantragen.",
       },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Mitarbeiter-Login — Klaro Heizöl" },
+      { property: "og:title", content: "Mitarbeiter-Login — HEIZKING" },
       {
         property: "og:description",
-        content: "Interner Zugang für Admins und Caller des Klaro Heizöl-Systems.",
+        content: "Interner Zugang für Admins und Caller des HEIZKING Heizöl-Systems.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -355,7 +355,7 @@ function AuthPage() {
               <span className="flex items-center gap-2 text-[11px] font-medium text-muted-custom">
                 <Radio className="size-3.5 text-brand" /> ZUGANGSKANAL GESICHERT
               </span>
-              <span className="text-[11px] text-muted-custom">KLARO / AUTH</span>
+              <span className="text-[11px] text-muted-custom">HEIZKING / AUTH</span>
             </div>
 
             <div className="flex flex-1 items-center px-5 py-8 sm:px-10 lg:px-14 xl:px-20">

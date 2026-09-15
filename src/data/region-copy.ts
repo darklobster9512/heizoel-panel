@@ -30,14 +30,14 @@ export function stateBlocks(state: State): CopyBlock[] {
     {
       heading: `Heizöl-Lieferung in ganz ${state.name}`,
       paragraphs: [
-        `Klaro liefert Heizöl in alle ${num(state.cityCount)} Städte und Gemeinden sowie ${num(state.plzCount)} Postleitzahl-Bereiche in ${state.name}. Der aktuelle Heizölpreis beträgt ab ${price()} pro 100 Liter (Stand: ${todayStamp()}). Bei einer durchschnittlichen Bestellung von ${num(SAMPLE_LITERS)} Litern liegt der Gesamtpreis bei ca. ${total()} — kostenlose Lieferung inklusive.`,
-        `Heizölpreise in ${state.name} schwanken täglich je nach Rohölpreis, Dollar-Kurs und saisonaler Nachfrage. Wählen Sie unten Ihre Stadt oder berechnen Sie Ihren Preis direkt mit Ihrer Postleitzahl. Mit über ${REVIEW_COUNT} zufriedenen Kunden deutschlandweit und ${REVIEW_SCORE}/5 Sternen gehört Klaro zu den beliebtesten Heizöl-Anbietern Deutschlands.`,
+        `Heizking liefert Heizöl in alle ${num(state.cityCount)} Städte und Gemeinden sowie ${num(state.plzCount)} Postleitzahl-Bereiche in ${state.name}. Der aktuelle Heizölpreis beträgt ab ${price()} pro 100 Liter (Stand: ${todayStamp()}). Bei einer durchschnittlichen Bestellung von ${num(SAMPLE_LITERS)} Litern liegt der Gesamtpreis bei ca. ${total()} — kostenlose Lieferung inklusive.`,
+        `Heizölpreise in ${state.name} schwanken täglich je nach Rohölpreis, Dollar-Kurs und saisonaler Nachfrage. Wählen Sie unten Ihre Stadt oder berechnen Sie Ihren Preis direkt mit Ihrer Postleitzahl. Mit über ${REVIEW_COUNT} zufriedenen Kunden deutschlandweit und ${REVIEW_SCORE}/5 Sternen gehört Heizking zu den beliebtesten Heizöl-Anbietern Deutschlands.`,
       ],
     },
     {
       heading: `Heizölpreis pro Liter in ${state.name} — was kostet 1 Liter?`,
       paragraphs: [
-        `Der Heizölpreis pro Liter in ${state.name} liegt heute bei ca. ${perLiter()} pro Liter — das entspricht ${price()} pro 100 Liter. Im deutschen Heizöl-Markt ist die Angabe €/100 L Standard, da Heizöl nur in größeren Mengen verkauft wird; bei Klaro beträgt die Mindestbestellmenge ${num(MIN_LITERS)} Liter.`,
+        `Der Heizölpreis pro Liter in ${state.name} liegt heute bei ca. ${perLiter()} pro Liter — das entspricht ${price()} pro 100 Liter. Im deutschen Heizöl-Markt ist die Angabe €/100 L Standard, da Heizöl nur in größeren Mengen verkauft wird; bei Heizking beträgt die Mindestbestellmenge ${num(MIN_LITERS)} Liter.`,
         `Bei einer typischen Bestellung von ${num(SAMPLE_LITERS)} Litern — dem durchschnittlichen Jahresbedarf eines Einfamilienhauses — zahlen Sie in ${state.name} ca. ${total()} inklusive Lieferung und Mehrwertsteuer. Je größer die Bestellmenge, desto günstiger wird der Preis pro 100 Liter.`,
       ],
     },
@@ -51,7 +51,7 @@ export function stateBlocks(state: State): CopyBlock[] {
     {
       heading: `Heizöl bestellen in ${state.name} — was Sie wissen müssen`,
       paragraphs: [
-        `Beim Heizöl bestellen in ${state.name} ist die Liefermenge entscheidend für den Preis pro 100 Liter: Je größer die Bestellmenge, desto günstiger der €/100-L-Preis. Die Mindestbestellmenge bei Klaro beträgt ${num(MIN_LITERS)} Liter. Die Lieferung erfolgt deutschlandweit innerhalb von ${DELIVERY_DAYS} Werktagen und ist im Preis enthalten.`,
+        `Beim Heizöl bestellen in ${state.name} ist die Liefermenge entscheidend für den Preis pro 100 Liter: Je größer die Bestellmenge, desto günstiger der €/100-L-Preis. Die Mindestbestellmenge bei Heizking beträgt ${num(MIN_LITERS)} Liter. Die Lieferung erfolgt deutschlandweit innerhalb von ${DELIVERY_DAYS} Werktagen und ist im Preis enthalten.`,
         `${state.logistics}. Alle Zahlungsarten — Vorkasse, Rechnung, EC-Karte und Barzahlung bei Lieferung — sind ohne Aufpreis verfügbar. Mit der Festpreisgarantie ist Ihr Heizölpreis ab Bestellabschluss bindend: Auch bei steigenden Marktpreisen bis zur Lieferung zahlen Sie nur den vereinbarten Betrag.`,
       ],
     },
@@ -89,8 +89,8 @@ export function cityBlocks(city: City, state: State): CopyBlock[] {
   const [low, high] = state.consumption;
   const v = variantIndex(city.slug, 3);
   const intro = [
-    `Klaro liefert Heizöl nach ${city.name} und in die umliegenden Orte im Postleitzahl-Bereich ${city.plz}. Der aktuelle Heizölpreis für ${city.name} beträgt ab ${price()} pro 100 Liter (Stand: ${todayStamp()}).`,
-    `Heizöl für ${withState(city, state)} bestellen Sie bei Klaro tagesaktuell ab ${price()} pro 100 Liter (Stand: ${todayStamp()}) — geliefert wird im PLZ-Gebiet ${city.plz} und in der gesamten Region.`,
+    `Heizking liefert Heizöl nach ${city.name} und in die umliegenden Orte im Postleitzahl-Bereich ${city.plz}. Der aktuelle Heizölpreis für ${city.name} beträgt ab ${price()} pro 100 Liter (Stand: ${todayStamp()}).`,
+    `Heizöl für ${withState(city, state)} bestellen Sie bei Heizking tagesaktuell ab ${price()} pro 100 Liter (Stand: ${todayStamp()}) — geliefert wird im PLZ-Gebiet ${city.plz} und in der gesamten Region.`,
     `In ${city.name} liefern wir Heizöl zum tagesaktuellen Preis ab ${price()} pro 100 Liter (Stand: ${todayStamp()}). Das Liefergebiet umfasst den Postleitzahl-Bereich ${city.plz} sowie die Nachbargemeinden.`,
   ];
   const introSecond = [
@@ -110,7 +110,7 @@ export function cityBlocks(city: City, state: State): CopyBlock[] {
       paragraphs: [
         intro[v] ?? intro[0]!,
         introSecond[v] ?? introSecond[0]!,
-        `${city.name}${city.district ? ` im Landkreis ${city.district}` : ""} hat rund ${num(city.population)} Einwohner. Mit über ${REVIEW_COUNT} zufriedenen Kunden und ${REVIEW_SCORE}/5 Sternen gehört Klaro zu den beliebtesten Heizöl-Anbietern Deutschlands.`,
+        `${city.name}${city.district ? ` im Landkreis ${city.district}` : ""} hat rund ${num(city.population)} Einwohner. Mit über ${REVIEW_COUNT} zufriedenen Kunden und ${REVIEW_SCORE}/5 Sternen gehört Heizking zu den beliebtesten Heizöl-Anbietern Deutschlands.`,
       ],
     },
     {
@@ -144,7 +144,7 @@ export function cityFaq(city: City, state: State): { q: string; a: string }[] {
       a: `Der Heizölpreis in ${city.name} beginnt heute bei ${price()} pro 100 Liter (Stand: ${todayStamp()}), also rund ${perLiter()} pro Liter. ${num(SAMPLE_LITERS)} Liter kosten ca. ${total()} inklusive Lieferung.`,
     },
     {
-      q: `Liefert Klaro Heizöl nach ${city.name}?`,
+      q: `Liefert Heizking Heizöl nach ${city.name}?`,
       a: `Ja. ${city.name} liegt im Postleitzahl-Bereich ${city.plz} und wird regelmäßig beliefert — innerhalb von ${DELIVERY_DAYS} Werktagen ab Bestellung, deutschlandweit kostenfrei.`,
     },
     {
