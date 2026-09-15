@@ -5,7 +5,7 @@ export function Logo({ className = "h-auto w-[139px]" }: { className?: string })
       role="img"
       aria-label="HEIZKING"
     >
-      klaro<span className="text-brand">.</span>
+      heizking<span className="text-brand">.</span>
     </span>
   );
 }
