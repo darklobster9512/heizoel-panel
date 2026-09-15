@@ -175,9 +175,12 @@ function OrdersPage() {
   const fetchOrders = useServerFn(listOrders);
   const fetchBrandings = useServerFn(listBrandings);
   const fetchInvoices = useServerFn(listInvoices);
+  const fetchAccount = useServerFn(getMyAccount);
+  const account = useQuery({ queryKey: ["my-account"], queryFn: () => fetchAccount({}) });
+  const isAdmin = account.data?.role === "admin";
   const { data, isPending, isError, refetch } = useQuery({ queryKey: ["orders"], queryFn: () => fetchOrders({}) });
-  const brandings = useQuery({ queryKey: ["brandings"], queryFn: () => fetchBrandings({}) });
-  const invoices = useQuery({ queryKey: ["invoices"], queryFn: () => fetchInvoices({}) });
+  const brandings = useQuery({ queryKey: ["brandings"], queryFn: () => fetchBrandings({}), enabled: isAdmin });
+  const invoices = useQuery({ queryKey: ["invoices"], queryFn: () => fetchInvoices({}), enabled: isAdmin });
 
   const invoicedOrderIds = useMemo(
     () => new Set((invoices.data ?? []).map((entry) => entry.orderId)),
