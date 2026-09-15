@@ -121,18 +121,25 @@ function CryptoBoard({
   failed: boolean;
   updatedAt: Date | null;
 }) {
-
   return (
-    <div className={compact ? "border-y border-ops-line py-4 lg:hidden" : "border border-ops-line bg-ops-panel/80"}>
-      <div className={`flex items-center justify-between ${compact ? "mb-3" : "border-b border-ops-line px-4 py-3"}`}>
+    <div
+      className={
+        compact
+          ? "border-y border-line bg-background py-4 lg:hidden"
+          : "overflow-hidden rounded-xl border border-line bg-card shadow-card"
+      }
+    >
+      <div
+        className={`flex items-center justify-between ${compact ? "mb-3 px-1" : "border-b border-line bg-surface/60 px-4 py-3"}`}
+      >
         <div className="flex items-center gap-2">
           <span className="relative flex size-2">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand-light opacity-50" />
-            <span className="relative inline-flex size-2 rounded-full bg-brand-light" />
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-40" />
+            <span className="relative inline-flex size-2 rounded-full bg-brand" />
           </span>
-          <span className="text-[10px] font-bold text-brand-light">LIVE-KURSE · EUR</span>
+          <span className="text-[10px] font-bold text-brand">LIVE-KURSE · EUR</span>
         </div>
-        <span className="flex items-center gap-1.5 text-[9px] text-ops-muted">
+        <span className="flex items-center gap-1.5 text-[9px] text-muted-custom">
           <RefreshCw className={`size-3 ${loading ? "animate-spin" : ""}`} />
           {updatedAt
             ? `${updatedAt.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} UHR`
@@ -142,7 +149,7 @@ function CryptoBoard({
         </span>
       </div>
 
-      <div className={compact ? "grid grid-cols-2 gap-px bg-ops-line" : "divide-y divide-ops-line"}>
+      <div className={compact ? "grid grid-cols-2 gap-2" : "divide-y divide-line"}>
         {CRYPTO_CONFIG.map((crypto, index) => {
           const price = prices[crypto.id];
           const positive = (price?.eur_24h_change ?? 0) >= 0;
@@ -150,29 +157,37 @@ function CryptoBoard({
           return (
             <div
               key={crypto.id}
-              className={`group flex items-center justify-between bg-ops-panel px-4 transition-colors hover:bg-ops-panel-strong ${compact ? "min-h-16 py-3" : "min-h-14 py-2.5"} ${index > 0 ? "animate-ops-enter-delay" : "animate-ops-enter"}`}
+              className={`group flex items-center justify-between transition-colors hover:bg-surface/70 ${compact ? "rounded-lg border border-line bg-card px-3 py-3" : "min-h-14 bg-card px-4 py-2.5"} ${index > 0 ? "animate-ops-enter-delay" : "animate-ops-enter"}`}
             >
               <div className="flex min-w-0 items-center gap-3">
-                <span className="flex size-8 shrink-0 items-center justify-center border border-ops-line bg-ops-canvas text-sm font-bold text-brand-light transition-colors group-hover:border-brand/50">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-line bg-surface text-sm font-bold text-brand transition-colors group-hover:border-brand/40">
                   {crypto.mark}
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-[12px] font-semibold text-ops-text">{compact ? crypto.symbol : crypto.name}</p>
-                  <p className="text-[9px] text-ops-muted">{compact ? "EUR" : `${crypto.symbol} / EUR`}</p>
+                  <p className="truncate text-[12px] font-semibold text-ink">
+                    {compact ? crypto.symbol : crypto.name}
+                  </p>
+                  <p className="text-[9px] text-muted-custom">
+                    {compact ? "EUR" : `${crypto.symbol} / EUR`}
+                  </p>
                 </div>
               </div>
               <div className="ml-2 text-right tabular">
                 {loading && !price ? (
-                  <div className="h-3 w-16 animate-pulse bg-ops-line" />
+                  <div className="h-3 w-16 animate-pulse rounded bg-line" />
                 ) : price ? (
                   <>
-                    <p className="text-[11px] font-semibold text-ops-text">{EURO_PRICE.format(price.eur)}</p>
-                    <p className={`mt-0.5 flex items-center justify-end gap-1 text-[9px] ${positive ? "text-brand-light" : "text-destructive"}`}>
+                    <p className="text-[11px] font-semibold text-ink">
+                      {EURO_PRICE.format(price.eur)}
+                    </p>
+                    <p
+                      className={`mt-0.5 flex items-center justify-end gap-1 text-[9px] ${positive ? "text-brand" : "text-destructive"}`}
+                    >
                       <TrendIcon className="size-2.5" /> {PERCENT_CHANGE.format(price.eur_24h_change)}%
                     </p>
                   </>
                 ) : (
-                  <p className="text-[10px] text-ops-muted">—</p>
+                  <p className="text-[10px] text-muted-custom">—</p>
                 )}
               </div>
             </div>
@@ -182,6 +197,7 @@ function CryptoBoard({
     </div>
   );
 }
+
 function translateError(message: string): string {
   const m = message.toLowerCase();
   if (m.includes("invalid login credentials")) return "E-Mail oder Passwort ist nicht korrekt.";
@@ -272,20 +288,19 @@ function AuthPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-ops-canvas font-body text-ops-text selection:bg-brand/30">
-      <div className="ops-grid pointer-events-none absolute inset-0 opacity-25" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/70 to-transparent" />
+    <div className="relative min-h-screen overflow-hidden bg-background font-body text-foreground selection:bg-brand/20">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/40 to-transparent" />
 
-      <header className="relative z-20 border-b border-ops-line bg-ops-canvas/95">
+      <header className="relative z-20 border-b border-line bg-background/95">
         <div className="mx-auto flex h-16 max-w-[1320px] items-center justify-between px-5 lg:px-8">
           <Link to="/" className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
-            <Logo className="h-auto w-[108px] text-ops-text md:w-[122px]" />
+            <Logo className="h-auto w-[108px] text-smava-logo md:w-[122px]" />
           </Link>
-          <div className="flex items-center gap-3 text-[11px] font-medium text-ops-muted">
+          <div className="flex items-center gap-3 text-[11px] font-medium text-muted-custom">
             <span className="hidden sm:inline">MITARBEITERPORTAL</span>
-            <span className="h-3 w-px bg-ops-line" />
-            <span className="flex items-center gap-2 text-brand-light">
-              <span className="size-1.5 animate-ops-pulse rounded-full bg-brand-light" />
+            <span className="h-3 w-px bg-line" />
+            <span className="flex items-center gap-2 text-brand">
+              <span className="size-1.5 animate-ops-pulse rounded-full bg-brand" />
               SYSTEM ONLINE
             </span>
           </div>
@@ -293,24 +308,23 @@ function AuthPage() {
       </header>
 
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-[1320px] items-center px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-        <div className="grid w-full animate-ops-enter overflow-hidden rounded-[6px] border border-ops-line bg-ops-panel-strong shadow-2xl lg:min-h-[720px] lg:grid-cols-12">
-          <section className="relative hidden overflow-hidden border-r border-ops-line p-8 lg:col-span-5 lg:flex lg:flex-col xl:p-10">
-            <div className="ops-grid pointer-events-none absolute inset-0 opacity-40" />
-            <div className="ops-scan pointer-events-none absolute inset-x-0 top-0 z-0 h-24" />
-            <div className="pointer-events-none absolute top-0 left-0 h-24 w-px bg-brand" />
-            <div className="pointer-events-none absolute top-0 left-0 h-px w-24 bg-brand" />
+        <div className="grid w-full animate-ops-enter overflow-hidden rounded-2xl border border-line bg-background shadow-card lg:min-h-[720px] lg:grid-cols-12">
+          <section className="relative hidden overflow-hidden border-r border-line bg-surface/60 p-8 lg:col-span-5 lg:flex lg:flex-col xl:p-10">
+            <div className="pointer-events-none absolute top-0 left-0 h-20 w-px bg-brand" />
+            <div className="pointer-events-none absolute top-0 left-0 h-px w-20 bg-brand" />
 
             <div className="relative z-10">
-              <div className="flex items-center gap-3 text-[11px] font-bold text-brand-light">
-                <span className="size-2 animate-ops-pulse rounded-full bg-brand-light" />
+              <div className="flex items-center gap-3 text-[11px] font-bold text-brand">
+                <span className="size-2 animate-ops-pulse rounded-full bg-brand" />
                 LIVE-BETRIEB · ZENTRALE 01
               </div>
-              <p className="mt-8 text-[11px] font-medium text-ops-muted">INTERNER ZUGANG</p>
-              <h2 className="mt-3 max-w-md text-[34px] leading-[1.08] font-light text-ops-text xl:text-[40px]">
-                Märkte im Blick. <span className="font-bold text-brand-light">Abläufe im Griff.</span>
+              <p className="mt-8 text-[11px] font-medium text-muted-custom">INTERNER ZUGANG</p>
+              <h2 className="mt-3 max-w-md text-[34px] leading-[1.08] font-light text-ink xl:text-[40px]">
+                Märkte im Blick. <span className="font-bold text-brand">Abläufe im Griff.</span>
               </h2>
-              <p className="mt-4 max-w-md text-[13px] leading-6 text-ops-muted">
-                Sicherer Zugang zur täglichen Disposition und zu aktuellen Marktsignalen. Nur für freigeschaltete Mitarbeiter.
+              <p className="mt-4 max-w-md text-[13px] leading-6 text-muted-custom">
+                Sicherer Zugang zur täglichen Disposition und zu aktuellen Marktsignalen. Nur für
+                freigeschaltete Mitarbeiter.
               </p>
             </div>
 
@@ -318,50 +332,52 @@ function AuthPage() {
               <CryptoBoard {...crypto} />
             </div>
 
-            <div className="relative z-10 mt-5 grid grid-cols-3 divide-x divide-ops-line border border-ops-line bg-ops-canvas/70 px-4 py-3">
+            <div className="relative z-10 mt-5 grid grid-cols-3 divide-x divide-line overflow-hidden rounded-xl border border-line bg-background px-4 py-3 shadow-sm">
               <div>
-                <p className="text-[9px] text-ops-muted">STATUS</p>
-                <p className="mt-1 flex items-center gap-1.5 text-[11px] font-semibold text-ops-text"><Check className="size-3 text-brand-light" /> Bereit</p>
+                <p className="text-[9px] text-muted-custom">STATUS</p>
+                <p className="mt-1 flex items-center gap-1.5 text-[11px] font-semibold text-ink">
+                  <Check className="size-3 text-brand" /> Bereit
+                </p>
               </div>
               <div className="pl-4">
-                <p className="text-[9px] text-ops-muted">ZUGRIFF</p>
-                <p className="mt-1 text-[11px] font-semibold text-ops-text">Intern</p>
+                <p className="text-[9px] text-muted-custom">ZUGRIFF</p>
+                <p className="mt-1 text-[11px] font-semibold text-ink">Intern</p>
               </div>
               <div className="pl-4">
-                <p className="text-[9px] text-ops-muted">KANAL</p>
-                <p className="mt-1 text-[11px] font-semibold text-ops-text">TLS 1.3</p>
+                <p className="text-[9px] text-muted-custom">KANAL</p>
+                <p className="mt-1 text-[11px] font-semibold text-ink">TLS 1.3</p>
               </div>
             </div>
           </section>
 
-          <section className="relative flex flex-col bg-ops-panel lg:col-span-7">
-            <div className="flex items-center justify-between border-b border-ops-line px-6 py-4 lg:px-10">
-              <span className="flex items-center gap-2 text-[11px] font-medium text-ops-muted">
-                <Radio className="size-3.5 text-brand-light" /> ZUGANGSKANAL GESICHERT
+          <section className="relative flex flex-col bg-background lg:col-span-7">
+            <div className="flex items-center justify-between border-b border-line px-6 py-4 lg:px-10">
+              <span className="flex items-center gap-2 text-[11px] font-medium text-muted-custom">
+                <Radio className="size-3.5 text-brand" /> ZUGANGSKANAL GESICHERT
               </span>
-              <span className="text-[11px] text-ops-muted">KLARO / AUTH</span>
+              <span className="text-[11px] text-muted-custom">KLARO / AUTH</span>
             </div>
 
             <div className="flex flex-1 items-center px-5 py-8 sm:px-10 lg:px-14 xl:px-20">
               <div className="mx-auto w-full max-w-[470px] animate-ops-enter-delay">
                 <div className="mb-8 lg:mb-10">
                   <div className="mb-5 flex items-center gap-2 lg:hidden">
-                    <Activity className="size-4 text-brand-light" />
-                    <span className="text-[11px] font-bold text-brand-light">SYSTEM ONLINE</span>
+                    <Activity className="size-4 text-brand" />
+                    <span className="text-[11px] font-bold text-brand">SYSTEM ONLINE</span>
                   </div>
                   <CryptoBoard compact {...crypto} />
-                  <p className="text-[11px] font-bold text-brand-light">MITARBEITERPORTAL</p>
-                  <h1 className="mt-3 text-[30px] leading-tight font-bold text-ops-text sm:text-[36px]">
+                  <p className="text-[11px] font-bold text-brand">MITARBEITERPORTAL</p>
+                  <h1 className="mt-3 text-[30px] leading-tight font-bold text-ink sm:text-[36px]">
                     {mode === "signin" ? "Willkommen zurück." : "Zugang beantragen."}
                   </h1>
-                  <p className="mt-3 text-[14px] leading-6 text-ops-muted">
+                  <p className="mt-3 text-[14px] leading-6 text-muted-custom">
                     {mode === "signin"
                       ? "Identifiziere dich, um deine Arbeitsumgebung zu öffnen."
                       : "Lege deinen Zugang an. Die Freischaltung erfolgt durch einen Administrator."}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 border border-ops-line bg-ops-canvas p-1">
+                <div className="grid grid-cols-2 rounded-xl border border-line bg-surface p-1">
                   {(
                     [
                       ["signin", "Anmelden"],
@@ -376,10 +392,10 @@ function AuthPage() {
                         setMode(value);
                         setNotice(null);
                       }}
-                      className={`h-10 rounded-[2px] text-[13px] ${
+                      className={`h-10 rounded-lg text-[13px] ${
                         mode === value
-                          ? "bg-ops-panel text-ops-text shadow-sm hover:bg-ops-panel"
-                          : "text-ops-muted hover:bg-ops-panel/60 hover:text-ops-text"
+                          ? "bg-background font-semibold text-ink shadow-sm hover:bg-background"
+                          : "text-muted-custom hover:bg-background/70 hover:text-ink"
                       }`}
                     >
                       {label}
@@ -388,27 +404,56 @@ function AuthPage() {
                 </div>
 
                 {notice ? (
-                  <div className="mt-5 flex gap-3 border border-brand/35 bg-brand/10 px-4 py-3 text-[13px] leading-relaxed text-ops-text">
-                    <Check className="mt-0.5 size-4 shrink-0 text-brand-light" />
+                  <div className="mt-5 flex gap-3 rounded-xl border border-brand/30 bg-brand/8 px-4 py-3 text-[13px] leading-relaxed text-ink">
+                    <Check className="mt-0.5 size-4 shrink-0 text-brand" />
                     <p>{notice}</p>
                   </div>
                 ) : null}
 
                 <form className="mt-7 min-h-[290px] space-y-5" onSubmit={handleSubmit}>
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-[11px] font-bold text-ops-muted">E-MAIL-ADRESSE</Label>
+                    <Label htmlFor="email" className="text-[11px] font-bold text-muted-custom">
+                      E-MAIL-ADRESSE
+                    </Label>
                     <div className="relative">
-                      <Mail className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-ops-muted" />
-                      <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@klaro.de" autoComplete="email" required className="h-12 rounded-[3px] border-ops-line bg-ops-canvas pl-11 text-ops-text shadow-none placeholder:text-ops-muted/60 focus-visible:border-brand focus-visible:ring-brand/30" />
+                      <Mail className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-custom" />
+                      <Input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="name@klaro.de"
+                        autoComplete="email"
+                        required
+                        className="h-12 rounded-xl border-line bg-background pl-11 text-ink shadow-none placeholder:text-muted-custom/60 focus-visible:border-brand focus-visible:ring-brand/25"
+                      />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-[11px] font-bold text-ops-muted">PASSWORT</Label>
+                    <Label htmlFor="password" className="text-[11px] font-bold text-muted-custom">
+                      PASSWORT
+                    </Label>
                     <div className="relative">
-                      <Lock className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-ops-muted" />
-                      <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" autoComplete={mode === "signin" ? "current-password" : "new-password"} required className="h-12 rounded-[3px] border-ops-line bg-ops-canvas pr-12 pl-11 text-ops-text shadow-none placeholder:text-ops-muted/60 focus-visible:border-brand focus-visible:ring-brand/30" />
-                      <Button type="button" variant="ghost" size="icon" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Passwort verbergen" : "Passwort anzeigen"} className="absolute top-1/2 right-2 -translate-y-1/2 text-ops-muted hover:bg-ops-panel hover:text-ops-text">
+                      <Lock className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-custom" />
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                        required
+                        className="h-12 rounded-xl border-line bg-background pr-12 pl-11 text-ink shadow-none placeholder:text-muted-custom/60 focus-visible:border-brand focus-visible:ring-brand/25"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setShowPassword((v) => !v)}
+                        aria-label={showPassword ? "Passwort verbergen" : "Passwort anzeigen"}
+                        className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-custom hover:bg-surface hover:text-ink"
+                      >
                         {showPassword ? <EyeOff /> : <Eye />}
                       </Button>
                     </div>
@@ -416,16 +461,34 @@ function AuthPage() {
 
                   {mode === "signup" ? (
                     <div className="space-y-2 animate-ops-enter">
-                      <Label htmlFor="passwordRepeat" className="text-[11px] font-bold text-ops-muted">PASSWORT WIEDERHOLEN</Label>
+                      <Label
+                        htmlFor="passwordRepeat"
+                        className="text-[11px] font-bold text-muted-custom"
+                      >
+                        PASSWORT WIEDERHOLEN
+                      </Label>
                       <div className="relative">
-                        <Lock className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-ops-muted" />
-                        <Input id="passwordRepeat" type={showPassword ? "text" : "password"} value={passwordRepeat} onChange={(e) => setPasswordRepeat(e.target.value)} placeholder="••••••••" autoComplete="new-password" required className="h-12 rounded-[3px] border-ops-line bg-ops-canvas pl-11 text-ops-text shadow-none placeholder:text-ops-muted/60 focus-visible:border-brand focus-visible:ring-brand/30" />
+                        <Lock className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-custom" />
+                        <Input
+                          id="passwordRepeat"
+                          type={showPassword ? "text" : "password"}
+                          value={passwordRepeat}
+                          onChange={(e) => setPasswordRepeat(e.target.value)}
+                          placeholder="••••••••"
+                          autoComplete="new-password"
+                          required
+                          className="h-12 rounded-xl border-line bg-background pl-11 text-ink shadow-none placeholder:text-muted-custom/60 focus-visible:border-brand focus-visible:ring-brand/25"
+                        />
                       </div>
                     </div>
                   ) : null}
 
-                  <Button type="submit" disabled={loading} className="group relative h-13 w-full overflow-hidden rounded-[3px] bg-brand text-[13px] font-bold text-white shadow-none hover:bg-brand-hover">
-                    <span className="absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-20deg] bg-primary-foreground/15 transition-transform duration-700 group-hover:translate-x-[420%]" />
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="group relative h-13 w-full overflow-hidden rounded-xl bg-brand text-[13px] font-bold text-white shadow-cta hover:bg-brand-hover"
+                  >
+                    <span className="absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-20deg] bg-white/20 transition-transform duration-700 group-hover:translate-x-[420%]" />
                     <span className="relative flex items-center gap-2">
                       {loading ? <Loader2 className="animate-spin" /> : null}
                       {mode === "signin" ? "ARBEITSUMGEBUNG ÖFFNEN" : "ZUGANG ANLEGEN"}
@@ -434,14 +497,22 @@ function AuthPage() {
                   </Button>
                 </form>
 
-                <div className="mt-7 flex items-start gap-3 border-t border-ops-line pt-5 text-[12px] leading-5 text-ops-muted">
-                  {mode === "signin" ? <Headphones className="mt-0.5 size-4 shrink-0 text-brand-light" /> : <ShieldCheck className="mt-0.5 size-4 shrink-0 text-brand-light" />}
-                  <p>{mode === "signin" ? "Zugang vergessen? Wende dich an deine Teamleitung oder den internen Support." : "Nach der Registrierung wird deine Rolle als Admin oder Caller intern freigeschaltet."}</p>
+                <div className="mt-7 flex items-start gap-3 border-t border-line pt-5 text-[12px] leading-5 text-muted-custom">
+                  {mode === "signin" ? (
+                    <Headphones className="mt-0.5 size-4 shrink-0 text-brand" />
+                  ) : (
+                    <ShieldCheck className="mt-0.5 size-4 shrink-0 text-brand" />
+                  )}
+                  <p>
+                    {mode === "signin"
+                      ? "Zugang vergessen? Wende dich an deine Teamleitung oder den internen Support."
+                      : "Nach der Registrierung wird deine Rolle als Admin oder Caller intern freigeschaltet."}
+                  </p>
                 </div>
               </div>
             </div>
 
-            <footer className="flex items-center justify-between border-t border-ops-line px-6 py-3 text-[10px] text-ops-muted lg:px-10">
+            <footer className="flex items-center justify-between border-t border-line px-6 py-3 text-[10px] text-muted-custom lg:px-10">
               <span>VERSCHLÜSSELTE ÜBERTRAGUNG</span>
               <span>INTERN · VERSION 2.4</span>
             </footer>
