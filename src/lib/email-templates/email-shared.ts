@@ -189,7 +189,7 @@ export function resolveBranding(branding: EmailBranding): ResolvedBranding {
     cityLine: text([branding.postalCode, branding.city].filter(Boolean).join(" "), "12345 Musterstadt"),
     host: esc(hostname(branding.domain, "shop-domain.de")),
     mail: text(branding.email, "info@shop-domain.de"),
-    register: `${text(branding.registryCourt, "Amtsgericht Musterstadt")} · HRB ${text(branding.commercialRegisterNumber, "00000")}`,
+    register: `${text(branding.registryCourt, "Amtsgericht Musterstadt")} · ${text(branding.commercialRegisterNumber, "HRB 00000")}`,
     vat: text(branding.vatId, "DE000000000"),
     director: text(branding.managingDirector, "Max Mustermann"),
   };
