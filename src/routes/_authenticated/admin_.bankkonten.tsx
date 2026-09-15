@@ -270,6 +270,78 @@ function BankkontenPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <BankAccountOrdersDialog account={ordersFor} onClose={() => setOrdersFor(null)} />
     </AdminPageShell>
   );
 }
+
+function BankAccountOrdersDialog({ account, onClose }: { account: BankAccount | null; onClose: () => void }) {
+  const queryClient = useQueryClient();
+  const fetchOrders = useServerFn(listBankAccountOrders);
+  const changeOrder = useServerFn(updateOrder);
+
+  const ordersQuery = useQuery({
+    queryKey: ["bank-account-orders", account?.id],
+    queryFn: () => fetchOrders({ data: { bankAccountId: account!.id } }),
+    enabled: Boolean(account),
+  });
+
+  const mutation = useMutation({
+    mutationFn: (orderId: string) => changeOrder({ data: { id: orderId, status: "angekommen" } }),
+    onSuccess: () => {
+      toast.success("Bestellung auf „Angekommen“ gesetzt.");
+      void queryClient.invalidateQueries({ queryKey: ["bank-account-orders", account?.id] });
+      void queryClient.invalidateQueries({ queryKey: ["orders"] });
+      void queryClient.invalidateQueries({ queryKey: ["invoices"] });
+    },
+    onError: () => toast.error("Der Status konnte nicht geändert werden."),
+  });
+
+  const dateTime = new Intl.DateTimeFormat("de-DE", { dateStyle: "short", timeStyle: "short" });
+
+  return (
+    <Dialog open={Boolean(account)} onOpenChange={(next) => { if (!next) onClose(); }}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>Zugewiesene Bestellungen</DialogTitle>
+          <DialogDescription>{account ? `${account.name} · ${account.iban}` : ""}</DialogDescription>
+        </DialogHeader>
+
+        {ordersQuery.isPending ? <div className="h-32 animate-pulse rounded-lg border border-line bg-surface" /> : null}
+        {ordersQuery.isError ? <p className="text-[13px] text-destructive">Bestellungen konnten nicht geladen werden.</p> : null}
+        {!ordersQuery.isPending && !ordersQuery.isError && (ordersQuery.data ?? []).length === 0 ? (
+          <p className="text-[13px] text-muted-custom">Diesem Bankkonto ist noch keine Bestellung zugewiesen.</p>
+        ) : null}
+
+        <div className="space-y-2">
+          {(ordersQuery.data ?? []).map((entry) => (
+            <div key={entry.invoiceId} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-card p-4">
+              <div className="min-w-0">
+                <p className="text-[14px] font-bold text-conditions">
+                  {entry.orderNumber} · {euro.format(entry.amount)}
+                </p>
+                <p className="truncate text-[12px] text-muted-custom">
+                  {entry.customer} · {dateTime.format(new Date(entry.placedAt))} · Rechnung {entry.invoiceNumber}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-3">
+                <span className="rounded-full bg-surface px-2.5 py-1 text-[11px] font-semibold text-muted-custom">
+                  {ORDER_STATUS_LABEL[entry.status]}
+                </span>
+                {entry.status === "angekommen" ? (
+                  <span className="flex items-center gap-1 text-[12px] font-semibold text-brand-hover"><Check className="size-4" /> Angekommen</span>
+                ) : (
+                  <Button size="sm" disabled={mutation.isPending} onClick={() => mutation.mutate(entry.orderId)}>
+                    Angekommen
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
