@@ -39,6 +39,7 @@ export function InternalShell({
 
   return (
     <div className="min-h-screen bg-surface">
+      {/* Mobile header */}
       <div className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-background px-4 py-3 lg:hidden">
         <Link to="/" className="rounded-md">
           <Logo className="h-auto w-[92px] text-smava-logo" />
@@ -54,22 +55,22 @@ export function InternalShell({
         </Button>
       </div>
 
-      <aside className="fixed left-0 top-1/2 z-40 hidden -translate-y-1/2 lg:block">
-        <div className="max-h-[96vh] w-max overflow-y-auto rounded-l-none rounded-r-2xl bg-brand p-3 shadow-xl">
-          <div className="flex flex-col items-start gap-2 px-1 pb-3">
-            <Link to="/" className="rounded-md">
-              <Logo className="h-auto w-[104px] text-white" />
-            </Link>
-            <span className="rounded-full border border-white/30 bg-white/10 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase">
-              {role}
-            </span>
-          </div>
+      {/* Desktop top dock */}
+      <header className="fixed top-4 left-1/2 z-50 hidden w-max max-w-[95vw] -translate-x-1/2 lg:block">
+        <div className="flex items-center gap-2 rounded-[1.75rem] bg-brand px-3 py-2 shadow-xl">
+          <Link to="/" className="shrink-0 rounded-md">
+            <Logo className="h-auto w-[92px] text-white" />
+          </Link>
+          <span className="rounded-full border border-white/30 bg-white/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase">
+            {role}
+          </span>
 
-          <div className="h-px bg-white/20" />
+          <div className="mx-1 h-6 w-px bg-white/20" />
 
-          <nav className="flex flex-col gap-1 py-3">
+          <nav className="flex items-center gap-1">
             {nav.map((item) => {
-              const base = "flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 text-[14px] transition-colors";
+              const base =
+                "flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-[13px] transition-colors";
               const className = item.active
                 ? `${base} bg-white font-semibold text-brand shadow-sm`
                 : `${base} text-white/90 hover:bg-white/10`;
@@ -87,44 +88,45 @@ export function InternalShell({
             })}
           </nav>
 
-          <div className="h-px bg-white/20" />
+          <div className="mx-1 h-6 w-px bg-white/20" />
 
-          <div className="flex items-center gap-2 px-1 pt-3">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-[12px] font-bold text-brand">
+          <div className="flex items-center gap-2">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-[12px] font-bold text-brand">
               {initials}
             </span>
-            <div className="min-w-0">
+            <div className="hidden min-w-0 xl:block">
               <p className="truncate text-[13px] font-semibold text-white">{name}</p>
               <p className="truncate text-[11px] text-white/70">{email}</p>
             </div>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              title="Abmelden"
+              className="flex items-center justify-center rounded-xl p-2 text-white/90 transition-colors hover:bg-white/10"
+            >
+              <LogOut className="size-4" />
+            </button>
           </div>
-
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="mt-2 flex w-full items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 text-[14px] text-white/90 transition-colors hover:bg-white/10"
-          >
-            <LogOut className="size-4" />
-            Abmelden
-          </button>
         </div>
-      </aside>
+      </header>
 
-      <div className="relative mx-auto flex min-h-screen max-w-[1440px] items-stretch gap-5 px-4 py-6 lg:pl-[16rem] lg:pr-5">
-        <main className="min-w-0 flex-1 space-y-6">{children}</main>
+      <div className="mx-auto min-h-screen w-full px-4 py-6 pb-20 lg:px-8 lg:pb-8 lg:pt-24">
+        <main className="min-w-0 space-y-6">{children}</main>
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-1 overflow-x-auto border-t border-line bg-background px-3 py-2 lg:hidden">
-        {nav.filter((item) => item.to).map((item) => (
-          <Link
-            key={item.label}
-            to={item.to ?? "/admin"}
-            className={`flex min-w-24 flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-[12px] ${item.active ? "bg-brand-soft font-semibold text-brand-hover" : "text-muted-custom"}`}
-          >
-            {item.icon}
-            {item.label}
-          </Link>
-        ))}
+        {nav
+          .filter((item) => item.to)
+          .map((item) => (
+            <Link
+              key={item.label}
+              to={item.to ?? "/admin"}
+              className={`flex min-w-24 flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-[12px] ${item.active ? "bg-brand-soft font-semibold text-brand-hover" : "text-muted-custom"}`}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          ))}
       </nav>
     </div>
   );
