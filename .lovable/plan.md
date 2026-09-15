@@ -1,46 +1,28 @@
-# Bestell-Edge-Function `create-order` — abgenommen
+# Bestell-Details als Popup in /admin/bestellungen
 
-## Status: Funktioniert
+## Ziel
 
-Die Supabase Edge Function wurde im Dashboard angelegt, mit dem fertigen Code ersetzt und veröffentlicht. Test vom 15.09.2026:
+Klick auf eine Bestellung in der Liste öffnet ein Popup (Dialog) mit allen übertragenen Bestelldaten — statt der bisherigen separaten Detailseite. Bearbeiten von Status und interner Notiz bleibt, ebenfalls im Popup.
 
-- **Endpoint:** `https://fdlhjoxmxryquecocwjv.supabase.co/functions/v1/create-order`
-- **Methode:** `POST`, Header nur `Content-Type: application/json` (kein API-Key)
-- **Testergebnis:** HTTP 201, Antwort `{ "ok": true, "orderId": "d5a4a399-a40e-4303-bbfd-6b0eb00260a2", "orderNumber": "1509-12876" }`
-- **Datenbankprüfung:** Bestellung `1509-12876` liegt korrekt in `public.orders` — Branding Demovero GmbH zugeordnet, 2.000 l, 128,07 €/100 l, 2.561,40 €, Vorkasse, Status „neu"
-- **Sichtbar im Panel:** unter `/admin/bestellungen`; Telegram-Benachrichtigung geht bei aktiven Empfängern automatisch raus
+## Inhalt des Popups
 
-## Übergabe ans externe Projekt (heizöl kompass)
+Kopf: Bestellnummer, Datum, Branding, Status-Badge.
 
-Beim Absenden der Bestellung per `fetch` POST an obige URL senden:
+- **Produkt & Preis:** Heizölart, Liefermenge, Lieferstellen, Schlauchlänge, Tankwagen, Preis/100 L, Gesamtpreis, Zahlungsart
+- **Liefertermin & Kontakt:** frühestes Datum, gewählter Termin (Datum + Vormittag/Nachmittag/telefonisch), E-Mail, Telefon, Hinweise
+- **Lieferadresse** und **Rechnungsadresse** (Hinweis „Entspricht der Lieferadresse", wenn keine abweichende)
+- **Status bearbeiten:** Auswahl + interne Notiz + Speichern-Button (mit Erfolgs-/Fehlermeldung), wie bisher
 
-```json
-{
-  "brandingId": "6e0ae941-5466-4946-afaf-7d44edf6da04",
-  "variant": "standard",
-  "liters": 2000,
-  "deliveryPoints": 1,
-  "hose": "standard",
-  "truck": "standard",
-  "pricePer100": 128.07,
-  "total": 2561.4,
-  "earliestDate": "2026-09-22",
-  "slotDate": "2026-09-22",
-  "slotPeriod": "vormittag",
-  "email": "kunde@example.com",
-  "phone": "017035829853",
-  "deliveryAddress": {
-    "firstName": "Max", "lastName": "Mustermann", "company": null,
-    "street": "Musterstraße 1", "postalCode": "10709", "city": "Berlin"
-  },
-  "billingAddress": null,
-  "notes": "optional",
-  "paymentMethod": "vorkasse",
-  "placedAt": "2026-09-15T13:10:00.000Z"
-}
-```
+## Verhalten
 
-- `billingAddress`: Objekt wie `deliveryAddress` oder `null` bei gleicher Adresse
-- `slotPeriod`: `vormittag` | `nachmittag` | `telefon`; `paymentMethod`: `vorkasse` | `ec` | `barzahlung`
-- Rückgabe `orderNumber` im Shop anzeigen/speichern statt selbst generieren
-- Die Testbestellung `1509-12876` kann unter `/admin/bestellungen` gelöscht werden
+- Desktop: Klick auf die Tabellenzeile öffnet das Popup. Mobil: Klick auf die Karte.
+- Popup ist scrollbar, schließt per X-Button, Klick daneben oder Escape.
+- Nach dem Speichern aktualisiert sich die Liste im Hintergrund.
+- Die bisherige Detail-Route `/admin/bestellungen/$orderId` entfällt; bestehende Links darauf werden nicht mehr verwendet.
+
+## Technische Details
+
+- `src/routes/_authenticated/admin_.bestellungen.tsx`: Zeilen/Karten werden zu Buttons; State `selectedId`; shadcn `Dialog` rendert den Detail-Inhalt (aus der bestehenden Detailseite übernommen: Karten, Zeilen, Adressblock, Status-Select, Notiz-Textarea, `updateOrder`-Mutation). `getOrder` wird per Query mit `enabled: !!selectedId` geladen.
+- `src/routes/_authenticated/admin_.bestellungen_.$orderId.tsx` wird gelöscht; Exporte (`formatEuro`, `formatDate`, `customerName`, `slotLabel`, `STATUS_STYLE`) bleiben in der Listen-Datei.
+- Prüfen, ob andere Stellen auf `/admin/bestellungen/$orderId` verlinken (z. B. Einstellungen/Rechnung) und ggf. anpassen.
+- Keine Datenbankänderung, keine Änderung an Serverfunktionen.
