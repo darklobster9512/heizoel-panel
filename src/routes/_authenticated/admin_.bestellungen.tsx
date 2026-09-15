@@ -206,18 +206,19 @@ function OrdersPage() {
         <>
           <section className="hidden overflow-hidden rounded-lg border border-line bg-card shadow-sm lg:block">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[960px] text-left">
+              <table className="w-full min-w-[1100px] text-left">
                 <thead>
                   <tr className="border-b border-line text-[12px] tracking-wide text-muted-custom uppercase">
-                    <th className="px-4 py-3 font-semibold">Nr.</th>
-                    <th className="px-4 py-3 font-semibold">Datum</th>
-                    <th className="px-4 py-3 font-semibold">Branding</th>
-                    <th className="px-4 py-3 font-semibold">Kunde</th>
-                    <th className="px-4 py-3 font-semibold">Ort</th>
-                    <th className="px-4 py-3 font-semibold">Menge</th>
+                    <th className="px-4 py-3 font-semibold">Datum (& Uhrzeit)</th>
+                    <th className="px-4 py-3 font-semibold">NR</th>
                     <th className="px-4 py-3 font-semibold">Summe</th>
-                    <th className="px-4 py-3 font-semibold">Zahlung</th>
-                    <th className="px-4 py-3 font-semibold">Termin</th>
+                    <th className="px-4 py-3 font-semibold">Kunde</th>
+                    <th className="px-4 py-3 font-semibold">Telefonnummer</th>
+                    <th className="px-4 py-3 font-semibold">Menge</th>
+                    <th className="px-4 py-3 font-semibold">Ort</th>
+                    <th className="px-4 py-3 font-semibold">Art</th>
+                    <th className="px-4 py-3 font-semibold">Abw. Lieferanschrift</th>
+                    <th className="px-4 py-3 font-semibold">Branding</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
                   </tr>
                 </thead>
@@ -228,15 +229,44 @@ function OrdersPage() {
                       onClick={() => setSelectedId(order.id)}
                       className="cursor-pointer border-b border-line/70 last:border-0 hover:bg-surface/60"
                     >
+                      <td className="px-4 py-3 text-[13px] text-muted-custom">{formatDateTime(order.placedAt)}</td>
                       <td className="px-4 py-3 text-[13px] font-semibold text-conditions">{order.orderNumber}</td>
-                      <td className="px-4 py-3 text-[13px] text-muted-custom">{formatDate(order.placedAt)}</td>
-                      <td className="px-4 py-3 text-[13px] text-conditions">{order.brandingName ?? "—"}</td>
-                      <td className="px-4 py-3 text-[13px] text-conditions">{customerName(order)}</td>
-                      <td className="px-4 py-3 text-[13px] text-conditions">{[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ") || "—"}</td>
-                      <td className="px-4 py-3 text-[13px] text-conditions">{order.liters.toLocaleString("de-DE")} L</td>
                       <td className="px-4 py-3 text-[13px] font-semibold text-conditions">{formatEuro(order.total)}</td>
-                      <td className="px-4 py-3 text-[13px] text-muted-custom">{order.paymentMethod ?? "—"}</td>
-                      <td className="px-4 py-3 text-[13px] text-muted-custom">{slotLabel(order)}</td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">{customerName(order)}</td>
+                      <td className="px-4 py-3 text-[13px] text-conditions" onClick={(event) => event.stopPropagation()}>
+                        {order.phone ? (
+                          <button
+                            type="button"
+                            onClick={() => void copyPhone(order.phone)}
+                            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 hover:bg-surface/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-hover"
+                            title="In Zwischenablage kopieren"
+                          >
+                            {order.phone}
+                            <Copy className="size-3.5 text-muted-custom" />
+                          </button>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">{order.liters.toLocaleString("de-DE")} L</td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">{[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ") || "—"}</td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">
+                        <span className="inline-flex rounded-full border border-line px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide">
+                          {variantLabel(order)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">
+                        {hasDeviation(order) ? (
+                          <span className="inline-flex items-center gap-1.5 text-brand-hover" title="Abweichende Lieferanschrift">
+                            <Check className="size-4" /> Ja
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 text-destructive" title="Keine Abweichung">
+                            <X className="size-4" /> Nein
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">{order.brandingName ?? "—"}</td>
                       <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
                         <StatusCell order={order} />
                       </td>
