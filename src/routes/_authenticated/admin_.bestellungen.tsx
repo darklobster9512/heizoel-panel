@@ -111,6 +111,7 @@ function StatusCell({ order }: { order: Order }) {
     onError: () => toast.error("Status konnte nicht gespeichert werden."),
   });
   return (
+    <div className="flex flex-col items-end gap-1">
     <Select
       value={order.status}
       onValueChange={(value) => mutation.mutate(value as OrderStatus)}
@@ -132,6 +133,18 @@ function StatusCell({ order }: { order: Order }) {
         ))}
       </SelectContent>
     </Select>
+      {order.statusChangedAt ? (
+        <span className="text-[10px] leading-tight text-muted-custom whitespace-nowrap">
+          {new Intl.DateTimeFormat("de-DE", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(new Date(order.statusChangedAt))}
+        </span>
+      ) : null}
+    </div>
   );
 }
 
@@ -396,9 +409,17 @@ function GenerateInvoiceDialog({ order, onClose }: { order: Order | null; onClos
   const mutation = useMutation({
     mutationFn: () => createInvoice({ data: { orderId: order!.id, bankAccountId: accountId! } }),
     onSuccess: (result) => {
-      toast.success(`Rechnung ${result.invoiceNumber} wurde generiert.`);
+      const parts = [
+        result.emailSent ? "E-Mail versendet" : null,
+        result.smsSent ? "SMS versendet" : null,
+      ].filter(Boolean);
+      toast.success(
+        `Rechnung ${result.invoiceNumber} wurde generiert${parts.length ? ` · ${parts.join(" · ")}` : ""}.`,
+      );
+      for (const warning of result.warnings) toast.warning(warning);
       void queryClient.invalidateQueries({ queryKey: ["invoices"] });
       void queryClient.invalidateQueries({ queryKey: ["bank-usage"] });
+      void queryClient.invalidateQueries({ queryKey: ["orders"] });
       onClose();
     },
     onError: () => toast.error("Die Rechnung konnte nicht generiert werden."),

@@ -238,6 +238,7 @@ export function buildInvoiceModel(
 }
 
 export const DEMO_INVOICE_ORDER: Order = {
+  statusChangedAt: null,
   id: "demo",
   orderNumber: "2609-74568",
   brandingId: null,

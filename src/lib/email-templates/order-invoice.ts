@@ -55,6 +55,8 @@ export type OrderInvoiceData = {
   deliveryWindow: string;
   totalPrice: number;
   phone: string;
+  /** "vorkasse" | "ec" | "barzahlung" — steuert Anzahlung vs. voller Betrag. */
+  paymentMethod?: string | null;
 };
 
 export const DEMO_INVOICE: OrderInvoiceData = {
@@ -88,11 +90,29 @@ function bankRow(label: string, value: string) {
   </tr>`;
 }
 
-export function renderOrderInvoiceEmail(branding: EmailBranding, invoice: OrderInvoiceData = DEMO_INVOICE) {
-  const bank = bankFrom(branding);
+export function renderOrderInvoiceEmail(
+  branding: EmailBranding,
+  invoice: OrderInvoiceData = DEMO_INVOICE,
+  bankOverride?: BankDetails | null,
+) {
+  const bank = bankOverride
+    ? { ...bankOverride, iban: formatIban(bankOverride.iban) }
+    : bankFrom(branding);
   const r = resolveBranding(branding, bank.accountHolder);
   const net = invoice.totalPrice / 1.19;
   const vatAmount = invoice.totalPrice - net;
+  const method = (invoice.paymentMethod ?? "").toLowerCase();
+  const isDeposit = method === "ec" || method === "barzahlung";
+  const payAmount = isDeposit ? Math.round((invoice.totalPrice / 2) * 100) / 100 : invoice.totalPrice;
+  const remaining = Math.round((invoice.totalPrice - payAmount) * 100) / 100;
+  const restText = method === "ec" ? "vor Ort per EC-Karte" : "vor Ort in bar";
+  const payTitle = isDeposit ? "Bitte überweisen Sie als Anzahlung" : "Bitte überweisen Sie";
+  const payHint = isDeposit
+    ? `Es ist eine <strong style="color:${HEADING}">Anzahlung von 50 %</strong> (${euro.format(payAmount)}) per Überweisung fällig. Der Restbetrag von <strong style="color:${HEADING}">${euro.format(remaining)}</strong> wird bei der Lieferung ${restText} bezahlt.`
+    : `Ihre Lieferung wird <strong style="color:${HEADING}">nach Zahlungseingang</strong> disponiert. Bitte geben Sie unbedingt den Verwendungszweck an, damit wir Ihre Zahlung zuordnen können.`;
+  const intro = isDeposit
+    ? `vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Bitte überweisen Sie die Anzahlung von 50 % auf das unten genannte Konto — den Restbetrag begleichen Sie bei der Lieferung ${restText}.`
+    : `vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Bitte überweisen Sie den Rechnungsbetrag auf das unten genannte Konto.`;
 
   const content = `${emailHeader(branding, r, "Rechnung")}
 
@@ -108,7 +128,7 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
 </tr></table>`, "24px 32px 4px")}
 
 ${section(`<p style="margin:0 0 14px;font:400 15px/23px ${FONT};color:${TEXT}">${esc(invoice.salutation)},</p>
-<p style="margin:0;font:400 15px/23px ${FONT};color:${TEXT}">vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Bitte überweisen Sie den Rechnungsbetrag auf das unten genannte Konto.</p>`, "8px 32px 22px")}
+<p style="margin:0;font:400 15px/23px ${FONT};color:${TEXT}">${intro}</p>`, "8px 32px 22px")}
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:6px"><tr>
   <td width="33%" align="center" style="padding:12px 8px">
@@ -142,8 +162,8 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${GREEN_SOFT};border:1px solid ${GREEN_BORDER};border-radius:8px;overflow:hidden">
   <tr><td style="padding:18px 18px 10px">
-    <div style="font:700 10px/14px ${FONT};color:${GREEN_DARK};text-transform:uppercase;letter-spacing:.9px">Bitte überweisen Sie</div>
-    <div style="margin-top:4px;font:700 22px/28px ${FONT};color:${GREEN_DARK}">${euro.format(invoice.totalPrice)}</div>
+    <div style="font:700 10px/14px ${FONT};color:${GREEN_DARK};text-transform:uppercase;letter-spacing:.9px">${payTitle}</div>
+    <div style="margin-top:4px;font:700 22px/28px ${FONT};color:${GREEN_DARK}">${euro.format(payAmount)}</div>
   </td></tr>
   <tr><td style="padding:4px 2px 8px">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
@@ -156,7 +176,7 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
       </tr>
     </table>
   </td></tr>
-  <tr><td style="padding:8px 18px 18px;font:400 12px/19px ${FONT};color:${GREEN_DARK}">Ihre Lieferung wird <strong style="color:${HEADING}">nach Zahlungseingang</strong> disponiert. Bitte geben Sie unbedingt den Verwendungszweck an, damit wir Ihre Zahlung zuordnen können.</td></tr>
+  <tr><td style="padding:8px 18px 18px;font:400 12px/19px ${FONT};color:${GREEN_DARK}">${payHint}</td></tr>
 </table>`, "0 32px 26px")}
 
 ${trustBar()}

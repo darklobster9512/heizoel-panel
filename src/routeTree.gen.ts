@@ -23,6 +23,7 @@ import { Route as AuthenticatedAdminRechnungRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin_.settings'
 import { Route as AuthenticatedAdminSmsRouteImport } from './routes/_authenticated/admin_.sms'
 import { Route as AuthenticatedAdminTelegramRouteImport } from './routes/_authenticated/admin_.telegram'
+import { Route as ApiPublicOrderConfirmationRouteImport } from './routes/api/public/order-confirmation'
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
 import { Route as AuthenticatedAdminBrandingsBrandingIdRouteImport } from './routes/_authenticated/admin_.brandings_.$brandingId'
 import { Route as AuthenticatedAdminBrandingsNeuRouteImport } from './routes/_authenticated/admin_.brandings_.neu'
@@ -104,6 +105,12 @@ const AuthenticatedAdminTelegramRoute =
     path: '/admin/telegram',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicOrderConfirmationRoute =
+  ApiPublicOrderConfirmationRouteImport.update({
+    id: '/api/public/order-confirmation',
+    path: '/api/public/order-confirmation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicOrdersRoute = ApiPublicOrdersRouteImport.update({
   id: '/api/public/orders',
   path: '/api/public/orders',
@@ -136,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/sms': typeof AuthenticatedAdminSmsRoute
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
+  '/api/public/order-confirmation': typeof ApiPublicOrderConfirmationRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
@@ -154,6 +162,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/sms': typeof AuthenticatedAdminSmsRoute
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
+  '/api/public/order-confirmation': typeof ApiPublicOrderConfirmationRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
@@ -174,6 +183,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin_/sms': typeof AuthenticatedAdminSmsRoute
   '/_authenticated/admin_/telegram': typeof AuthenticatedAdminTelegramRoute
+  '/api/public/order-confirmation': typeof ApiPublicOrderConfirmationRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/_authenticated/admin_/brandings_/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/_authenticated/admin_/brandings_/neu': typeof AuthenticatedAdminBrandingsNeuRoute
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/sms'
     | '/admin/telegram'
+    | '/api/public/order-confirmation'
     | '/api/public/orders'
     | '/admin/brandings/$brandingId'
     | '/admin/brandings/neu'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/sms'
     | '/admin/telegram'
+    | '/api/public/order-confirmation'
     | '/api/public/orders'
     | '/admin/brandings/$brandingId'
     | '/admin/brandings/neu'
@@ -231,6 +243,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/settings'
     | '/_authenticated/admin_/sms'
     | '/_authenticated/admin_/telegram'
+    | '/api/public/order-confirmation'
     | '/api/public/orders'
     | '/_authenticated/admin_/brandings_/$brandingId'
     | '/_authenticated/admin_/brandings_/neu'
@@ -240,6 +253,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicOrderConfirmationRoute: typeof ApiPublicOrderConfirmationRoute
   ApiPublicOrdersRoute: typeof ApiPublicOrdersRoute
 }
 
@@ -343,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTelegramRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/order-confirmation': {
+      id: '/api/public/order-confirmation'
+      path: '/api/public/order-confirmation'
+      fullPath: '/api/public/order-confirmation'
+      preLoaderRoute: typeof ApiPublicOrderConfirmationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/orders': {
       id: '/api/public/orders'
       path: '/api/public/orders'
@@ -407,6 +428,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicOrderConfirmationRoute: ApiPublicOrderConfirmationRoute,
   ApiPublicOrdersRoute: ApiPublicOrdersRoute,
 }
 export const routeTree = rootRouteImport

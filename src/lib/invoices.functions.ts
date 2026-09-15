@@ -8,7 +8,23 @@ import {
   type InvoiceBranding,
   type InvoiceModel,
 } from "@/lib/invoice/invoice-data";
+import { renderOrderInvoiceEmail } from "@/lib/email-templates/order-invoice";
+import {
+  emailBrandingFrom,
+  invoiceDataFrom,
+  smsBrandingFrom,
+  smsDataFrom,
+} from "@/lib/notify/order-payloads";
+import { renderOrderInvoiceSms, smsSender } from "@/lib/sms-templates";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
+
+export type GenerateInvoiceResult = {
+  id: string;
+  invoiceNumber: string;
+  emailSent: boolean;
+  smsSent: boolean;
+  warnings: string[];
+};
 
 export type InvoiceRecord = {
   id: string;
@@ -153,7 +169,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
   .inputValidator((input: { orderId: string; bankAccountId: string }) =>
     z.object({ orderId: z.string().uuid(), bankAccountId: z.string().uuid() }).parse(input),
   )
-  .handler(async ({ data, context }): Promise<{ id: string; invoiceNumber: string }> => {
+  .handler(async ({ data, context }): Promise<GenerateInvoiceResult> => {
     await requireAdmin(context);
 
     const { data: orderRow, error: orderError } = await context.supabase
@@ -172,6 +188,8 @@ export const generateInvoice = createServerFn({ method: "POST" })
 
     const brandingId = text(orderRow.branding_id);
     let branding: InvoiceBranding = INVOICE_FALLBACK_BRANDING;
+    let brandingRaw: Record<string, unknown> | null = null;
+    let brandingLogoUrl: string | null = null;
     if (brandingId) {
       const { data: brandingRow } = await context.supabase
         .from("brandings")
@@ -179,10 +197,12 @@ export const generateInvoice = createServerFn({ method: "POST" })
         .eq("id", brandingId)
         .maybeSingle();
       if (brandingRow) {
+        brandingRaw = brandingRow as unknown as Record<string, unknown>;
         const logoPath = text(brandingRow.logo_path);
         const signed = logoPath
           ? await context.supabase.storage.from("branding-logos").createSignedUrl(logoPath, 3600)
           : null;
+        brandingLogoUrl = signed?.data?.signedUrl ?? null;
         branding = {
           companyName: text(brandingRow.company_name),
           shopName: text(brandingRow.shop_name),
@@ -203,6 +223,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
     }
 
     const order: Order = {
+      statusChangedAt: text(orderRow.status_changed_at),
       id: String(orderRow.id),
       orderNumber: String(orderRow.order_number),
       brandingId,
@@ -265,7 +286,72 @@ export const generateInvoice = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error("Die Rechnung konnte nicht gespeichert werden.");
 
-    return { id: String(saved.id), invoiceNumber: order.orderNumber };
+    const warnings: string[] = [];
+    let emailSent = false;
+    let smsSent = false;
+
+    // E-Mail mit Rechnung über Resend-Daten des Brandings
+    const resendKey = text(brandingRaw?.["resend_api_key"]);
+    const resendFrom = text(brandingRaw?.["resend_sender_email"]);
+    if (!resendKey || !resendFrom) {
+      warnings.push("E-Mail nicht versendet: Resend-Daten fehlen beim Branding.");
+    } else if (!order.email) {
+      warnings.push("E-Mail nicht versendet: Die Bestellung hat keine E-Mail-Adresse.");
+    } else {
+      try {
+        const { sendResendEmail, senderLine, toBase64 } = await import("@/lib/notify/resend.server");
+        const emailBranding = emailBrandingFrom(brandingRaw, brandingLogoUrl);
+        const html = renderOrderInvoiceEmail(emailBranding, invoiceDataFrom(order, order.orderNumber), {
+          accountHolder: String(bankRow.name),
+          iban: String(bankRow.iban),
+          bic: String(bankRow.bic),
+        });
+        await sendResendEmail({
+          apiKey: resendKey,
+          from: senderLine(text(brandingRaw?.["resend_sender_name"]), resendFrom),
+          to: order.email,
+          subject: `Ihre Rechnung ${order.orderNumber}`,
+          html,
+          replyTo: text(brandingRaw?.["email"]),
+          attachments: [{ filename: `Rechnung_${order.orderNumber}.pdf`, content: toBase64(bytes) }],
+        });
+        emailSent = true;
+      } catch (caught) {
+        console.error("[invoice] email failed", caught);
+        warnings.push("Die Rechnungs-E-Mail konnte nicht versendet werden.");
+      }
+    }
+
+    // SMS über Seven.io-Daten des Brandings
+    const sevenKey = text(brandingRaw?.["seven_api_key"]);
+    if (!sevenKey) {
+      warnings.push("SMS nicht versendet: Seven.io-Daten fehlen beim Branding.");
+    } else if (!order.phone) {
+      warnings.push("SMS nicht versendet: Die Bestellung hat keine Telefonnummer.");
+    } else {
+      try {
+        const { sendSevenSms } = await import("@/lib/notify/seven.server");
+        const smsBranding = smsBrandingFrom(brandingRaw);
+        await sendSevenSms({
+          apiKey: sevenKey,
+          to: order.phone,
+          from: smsSender(smsBranding),
+          text: renderOrderInvoiceSms(smsBranding, smsDataFrom(order)),
+        });
+        smsSent = true;
+      } catch (caught) {
+        console.error("[invoice] sms failed", caught);
+        warnings.push("Die SMS konnte nicht versendet werden.");
+      }
+    }
+
+    const { error: statusError } = await context.supabase
+      .from("orders")
+      .update({ status: "rechnung_versendet" })
+      .eq("id", order.id);
+    if (statusError) warnings.push("Der Status konnte nicht aktualisiert werden.");
+
+    return { id: String(saved.id), invoiceNumber: order.orderNumber, emailSent, smsSent, warnings };
   });
 
 export const downloadInvoice = createServerFn({ method: "POST" })
