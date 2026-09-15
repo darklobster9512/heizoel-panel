@@ -24,7 +24,6 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminSmsRouteImport } from './routes/_authenticated/admin_.sms'
 import { Route as AuthenticatedAdminTelegramRouteImport } from './routes/_authenticated/admin_.telegram'
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
-import { Route as AuthenticatedAdminBestellungenOrderIdRouteImport } from './routes/_authenticated/admin_.bestellungen_.$orderId'
 import { Route as AuthenticatedAdminBrandingsBrandingIdRouteImport } from './routes/_authenticated/admin_.brandings_.$brandingId'
 import { Route as AuthenticatedAdminBrandingsNeuRouteImport } from './routes/_authenticated/admin_.brandings_.neu'
 
@@ -110,12 +109,6 @@ const ApiPublicOrdersRoute = ApiPublicOrdersRouteImport.update({
   path: '/api/public/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminBestellungenOrderIdRoute =
-  AuthenticatedAdminBestellungenOrderIdRouteImport.update({
-    id: '/admin_/bestellungen_/$orderId',
-    path: '/admin/bestellungen/$orderId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedAdminBrandingsBrandingIdRoute =
   AuthenticatedAdminBrandingsBrandingIdRouteImport.update({
     id: '/admin_/brandings_/$brandingId',
@@ -144,7 +137,6 @@ export interface FileRoutesByFullPath {
   '/admin/sms': typeof AuthenticatedAdminSmsRoute
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
-  '/admin/bestellungen/$orderId': typeof AuthenticatedAdminBestellungenOrderIdRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -163,7 +155,6 @@ export interface FileRoutesByTo {
   '/admin/sms': typeof AuthenticatedAdminSmsRoute
   '/admin/telegram': typeof AuthenticatedAdminTelegramRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
-  '/admin/bestellungen/$orderId': typeof AuthenticatedAdminBestellungenOrderIdRoute
   '/admin/brandings/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/admin/brandings/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -184,7 +175,6 @@ export interface FileRoutesById {
   '/_authenticated/admin_/sms': typeof AuthenticatedAdminSmsRoute
   '/_authenticated/admin_/telegram': typeof AuthenticatedAdminTelegramRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
-  '/_authenticated/admin_/bestellungen_/$orderId': typeof AuthenticatedAdminBestellungenOrderIdRoute
   '/_authenticated/admin_/brandings_/$brandingId': typeof AuthenticatedAdminBrandingsBrandingIdRoute
   '/_authenticated/admin_/brandings_/neu': typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -205,7 +195,6 @@ export interface FileRouteTypes {
     | '/admin/sms'
     | '/admin/telegram'
     | '/api/public/orders'
-    | '/admin/bestellungen/$orderId'
     | '/admin/brandings/$brandingId'
     | '/admin/brandings/neu'
   fileRoutesByTo: FileRoutesByTo
@@ -224,7 +213,6 @@ export interface FileRouteTypes {
     | '/admin/sms'
     | '/admin/telegram'
     | '/api/public/orders'
-    | '/admin/bestellungen/$orderId'
     | '/admin/brandings/$brandingId'
     | '/admin/brandings/neu'
   id:
@@ -244,7 +232,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/sms'
     | '/_authenticated/admin_/telegram'
     | '/api/public/orders'
-    | '/_authenticated/admin_/bestellungen_/$orderId'
     | '/_authenticated/admin_/brandings_/$brandingId'
     | '/_authenticated/admin_/brandings_/neu'
   fileRoutesById: FileRoutesById
@@ -363,13 +350,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin_/bestellungen_/$orderId': {
-      id: '/_authenticated/admin_/bestellungen_/$orderId'
-      path: '/admin/bestellungen/$orderId'
-      fullPath: '/admin/bestellungen/$orderId'
-      preLoaderRoute: typeof AuthenticatedAdminBestellungenOrderIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/admin_/brandings_/$brandingId': {
       id: '/_authenticated/admin_/brandings_/$brandingId'
       path: '/admin/brandings/$brandingId'
@@ -399,7 +379,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSmsRoute: typeof AuthenticatedAdminSmsRoute
   AuthenticatedAdminTelegramRoute: typeof AuthenticatedAdminTelegramRoute
-  AuthenticatedAdminBestellungenOrderIdRoute: typeof AuthenticatedAdminBestellungenOrderIdRoute
   AuthenticatedAdminBrandingsBrandingIdRoute: typeof AuthenticatedAdminBrandingsBrandingIdRoute
   AuthenticatedAdminBrandingsNeuRoute: typeof AuthenticatedAdminBrandingsNeuRoute
 }
@@ -416,8 +395,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminSmsRoute: AuthenticatedAdminSmsRoute,
   AuthenticatedAdminTelegramRoute: AuthenticatedAdminTelegramRoute,
-  AuthenticatedAdminBestellungenOrderIdRoute:
-    AuthenticatedAdminBestellungenOrderIdRoute,
   AuthenticatedAdminBrandingsBrandingIdRoute:
     AuthenticatedAdminBrandingsBrandingIdRoute,
   AuthenticatedAdminBrandingsNeuRoute: AuthenticatedAdminBrandingsNeuRoute,
