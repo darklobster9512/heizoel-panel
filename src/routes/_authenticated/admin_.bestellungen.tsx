@@ -368,6 +368,10 @@ function OrdersPage() {
                     <span className="text-[11px] uppercase text-muted-custom">Summe</span>
                     <p className="font-semibold text-conditions">{formatEuro(order.total)}</p>
                   </div>
+                  <div>
+                    <span className="text-[11px] uppercase text-muted-custom">Zahlungsart</span>
+                    <p className="text-conditions">{paymentMethodLabel(order)}</p>
+                  </div>
                 </div>
 
                 <div className="mt-3 flex flex-wrap items-center gap-3 text-[13px]">
