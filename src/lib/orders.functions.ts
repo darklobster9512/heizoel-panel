@@ -60,6 +60,7 @@ export type Order = {
   status: OrderStatus;
   internalNote: string | null;
   placedAt: string;
+  statusChangedAt: string | null;
   createdAt: string;
 };
 
@@ -140,6 +141,7 @@ function mapRow(row: Row): Order {
       : "neu",
     internalNote: text(row.internal_note),
     placedAt: String(row.placed_at ?? row.created_at),
+    statusChangedAt: text(row.status_changed_at),
     createdAt: String(row.created_at),
   };
 }
