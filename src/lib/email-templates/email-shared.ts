@@ -1,3 +1,5 @@
+import { cleanRegisterNumber } from "@/lib/iban";
+
 export type EmailBranding = {
   shopName: string | null;
   companyName: string | null;
