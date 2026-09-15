@@ -1,3 +1,4 @@
+import { formatIban } from "@/lib/iban";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
 
 export type InvoiceCompany = {
@@ -173,7 +174,7 @@ function bankFor(
       ? override.accountHolder
       : value(branding.accountHolder, value(branding.companyName, "Muster-Energie GmbH")),
     bankName: override ? override.bankName : value(branding.bankName, "Commerzbank AG"),
-    iban: override ? override.iban : value(branding.iban, "DE89 3704 0044 0532 0130 00"),
+    iban: formatIban(override ? override.iban : value(branding.iban, "DE89 3704 0044 0532 0130 00")),
     bic: override ? override.bic : value(branding.bic, "COBADEFFXXX"),
     amount: euro.format(deposit ? half : gross),
     reference: order.orderNumber,
