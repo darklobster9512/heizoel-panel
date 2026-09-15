@@ -41,9 +41,30 @@ export const Route = createFileRoute("/_authenticated/admin_/settings")({
 function SettingsPage() {
   const { tab } = Route.useSearch();
 
+  const subDock = (
+    <>
+      {TABS.map((entry) => {
+        const active = entry.id === tab;
+        return (
+          <Link
+            key={entry.id}
+            to="/admin/settings"
+            search={{ tab: entry.id }}
+            className={`flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-[13px] transition-colors ${
+              active ? "bg-white font-semibold text-brand shadow-sm" : "text-white/90 hover:bg-white/10"
+            }`}
+          >
+            {entry.icon}
+            {entry.label}
+          </Link>
+        );
+      })}
+    </>
+  );
+
   return (
-    <AdminPageShell active="settings">
-      <div className="flex flex-wrap items-center gap-1 rounded-lg border border-line bg-card p-1.5">
+    <AdminPageShell active="settings" subDock={subDock}>
+      <div className="flex flex-wrap items-center gap-1 rounded-lg border border-line bg-card p-1.5 lg:hidden">
         {TABS.map((entry) => {
           const active = entry.id === tab;
           return (
