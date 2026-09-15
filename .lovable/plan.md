@@ -1,39 +1,47 @@
-# Bestell-Schnittstelle: Link & Format für das externe Projekt
+# Bestell-Schnittstelle als Supabase Edge Function
 
-## Endpunkt
+## Ziel
+
+Die Bestellungen werden künftig über eine Funktion in deinem eigenen Supabase-Projekt entgegengenommen. Damit liegt auch die Adresse komplett bei Supabase.
+
+## Adresse für das externe Projekt
 
 ```text
-POST https://project--485f594a-9180-4077-adda-eb24ffaadc89-dev.lovable.app/api/public/orders
+POST https://fdlhjoxmxryquecocwjv.supabase.co/functions/v1/orders
 ```
 
-(Produktiv nach Veröffentlichung: `https://project--485f594a-9180-4077-adda-eb24ffaadc89.lovable.app/api/public/orders`)
+Header:
+```text
+Content-Type: application/json
+apikey: <dein Supabase anon key>
+```
 
-Kein Schlüssel nötig. Header: `Content-Type: application/json`.
+Die Funktion wird ohne Login-Zwang veröffentlicht (`verify_jwt = false`), der anon key reicht.
 
-## Was das Shop-Projekt schickt (JSON-Body)
+## Was das Shop-Projekt schickt (JSON)
 
 | Feld | Typ | Pflicht | Beispiel |
 |---|---|---|---|
-| brandingId | string (UUID) | ja | "6e0ae941-5466-4946-afaf-7d44edf6da04" |
-| variant | string | nein (Standard: "standard") | "standard" oder "premium" |
-| liters | Zahl (Ganzzahl) | ja | 2000 |
-| deliveryPoints | Zahl | nein (Standard: 1) | 1 |
-| hose | string | nein | "30 m" |
-| truck | string | nein | "4-Kammer" |
+| brandingId | UUID | ja | "6e0ae941-5466-4946-afaf-7d44edf6da04" |
+| variant | Text | nein (Standard "standard") | "standard" / "premium" |
+| liters | Zahl | ja | 2000 |
+| deliveryPoints | Zahl | nein (Standard 1) | 1 |
+| hose | Text | nein | "30 m" |
+| truck | Text | nein | "4-Kammer" |
 | pricePer100 | Zahl | ja | 128.07 |
 | total | Zahl | ja | 2561.40 |
-| earliestDate | string | nein | "2026-09-22" |
-| slotDate | string | nein | "2026-09-24" |
-| slotPeriod | string | nein | "vormittag" / "nachmittag" / "telefon" |
-| email | string (E-Mail) | ja | "max@example.com" |
-| phone | string | nein | "017035829853" |
+| earliestDate | Text | nein | "2026-09-22" |
+| slotDate | Text | nein | "2026-09-24" |
+| slotPeriod | Text | nein | "vormittag" / "nachmittag" / "telefon" |
+| email | Text | ja | "max@example.com" |
+| phone | Text | nein | "017035829853" |
 | deliveryAddress | Objekt | ja | siehe unten |
-| billingAddress | Objekt oder null | nein | null, wenn gleich |
-| notes | string | nein | "Bitte vorher anrufen" |
-| paymentMethod | string | nein | "vorkasse" / "ec" / "barzahlung" |
-| placedAt | string (ISO-Datum) | nein | "2026-09-15T12:00:00.000Z" |
+| billingAddress | Objekt oder null | nein | null wenn gleich |
+| notes | Text | nein | "Bitte vorher anrufen" |
+| paymentMethod | Text | nein | "vorkasse" / "ec" / "barzahlung" |
+| placedAt | Text (ISO) | nein | "2026-09-15T12:00:00.000Z" |
 
-### Adress-Objekt (deliveryAddress / billingAddress)
+Adress-Objekt (alle Felder optional, dürfen null sein):
 
 ```json
 {
@@ -48,26 +56,35 @@ Kein Schlüssel nötig. Header: `Content-Type: application/json`.
 }
 ```
 
-Alle Felder im Adress-Objekt sind optional (dürfen null sein), das Objekt selbst ist Pflicht.
-
 ## Antwort
 
 Erfolg (201):
 ```json
 { "ok": true, "orderNumber": "1509-48372", "orderId": "..." }
 ```
-Die zurückgegebene `orderNumber` ersetzt die lokal gewürfelte Bestellnummer im Shop.
+Die zurückgegebene `orderNumber` ersetzt im Shop die lokal gewürfelte Nummer.
 
-Fehler: `{ "ok": false, "error": "..." }` (400 = ungültige Daten, 404 = unbekannte Branding-ID, 500 = Serverfehler).
+Fehler: `{ "ok": false, "error": "..." }` — 400 ungültige Daten, 404 unbekannte Branding-ID, 500 Serverfehler.
 
-## Fertiges Schnipsel für das Shop-Projekt
+## Was umgesetzt wird
+
+1. Neue Edge Function `supabase/functions/orders/index.ts`: CORS + OPTIONS, Zod-Validierung aller Felder, Branding-Auflösung über `public_id` oder `id`, Bestellnummer im Format `1509-48372` mit Wiederholung bei Kollision, Insert in `public.orders` per Service-Role.
+2. Telegram-Benachrichtigung bei Bestelleingang direkt in der Funktion (nutzt das bereits hinterlegte `TELEGRAM_BOT_TOKEN`, lädt aktive Empfänger aus `telegram_recipients`). Fehler beim Versand blockieren die Bestellung nicht.
+3. `supabase/config.toml`: Eintrag für `orders` mit `verify_jwt = false`.
+4. Bestehende Route `src/routes/api/public/orders.ts` wird entfernt, damit es nur eine Schnittstelle gibt.
+5. Test der veröffentlichten Funktion mit einer Beispielbestellung; danach bekommst du ein fertiges Code-Schnipsel für das Shop-Projekt.
+
+## Code-Schnipsel für das Shop-Projekt
 
 ```ts
 const response = await fetch(
-  "https://project--485f594a-9180-4077-adda-eb24ffaadc89-dev.lovable.app/api/public/orders",
+  "https://fdlhjoxmxryquecocwjv.supabase.co/functions/v1/orders",
   {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      apikey: SUPABASE_ANON_KEY,
+    },
     body: JSON.stringify({
       brandingId: "6e0ae941-5466-4946-afaf-7d44edf6da04",
       variant: draft.variant,
