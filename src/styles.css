@@ -85,6 +85,16 @@
   --color-ops-muted: var(--ops-muted);
   --color-ops-line: var(--ops-line);
 
+  /* Status badge color tokens */
+  --color-status-info-bg: var(--status-info-bg);
+  --color-status-info-text: var(--status-info-text);
+  --color-status-warning-bg: var(--status-warning-bg);
+  --color-status-warning-text: var(--status-warning-text);
+  --color-status-success-bg: var(--status-success-bg);
+  --color-status-success-text: var(--status-success-text);
+  --color-status-danger-bg: var(--status-danger-bg);
+  --color-status-danger-text: var(--status-danger-text);
+
 
   /* Typography */
   --font-display: "Roboto", ui-sans-serif, system-ui, sans-serif;
