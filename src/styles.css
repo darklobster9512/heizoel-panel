@@ -94,6 +94,18 @@
   --color-status-success-text: var(--status-success-text);
   --color-status-danger-bg: var(--status-danger-bg);
   --color-status-danger-text: var(--status-danger-text);
+  --color-status-red-bg: var(--status-red-bg);
+  --color-status-red-text: var(--status-red-text);
+  --color-status-orange-bg: var(--status-orange-bg);
+  --color-status-orange-text: var(--status-orange-text);
+  --color-status-blue-bg: var(--status-blue-bg);
+  --color-status-blue-text: var(--status-blue-text);
+  --color-status-greenish-bg: var(--status-greenish-bg);
+  --color-status-greenish-text: var(--status-greenish-text);
+  --color-status-green-bg: var(--status-green-bg);
+  --color-status-green-text: var(--status-green-text);
+  --color-status-gray-bg: var(--status-gray-bg);
+  --color-status-gray-text: var(--status-gray-text);
 
 
   /* Typography */
