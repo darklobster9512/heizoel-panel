@@ -147,7 +147,19 @@ function salutationFor(address: OrderAddress) {
   return "Sehr geehrte Damen und Herren";
 }
 
-function bankFor(order: Order, branding: InvoiceBranding, gross: number): InvoiceBank {
+export type InvoiceBankOverride = {
+  accountHolder: string;
+  bankName: string;
+  iban: string;
+  bic: string;
+};
+
+function bankFor(
+  order: Order,
+  branding: InvoiceBranding,
+  gross: number,
+  override?: InvoiceBankOverride | null,
+): InvoiceBank {
   const deposit = order.paymentMethod === "ec" || order.paymentMethod === "barzahlung";
   const half = Math.round((gross / 2) * 100) / 100;
   const restLabel =
@@ -157,10 +169,12 @@ function bankFor(order: Order, branding: InvoiceBranding, gross: number): Invoic
         ? "bei Lieferung vor Ort in bar"
         : null;
   return {
-    accountHolder: value(branding.accountHolder, value(branding.companyName, "Muster-Energie GmbH")),
-    bankName: value(branding.bankName, "Commerzbank AG"),
-    iban: value(branding.iban, "DE89 3704 0044 0532 0130 00"),
-    bic: value(branding.bic, "COBADEFFXXX"),
+    accountHolder: override
+      ? override.accountHolder
+      : value(branding.accountHolder, value(branding.companyName, "Muster-Energie GmbH")),
+    bankName: override ? override.bankName : value(branding.bankName, "Commerzbank AG"),
+    iban: override ? override.iban : value(branding.iban, "DE89 3704 0044 0532 0130 00"),
+    bic: override ? override.bic : value(branding.bic, "COBADEFFXXX"),
     amount: euro.format(deposit ? half : gross),
     reference: order.orderNumber,
     isDeposit: deposit,
@@ -172,7 +186,11 @@ function bankFor(order: Order, branding: InvoiceBranding, gross: number): Invoic
   };
 }
 
-export function buildInvoiceModel(order: Order, branding: InvoiceBranding): InvoiceModel {
+export function buildInvoiceModel(
+  order: Order,
+  branding: InvoiceBranding,
+  bankOverride?: InvoiceBankOverride | null,
+): InvoiceModel {
   const billing = order.billingAddress ?? order.deliveryAddress;
   const gross = order.total;
   const net = gross / 1.19;
