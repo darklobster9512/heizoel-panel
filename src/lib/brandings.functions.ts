@@ -29,7 +29,20 @@ const brandingInputSchema = z.object({
   managingDirector: nullableText(160),
   vatId: z.union([z.string().trim().regex(/^DE[0-9]{9}$/i), z.literal(""), z.null()]).optional(),
   email: z.union([z.string().trim().email().max(255), z.literal(""), z.null()]).optional(),
-  domain: z.union([z.string().trim().url().max(255), z.literal(""), z.null()]).optional(),
+  domain: z
+    .union([
+      z
+        .string()
+        .trim()
+        .max(255)
+        .regex(
+          /^(https?:\/\/)?([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(\/[^\s]*)?$/i,
+          "Bitte eine gültige Domain angeben.",
+        ),
+      z.literal(""),
+      z.null(),
+    ])
+    .optional(),
   resendApiKey: nullableText(500),
   resendSenderEmail: z.union([z.string().trim().email().max(255), z.literal(""), z.null()]).optional(),
   resendSenderName: nullableText(160),

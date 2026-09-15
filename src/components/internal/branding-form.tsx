@@ -60,6 +60,23 @@ const REQUIRED: (keyof FormValues)[] = [
   "registryCourt", "commercialRegisterNumber", "managingDirector", "vatId", "email", "domain",
 ];
 
+const FIELD_ERRORS: Record<string, string> = {
+  domain: "Bitte eine gültige Domain angeben, z. B. mein-shop.de.",
+  email: "Bitte eine gültige E-Mail-Adresse angeben.",
+  vatId: "Die USt-IdNr. muss im Format DE123456789 angegeben werden.",
+  resendSenderEmail: "Bitte eine gültige Absender-E-Mail für Resend angeben.",
+  sevenSenderName: "Der Seven.io-Absendername darf höchstens 11 Zeichen lang sein.",
+};
+
+function saveErrorMessage(caught: unknown): string {
+  const raw = caught instanceof Error ? caught.message : typeof caught === "string" ? caught : "";
+  for (const [field, message] of Object.entries(FIELD_ERRORS)) {
+    if (raw.includes(`"${field}"`)) return message;
+  }
+  return "Das Branding konnte nicht gespeichert werden. Bitte prüfe deine Angaben.";
+}
+
+
 function Field({ id, label, value, onChange, required, type = "text", placeholder, maxLength }: {
   id: keyof FormValues;
   label: string;
@@ -150,8 +167,8 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
       setDirty(false);
       toast.success(status === "active" ? "Branding wurde aktiviert." : "Entwurf wurde gespeichert.");
       navigate({ to: "/admin/brandings/$brandingId", params: { brandingId: result.id }, replace: true });
-    } catch {
-      setError("Das Branding konnte nicht gespeichert werden. Bitte prüfe deine Angaben.");
+    } catch (caught) {
+      setError(saveErrorMessage(caught));
     } finally {
       setSaving(null);
     }
@@ -200,7 +217,7 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
 
         <Section icon={<Mail className="size-4" />} title="Kontakt" description="Zentrale Erreichbarkeit und Shop-Domain.">
           <Field id="email" label="E-Mail" value={values.email ?? ""} onChange={setValue} required type="email" placeholder="info@muster-shop.de" />
-          <Field id="domain" label="Domain" value={values.domain ?? ""} onChange={setValue} required type="url" placeholder="https://mein-shop.de" />
+          <Field id="domain" label="Domain" value={values.domain ?? ""} onChange={setValue} required placeholder="mein-shop.de" />
         </Section>
 
         <Section icon={<Mail className="size-4" />} title="Resend" description="Optionaler E-Mail-Versand für dieses Branding.">
