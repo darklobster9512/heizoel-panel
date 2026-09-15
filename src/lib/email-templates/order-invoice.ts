@@ -76,8 +76,8 @@ function bankFrom(branding: EmailBranding): BankDetails {
   const iban = (branding.iban ?? "").trim();
   const accountHolder = (branding.accountHolder ?? branding.companyName ?? "").trim();
   const bic = (branding.bic ?? "").trim();
-  if (!iban || !accountHolder) return DEMO_BANK;
-  return { accountHolder, iban, bic: bic || DEMO_BANK.bic };
+  if (!iban || !accountHolder) return { ...DEMO_BANK, iban: formatIban(DEMO_BANK.iban) };
+  return { accountHolder, iban: formatIban(iban), bic: bic || DEMO_BANK.bic };
 }
 
 function bankRow(label: string, value: string) {

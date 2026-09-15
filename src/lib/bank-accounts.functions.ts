@@ -6,10 +6,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 type BankAccountRow = Database["public"]["Tables"]["bank_accounts"]["Row"];
 
-export function formatIban(value: string): string {
-  const cleaned = value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 34);
-  return cleaned.replace(/(.{4})(?!$)/g, "$1 ");
-}
+export { formatIban } from "@/lib/iban";
 
 const requiredText = (max: number, label: string) =>
   z.string().trim().min(1, `${label} ist ein Pflichtfeld.`).max(max);
