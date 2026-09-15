@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useOrdersRealtime } from "@/hooks/use-orders-realtime";
 import { cn } from "@/lib/utils";
 import { listBrandings } from "@/lib/brandings.functions";
 import { getMyAccount } from "@/lib/roles.functions";
@@ -179,7 +180,13 @@ function OrdersPage() {
   const fetchAccount = useServerFn(getMyAccount);
   const account = useQuery({ queryKey: ["my-account"], queryFn: () => fetchAccount({}) });
   const isAdmin = account.data?.role === "admin";
-  const { data, isPending, isError, refetch } = useQuery({ queryKey: ["orders"], queryFn: () => fetchOrders({}) });
+  const { data, isPending, isError, refetch } = useQuery({
+    queryKey: ["orders"],
+    queryFn: () => fetchOrders({}),
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
+  });
+  useOrdersRealtime();
   const brandings = useQuery({ queryKey: ["brandings"], queryFn: () => fetchBrandings({}), enabled: isAdmin });
   const invoices = useQuery({ queryKey: ["invoices"], queryFn: () => fetchInvoices({}), enabled: isAdmin });
 
