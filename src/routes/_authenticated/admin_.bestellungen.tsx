@@ -300,7 +300,7 @@ function OrdersPage() {
                           onClick={() => setInvoiceOrder(order)}
                           title={invoicedOrderIds.has(order.id) ? "Rechnung neu generieren" : "Rechnung generieren"}
                           className={cn(
-                            "inline-flex size-8 items-center justify-center rounded-md border border-line hover:bg-surface",
+                            "inline-flex size-8 cursor-pointer items-center justify-center rounded-md border border-line hover:bg-surface",
                             invoicedOrderIds.has(order.id) ? "text-brand-hover" : "text-muted-custom",
                           )}
                         >
