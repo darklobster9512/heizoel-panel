@@ -71,7 +71,7 @@ export function InternalShell({
       </header>
 
       <div className="mx-auto flex max-w-[1440px] gap-5 pl-3 pr-5 py-6">
-        <aside className="hidden w-52 shrink-0 lg:block">
+        <aside className="hidden w-max shrink-0 lg:block">
           <nav className="sticky top-22 space-y-1">
             {nav.map((item) => {
               const className = `flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] transition-colors ${
