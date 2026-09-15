@@ -210,7 +210,9 @@ function OrdersPage() {
                       <td className="px-4 py-3 text-[13px] font-semibold text-conditions">{formatEuro(order.total)}</td>
                       <td className="px-4 py-3 text-[13px] text-muted-custom">{order.paymentMethod ?? "—"}</td>
                       <td className="px-4 py-3 text-[13px] text-muted-custom">{slotLabel(order)}</td>
-                      <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLE[order.status]}`}>{ORDER_STATUS_LABEL[order.status]}</span></td>
+                      <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
+                        <StatusCell order={order} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
