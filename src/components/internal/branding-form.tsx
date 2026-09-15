@@ -150,8 +150,8 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
       setDirty(false);
       toast.success(status === "active" ? "Branding wurde aktiviert." : "Entwurf wurde gespeichert.");
       navigate({ to: "/admin/brandings/$brandingId", params: { brandingId: result.id }, replace: true });
-    } catch {
-      setError("Das Branding konnte nicht gespeichert werden. Bitte prüfe deine Angaben.");
+    } catch (caught) {
+      setError(saveErrorMessage(caught));
     } finally {
       setSaving(null);
     }
@@ -200,7 +200,7 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
 
         <Section icon={<Mail className="size-4" />} title="Kontakt" description="Zentrale Erreichbarkeit und Shop-Domain.">
           <Field id="email" label="E-Mail" value={values.email ?? ""} onChange={setValue} required type="email" placeholder="info@muster-shop.de" />
-          <Field id="domain" label="Domain" value={values.domain ?? ""} onChange={setValue} required type="url" placeholder="https://mein-shop.de" />
+          <Field id="domain" label="Domain" value={values.domain ?? ""} onChange={setValue} required placeholder="mein-shop.de" />
         </Section>
 
         <Section icon={<Mail className="size-4" />} title="Resend" description="Optionaler E-Mail-Versand für dieses Branding.">
