@@ -60,10 +60,12 @@ export function slotLabel(order: Order) {
 
 export const STATUS_STYLE: Record<OrderStatus, string> = {
   neu: "bg-brand-soft text-brand-hover",
-  in_bearbeitung: "bg-surface text-conditions",
-  bestaetigt: "bg-brand-soft text-brand-hover",
-  geliefert: "bg-surface text-conditions",
-  storniert: "bg-surface text-muted-custom",
+  mailbox: "bg-surface text-conditions",
+  moechte_rechnung: "bg-surface text-conditions",
+  rechnung_versendet: "bg-brand-soft text-brand-hover",
+  ueberwiesen: "bg-brand-soft text-brand-hover",
+  angekommen: "bg-surface text-conditions",
+  exchanged: "bg-surface text-muted-custom",
 };
 
 function OrdersPage() {
