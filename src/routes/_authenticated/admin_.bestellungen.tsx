@@ -1,14 +1,26 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { RefreshCw, Search, ShoppingCart } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Loader2, RefreshCw, Save, Search, ShoppingCart } from "lucide-react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 
 import { AdminPageShell } from "@/components/internal/admin-page-shell";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { listBrandings } from "@/lib/brandings.functions";
-import { ORDER_STATUSES, ORDER_STATUS_LABEL, listOrders, type Order, type OrderStatus } from "@/lib/orders.functions";
+import {
+  ORDER_STATUSES,
+  ORDER_STATUS_LABEL,
+  getOrder,
+  listOrders,
+  updateOrder,
+  type Order,
+  type OrderAddress,
+  type OrderStatus,
+} from "@/lib/orders.functions";
 
 export const Route = createFileRoute("/_authenticated/admin_/bestellungen")({
   head: () => ({ meta: [
@@ -22,8 +34,6 @@ export const Route = createFileRoute("/_authenticated/admin_/bestellungen")({
   ] }),
   component: OrdersPage,
 });
-
-export const EURO = new Intl.DateTimeFormat("de-DE");
 
 export function formatEuro(value: number) {
   return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(value);
@@ -65,6 +75,7 @@ function OrdersPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<OrderStatus | "alle">("alle");
   const [branding, setBranding] = useState<string>("alle");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const rows = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -145,10 +156,12 @@ function OrdersPage() {
                 </thead>
                 <tbody>
                   {rows.map((order) => (
-                    <tr key={order.id} className="border-b border-line/70 last:border-0 hover:bg-surface/60">
-                      <td className="px-4 py-3 text-[13px] font-semibold text-conditions">
-                        <Link to="/admin/bestellungen/$orderId" params={{ orderId: order.id }} className="hover:text-brand-hover">{order.orderNumber}</Link>
-                      </td>
+                    <tr
+                      key={order.id}
+                      onClick={() => setSelectedId(order.id)}
+                      className="cursor-pointer border-b border-line/70 last:border-0 hover:bg-surface/60"
+                    >
+                      <td className="px-4 py-3 text-[13px] font-semibold text-conditions">{order.orderNumber}</td>
                       <td className="px-4 py-3 text-[13px] text-muted-custom">{formatDate(order.placedAt)}</td>
                       <td className="px-4 py-3 text-[13px] text-conditions">{order.brandingName ?? "—"}</td>
                       <td className="px-4 py-3 text-[13px] text-conditions">{customerName(order)}</td>
@@ -167,7 +180,12 @@ function OrdersPage() {
 
           <div className="grid gap-4 lg:hidden">
             {rows.map((order) => (
-              <Link key={order.id} to="/admin/bestellungen/$orderId" params={{ orderId: order.id }} className="rounded-lg border border-line bg-card p-4 shadow-sm">
+              <button
+                key={order.id}
+                type="button"
+                onClick={() => setSelectedId(order.id)}
+                className="rounded-lg border border-line bg-card p-4 text-left shadow-sm"
+              >
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[14px] font-bold text-conditions">{order.orderNumber}</span>
                   <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLE[order.status]}`}>{ORDER_STATUS_LABEL[order.status]}</span>
@@ -175,11 +193,147 @@ function OrdersPage() {
                 <p className="mt-1 text-[13px] text-muted-custom">{formatDate(order.placedAt)} · {order.brandingName ?? "Ohne Branding"}</p>
                 <p className="mt-2 text-[13px] text-conditions">{customerName(order)} · {[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ")}</p>
                 <p className="mt-1 text-[13px] text-conditions">{order.liters.toLocaleString("de-DE")} L · <span className="font-semibold">{formatEuro(order.total)}</span></p>
-              </Link>
+              </button>
             ))}
           </div>
         </>
       ) : null}
+
+      <OrderDetailDialog orderId={selectedId} onClose={() => setSelectedId(null)} />
     </AdminPageShell>
+  );
+}
+
+function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClose: () => void }) {
+  const fetchOrder = useServerFn(getOrder);
+  const saveOrder = useServerFn(updateOrder);
+  const queryClient = useQueryClient();
+
+  const { data, isPending } = useQuery({
+    queryKey: ["order", orderId],
+    queryFn: () => fetchOrder({ data: { id: orderId! } }),
+    enabled: Boolean(orderId),
+  });
+
+  const [status, setStatus] = useState<OrderStatus>("neu");
+  const [note, setNote] = useState("");
+
+  useEffect(() => {
+    if (data) {
+      setStatus(data.status);
+      setNote(data.internalNote ?? "");
+    }
+  }, [data]);
+
+  const mutation = useMutation({
+    mutationFn: () => saveOrder({ data: { id: orderId!, status, internalNote: note } }),
+    onSuccess: () => {
+      toast.success("Bestellung aktualisiert.");
+      void queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      void queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+    onError: () => toast.error("Bestellung konnte nicht gespeichert werden."),
+  });
+
+  return (
+    <Dialog open={Boolean(orderId)} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+        {isPending || !data ? (
+          <>
+            <DialogHeader>
+              <DialogTitle>Bestellung wird geladen …</DialogTitle>
+            </DialogHeader>
+            <div className="h-64 animate-pulse rounded-lg border border-line bg-surface" />
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex flex-wrap items-center gap-3">
+                <span>Bestellung {data.orderNumber}</span>
+                <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLE[data.status]}`}>{ORDER_STATUS_LABEL[data.status]}</span>
+              </DialogTitle>
+              <p className="text-[13px] text-muted-custom">
+                {formatDate(data.placedAt)} · {data.brandingName ?? "Ohne Branding"}
+              </p>
+            </DialogHeader>
+
+            <div className="flex items-center gap-2">
+              <select value={status} onChange={(event) => setStatus(event.target.value as OrderStatus)} className="h-9 rounded-md border border-line bg-background px-3 text-[13px] text-conditions">
+                {ORDER_STATUSES.map((value) => (
+                  <option key={value} value={value}>{ORDER_STATUS_LABEL[value]}</option>
+                ))}
+              </select>
+              <Button size="sm" onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+                {mutation.isPending ? <Loader2 className="animate-spin" /> : <Save />} Speichern
+              </Button>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card title="Produkt & Preis">
+                <Row label="Heizölart" value={data.variant === "premium" ? "Heizöl Premium" : "Heizöl Standard"} />
+                <Row label="Liefermenge" value={`${data.liters.toLocaleString("de-DE")} Liter`} />
+                <Row label="Lieferstellen" value={String(data.deliveryPoints)} />
+                <Row label="Schlauchlänge" value={data.hose ?? "—"} />
+                <Row label="Tankwagen" value={data.truck ?? "—"} />
+                <Row label="Preis / 100 L" value={formatEuro(data.pricePer100)} />
+                <Row label="Gesamtpreis" value={formatEuro(data.total)} strong />
+                <Row label="Zahlungsart" value={data.paymentMethod ?? "—"} />
+              </Card>
+
+              <Card title="Liefertermin & Kontakt">
+                <Row label="Frühestes Datum" value={formatDate(data.earliestDate)} />
+                <Row label="Gewählter Termin" value={data.slotPeriod === "telefon" ? "Telefonische Absprache" : slotLabel(data)} />
+                <Row label="E-Mail" value={data.email} />
+                <Row label="Telefon" value={data.phone ?? "—"} />
+                <Row label="Hinweise" value={data.notes ?? "—"} />
+              </Card>
+
+              <Card title="Lieferadresse"><AddressBlock address={data.deliveryAddress} /></Card>
+              <Card title="Rechnungsadresse">
+                {data.billingAddress ? <AddressBlock address={data.billingAddress} /> : <p className="px-5 py-4 text-[13px] text-muted-custom">Entspricht der Lieferadresse.</p>}
+              </Card>
+            </div>
+
+            <section className="rounded-lg border border-line bg-card p-5 shadow-sm">
+              <h2 className="text-[15px] font-bold text-conditions">Interne Notiz</h2>
+              <p className="mt-1 text-[12px] text-muted-custom">Nur im Panel sichtbar, wird dem Kunden nicht angezeigt.</p>
+              <Textarea className="mt-3" rows={3} value={note} onChange={(event) => setNote(event.target.value)} placeholder="z. B. Kunde telefonisch erreicht, Termin bestätigt" />
+            </section>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function Card({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="rounded-lg border border-line bg-card shadow-sm">
+      <div className="border-b border-line px-5 py-3"><h2 className="text-[14px] font-bold text-conditions">{title}</h2></div>
+      <div className="divide-y divide-line/70">{children}</div>
+    </section>
+  );
+}
+
+function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <div className="flex items-start justify-between gap-4 px-5 py-2.5">
+      <span className="text-[12px] tracking-wide text-muted-custom uppercase">{label}</span>
+      <span className={`text-right text-[13px] ${strong ? "font-bold text-brand-hover" : "text-conditions"}`}>{value}</span>
+    </div>
+  );
+}
+
+function AddressBlock({ address }: { address: OrderAddress }) {
+  const lines = [
+    [address.salutation, address.firstName, address.lastName].filter(Boolean).join(" "),
+    address.company ?? "",
+    [address.street, address.streetNo].filter(Boolean).join(" "),
+    [address.plz, address.city].filter(Boolean).join(" "),
+  ].filter(Boolean);
+  return (
+    <div className="px-5 py-4">
+      {lines.length > 0 ? lines.map((line) => <p key={line} className="text-[13px] text-conditions">{line}</p>) : <p className="text-[13px] text-muted-custom">Keine Angaben.</p>}
+    </div>
   );
 }
