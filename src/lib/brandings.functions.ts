@@ -35,10 +35,6 @@ const brandingInputSchema = z.object({
   resendSenderName: nullableText(160),
   sevenApiKey: nullableText(500),
   sevenSenderName: nullableText(11),
-  accountHolder: nullableText(160),
-  iban: nullableText(40),
-  bankName: nullableText(160),
-  bic: nullableText(20),
 });
 
 export type BrandingInput = z.input<typeof brandingInputSchema>;
@@ -200,10 +196,6 @@ export const saveBranding = createServerFn({ method: "POST" })
       resend_sender_name: data.resendSenderName,
       seven_api_key: savedSevenApiKey,
       seven_sender_name: data.sevenSenderName,
-      account_holder: data.accountHolder,
-      iban: data.iban,
-      bank_name: data.bankName,
-      bic: data.bic,
       updated_by: context.userId,
     };
 

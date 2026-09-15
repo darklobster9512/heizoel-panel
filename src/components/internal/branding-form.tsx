@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Building2, Check, ImagePlus, Landmark, Loader2, Mail, MapPin, MessageSquare, Save, ShieldCheck } from "lucide-react";
+import { Building2, Check, ImagePlus, Loader2, Mail, MapPin, MessageSquare, Save, ShieldCheck } from "lucide-react";
 import { useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -30,10 +30,6 @@ const EMPTY: FormValues = {
   resendSenderName: "",
   sevenApiKey: "",
   sevenSenderName: "",
-  accountHolder: "",
-  iban: "",
-  bankName: "",
-  bic: "",
 };
 
 function initialValues(branding?: Branding | null): FormValues {
@@ -56,10 +52,6 @@ function initialValues(branding?: Branding | null): FormValues {
     resendSenderName: branding.resendSenderName ?? "",
     sevenApiKey: "",
     sevenSenderName: branding.sevenSenderName ?? "",
-    accountHolder: branding.accountHolder ?? "",
-    iban: branding.iban ?? "",
-    bankName: branding.bankName ?? "",
-    bic: branding.bic ?? "",
   };
 }
 
@@ -220,13 +212,6 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
         <Section icon={<MessageSquare className="size-4" />} title="Seven.io" description="Optionaler SMS-Versand für dieses Branding.">
           <Field id="sevenApiKey" label={branding?.sevenConfigured ? "Seven.io API Key · hinterlegt" : "Seven.io API Key"} value={values.sevenApiKey ?? ""} onChange={setValue} placeholder={branding?.sevenConfigured ? "Leer lassen, um Schlüssel beizubehalten" : "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"} />
           <Field id="sevenSenderName" label="Absendername" value={values.sevenSenderName ?? ""} onChange={setValue} maxLength={11} placeholder="Max. 11 Zeichen" />
-        </Section>
-
-        <Section icon={<Landmark className="size-4" />} title="Bankverbindung" description="Optional — wird auf Rechnungs-E-Mails als Überweisungskonto angezeigt.">
-          <Field id="accountHolder" label="Kontoinhaber" value={values.accountHolder ?? ""} onChange={setValue} placeholder="Musterheizöl GmbH" />
-          <Field id="iban" label="IBAN" value={values.iban ?? ""} onChange={setValue} maxLength={40} placeholder="DE89 3704 0044 0532 0130 00" />
-          <Field id="bankName" label="Bankname" value={values.bankName ?? ""} onChange={setValue} placeholder="Musterbank" />
-          <Field id="bic" label="BIC" value={values.bic ?? ""} onChange={setValue} maxLength={20} placeholder="COBADEFFXXX" />
         </Section>
       </div>
 
