@@ -70,9 +70,9 @@ export function InternalShell({
         </div>
       </header>
 
-      <div className="mx-auto flex min-h-[calc(100vh-64px)] max-w-[1440px] items-stretch gap-5 px-4 py-6 lg:pl-0 lg:pr-5">
+      <div className="relative mx-auto flex min-h-[calc(100vh-64px)] max-w-[1440px] items-stretch gap-5 px-4 py-6 lg:pl-0 lg:pr-5">
         <aside className="hidden w-max shrink-0 lg:block">
-          <div className="sticky top-1/2 w-max -translate-y-1/2 rounded-r-2xl rounded-l-none bg-brand p-2 shadow-xl">
+          <div className="sticky top-[50vh] w-max -translate-y-1/2 rounded-r-2xl rounded-l-none bg-brand p-2 shadow-xl">
             <nav className="flex flex-col gap-1">
               {nav.map((item) => {
                 const base = "flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 text-[14px] transition-colors";
