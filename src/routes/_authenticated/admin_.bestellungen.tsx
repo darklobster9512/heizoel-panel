@@ -561,6 +561,84 @@ function GenerateInvoiceDialog({ order, onClose }: { order: Order | null; onClos
 }
 
 
+type OrderForm = {
+  status: OrderStatus;
+  internalNote: string;
+  variant: "standard" | "premium";
+  liters: string;
+  pricePer100: string;
+  deliveryPoints: string;
+  hose: string;
+  truck: string;
+  paymentMethod: string;
+  email: string;
+  phone: string;
+  earliestDate: string;
+  slotDate: string;
+  slotPeriod: string;
+  notes: string;
+  deliveryAddress: OrderAddress;
+  billingAddress: OrderAddress | null;
+};
+
+const EMPTY_ADDRESS: OrderAddress = {
+  salutation: "",
+  firstName: "",
+  lastName: "",
+  company: "",
+  street: "",
+  streetNo: "",
+  plz: "",
+  city: "",
+};
+
+const addressForm = (address: OrderAddress | null): OrderAddress => ({
+  salutation: address?.salutation ?? "",
+  firstName: address?.firstName ?? "",
+  lastName: address?.lastName ?? "",
+  company: address?.company ?? "",
+  street: address?.street ?? "",
+  streetNo: address?.streetNo ?? "",
+  plz: address?.plz ?? "",
+  city: address?.city ?? "",
+});
+
+function toForm(order: Order): OrderForm {
+  return {
+    status: order.status,
+    internalNote: order.internalNote ?? "",
+    variant: order.variant === "premium" ? "premium" : "standard",
+    liters: String(order.liters ?? 0),
+    pricePer100: String(order.pricePer100 ?? 0),
+    deliveryPoints: String(order.deliveryPoints || 1),
+    hose: order.hose ?? "",
+    truck: order.truck ?? "",
+    paymentMethod: order.paymentMethod ?? "",
+    email: order.email ?? "",
+    phone: order.phone ?? "",
+    earliestDate: order.earliestDate ?? "",
+    slotDate: order.slotDate ?? "",
+    slotPeriod: order.slotPeriod ?? "",
+    notes: order.notes ?? "",
+    deliveryAddress: addressForm(order.deliveryAddress),
+    billingAddress: order.billingAddress ? addressForm(order.billingAddress) : null,
+  };
+}
+
+const PAYMENT_OPTIONS = [
+  { value: "vorkasse", label: "Vorkasse" },
+  { value: "ec", label: "EC-Karte" },
+  { value: "barzahlung", label: "Barzahlung" },
+];
+
+const SLOT_OPTIONS = [
+  { value: "", label: "— kein Zeitfenster —" },
+  { value: "vormittag", label: "Vormittag" },
+  { value: "nachmittag", label: "Nachmittag" },
+  { value: "ganztags", label: "Ganztags" },
+  { value: "telefon", label: "Telefonische Absprache" },
+];
+
 function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClose: () => void }) {
   const fetchOrder = useServerFn(getOrder);
   const saveOrder = useServerFn(updateOrder);
@@ -572,30 +650,107 @@ function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClo
     enabled: Boolean(orderId),
   });
 
-  const [status, setStatus] = useState<OrderStatus>("neu");
-  const [note, setNote] = useState("");
+  const [form, setForm] = useState<OrderForm | null>(null);
+  const [initial, setInitial] = useState<string>("");
 
   useEffect(() => {
-    if (data) {
-      setStatus(data.status);
-      setNote(data.internalNote ?? "");
+    if (!data) {
+      setForm(null);
+      setInitial("");
+      return;
     }
-  }, [data]);
+    const next = toForm(data);
+    setForm(next);
+    setInitial(JSON.stringify(next));
+  }, [data?.id, data]);
+
+  const set = <K extends keyof OrderForm>(key: K, value: OrderForm[K]) =>
+    setForm((prev) => (prev ? { ...prev, [key]: value } : prev));
+
+  const setAddress = (which: "deliveryAddress" | "billingAddress", key: keyof OrderAddress, value: string) =>
+    setForm((prev) => {
+      if (!prev) return prev;
+      const base = which === "billingAddress" ? (prev.billingAddress ?? EMPTY_ADDRESS) : prev.deliveryAddress;
+      return { ...prev, [which]: { ...base, [key]: value } };
+    });
+
+  const total = useMemo(() => {
+    if (!form) return 0;
+    const liters = Number(form.liters.replace(",", ".")) || 0;
+    const price = Number(form.pricePer100.replace(",", ".")) || 0;
+    return Math.round(((liters / 100) * price + Number.EPSILON) * 100) / 100;
+  }, [form?.liters, form?.pricePer100, form]);
+
+  const dirty = Boolean(form) && JSON.stringify(form) !== initial;
 
   const mutation = useMutation({
-    mutationFn: () => saveOrder({ data: { id: orderId!, status, internalNote: note } }),
+    mutationFn: () => {
+      const values = form!;
+      return saveOrder({
+        data: {
+          id: orderId!,
+          status: values.status,
+          internalNote: values.internalNote,
+          variant: values.variant,
+          liters: Math.round(Number(values.liters.replace(",", ".")) || 0),
+          pricePer100: Number(values.pricePer100.replace(",", ".")) || 0,
+          deliveryPoints: Math.round(Number(values.deliveryPoints) || 1),
+          hose: values.hose,
+          truck: values.truck,
+          paymentMethod: values.paymentMethod,
+          email: values.email,
+          phone: values.phone,
+          earliestDate: values.earliestDate || null,
+          slotDate: values.slotDate || null,
+          slotPeriod: values.slotPeriod,
+          notes: values.notes,
+          deliveryAddress: values.deliveryAddress,
+          billingAddress: values.billingAddress,
+        },
+      });
+    },
     onSuccess: () => {
       toast.success("Bestellung aktualisiert.");
       void queryClient.invalidateQueries({ queryKey: ["order", orderId] });
       void queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
-    onError: () => toast.error("Bestellung konnte nicht gespeichert werden."),
+    onError: (error) =>
+      toast.error(
+        error instanceof Error && error.message
+          ? error.message
+          : "Bestellung konnte nicht gespeichert werden.",
+      ),
   });
 
+  function handleSave() {
+    if (!form) return;
+    const liters = Math.round(Number(form.liters.replace(",", ".")) || 0);
+    const price = Number(form.pricePer100.replace(",", ".")) || 0;
+    if (liters <= 0) {
+      toast.error("Die Menge muss größer als 0 sein.");
+      return;
+    }
+    if (price < 0) {
+      toast.error("Der Preis darf nicht negativ sein.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      toast.error("Bitte eine gültige E-Mail-Adresse angeben.");
+      return;
+    }
+    mutation.mutate();
+  }
+
+  function handleOpenChange(open: boolean) {
+    if (open) return;
+    if (dirty && !window.confirm("Es gibt ungespeicherte Änderungen. Wirklich schließen?")) return;
+    onClose();
+  }
+
   return (
-    <Dialog open={Boolean(orderId)} onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog open={Boolean(orderId)} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
-        {isPending || !data ? (
+        {isPending || !data || !form ? (
           <>
             <DialogHeader>
               <DialogTitle>Bestellung wird geladen …</DialogTitle>
@@ -614,47 +769,134 @@ function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClo
               </p>
             </DialogHeader>
 
-            <div className="flex items-center gap-2">
-              <select value={status} onChange={(event) => setStatus(event.target.value as OrderStatus)} className="h-9 rounded-md border border-line bg-background px-3 text-[13px] text-conditions">
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                value={form.status}
+                onChange={(event) => set("status", event.target.value as OrderStatus)}
+                className="h-9 rounded-md border border-line bg-background px-3 text-[13px] text-conditions"
+              >
                 {ORDER_STATUSES.map((value) => (
                   <option key={value} value={value}>{ORDER_STATUS_LABEL[value]}</option>
                 ))}
               </select>
-              <Button size="sm" onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+              <Button size="sm" onClick={handleSave} disabled={mutation.isPending}>
                 {mutation.isPending ? <Loader2 className="animate-spin" /> : <Save />} Speichern
               </Button>
+              {dirty ? <span className="text-[12px] text-muted-custom">Ungespeicherte Änderungen</span> : null}
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <Card title="Produkt & Preis">
-                <Row label="Heizölart" value={data.variant === "premium" ? "Heizöl Premium" : "Heizöl Standard"} />
-                <Row label="Liefermenge" value={`${data.liters.toLocaleString("de-DE")} Liter`} />
-                <Row label="Lieferstellen" value={String(data.deliveryPoints)} />
-                <Row label="Schlauchlänge" value={data.hose ?? "—"} />
-                <Row label="Tankwagen" value={data.truck ?? "—"} />
-                <Row label="Preis / 100 L" value={formatEuro(data.pricePer100)} />
-                <Row label="Gesamtpreis" value={formatEuro(data.total)} strong />
-                <Row label="Zahlungsart" value={data.paymentMethod ?? "—"} />
+                <Field label="Heizölart">
+                  <SelectInput
+                    value={form.variant}
+                    onChange={(value) => set("variant", value === "premium" ? "premium" : "standard")}
+                    options={[
+                      { value: "standard", label: "Heizöl Standard" },
+                      { value: "premium", label: "Heizöl Premium" },
+                    ]}
+                  />
+                </Field>
+                <Field label="Liefermenge (L)">
+                  <TextInput value={form.liters} onChange={(value) => set("liters", value)} inputMode="numeric" />
+                </Field>
+                <Field label="Preis / 100 L">
+                  <TextInput value={form.pricePer100} onChange={(value) => set("pricePer100", value)} inputMode="decimal" />
+                </Field>
+                <div className="flex items-center justify-between gap-4 px-5 py-2.5">
+                  <span className="text-[12px] tracking-wide text-muted-custom uppercase">Gesamtpreis</span>
+                  <span className="text-right text-[13px] font-bold text-brand-hover">{formatEuro(total)}</span>
+                </div>
+                <Field label="Lieferstellen">
+                  <TextInput value={form.deliveryPoints} onChange={(value) => set("deliveryPoints", value)} inputMode="numeric" />
+                </Field>
+                <Field label="Schlauchlänge">
+                  <TextInput value={form.hose} onChange={(value) => set("hose", value)} />
+                </Field>
+                <Field label="Tankwagen">
+                  <TextInput value={form.truck} onChange={(value) => set("truck", value)} />
+                </Field>
+                <Field label="Zahlungsart">
+                  <SelectInput
+                    value={form.paymentMethod}
+                    onChange={(value) => set("paymentMethod", value)}
+                    options={[
+                      { value: "", label: "— keine Angabe —" },
+                      ...PAYMENT_OPTIONS,
+                      ...(form.paymentMethod &&
+                      !PAYMENT_OPTIONS.some((option) => option.value === form.paymentMethod)
+                        ? [{ value: form.paymentMethod, label: form.paymentMethod }]
+                        : []),
+                    ]}
+                  />
+                </Field>
               </Card>
 
               <Card title="Liefertermin & Kontakt">
-                <Row label="Frühestes Datum" value={formatDate(data.earliestDate)} />
-                <Row label="Gewählter Termin" value={data.slotPeriod === "telefon" ? "Telefonische Absprache" : slotLabel(data)} />
-                <Row label="E-Mail" value={data.email} />
-                <Row label="Telefon" value={data.phone ?? "—"} />
-                <Row label="Hinweise" value={data.notes ?? "—"} />
+                <Field label="Frühestes Datum">
+                  <TextInput type="date" value={form.earliestDate} onChange={(value) => set("earliestDate", value)} />
+                </Field>
+                <Field label="Termin-Datum">
+                  <TextInput type="date" value={form.slotDate} onChange={(value) => set("slotDate", value)} />
+                </Field>
+                <Field label="Zeitfenster">
+                  <SelectInput
+                    value={form.slotPeriod}
+                    onChange={(value) => set("slotPeriod", value)}
+                    options={[
+                      ...SLOT_OPTIONS,
+                      ...(form.slotPeriod && !SLOT_OPTIONS.some((option) => option.value === form.slotPeriod)
+                        ? [{ value: form.slotPeriod, label: form.slotPeriod }]
+                        : []),
+                    ]}
+                  />
+                </Field>
+                <Field label="E-Mail">
+                  <TextInput type="email" value={form.email} onChange={(value) => set("email", value)} />
+                </Field>
+                <Field label="Telefon">
+                  <TextInput value={form.phone} onChange={(value) => set("phone", value)} />
+                </Field>
+                <Field label="Hinweise">
+                  <TextInput value={form.notes} onChange={(value) => set("notes", value)} />
+                </Field>
               </Card>
 
-              <Card title="Lieferadresse"><AddressBlock address={data.deliveryAddress} /></Card>
+              <Card title="Lieferadresse">
+                <AddressFields
+                  address={form.deliveryAddress}
+                  onChange={(key, value) => setAddress("deliveryAddress", key, value)}
+                />
+              </Card>
+
               <Card title="Rechnungsadresse">
-                {data.billingAddress ? <AddressBlock address={data.billingAddress} /> : <p className="px-5 py-4 text-[13px] text-muted-custom">Entspricht der Lieferadresse.</p>}
+                <div className="flex items-center gap-2 px-5 py-3">
+                  <input
+                    id="billing-toggle"
+                    type="checkbox"
+                    className="size-4 accent-[var(--color-brand)]"
+                    checked={form.billingAddress !== null}
+                    onChange={(event) => set("billingAddress", event.target.checked ? { ...EMPTY_ADDRESS } : null)}
+                  />
+                  <label htmlFor="billing-toggle" className="text-[13px] text-conditions">
+                    Abweichende Rechnungsadresse
+                  </label>
+                </div>
+                {form.billingAddress ? (
+                  <AddressFields
+                    address={form.billingAddress}
+                    onChange={(key, value) => setAddress("billingAddress", key, value)}
+                  />
+                ) : (
+                  <p className="px-5 py-4 text-[13px] text-muted-custom">Entspricht der Lieferadresse.</p>
+                )}
               </Card>
             </div>
 
             <section className="rounded-lg border border-line bg-card p-5 shadow-sm">
               <h2 className="text-[15px] font-bold text-conditions">Interne Notiz</h2>
               <p className="mt-1 text-[12px] text-muted-custom">Nur im Panel sichtbar, wird dem Kunden nicht angezeigt.</p>
-              <Textarea className="mt-3" rows={3} value={note} onChange={(event) => setNote(event.target.value)} placeholder="z. B. Kunde telefonisch erreicht, Termin bestätigt" />
+              <Textarea className="mt-3" rows={3} value={form.internalNote} onChange={(event) => set("internalNote", event.target.value)} placeholder="z. B. Kunde telefonisch erreicht, Termin bestätigt" />
             </section>
           </>
         )}
@@ -672,25 +914,86 @@ function Card({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-4 px-5 py-2.5">
-      <span className="text-[12px] tracking-wide text-muted-custom uppercase">{label}</span>
-      <span className={`text-right text-[13px] ${strong ? "font-bold text-brand-hover" : "text-conditions"}`}>{value}</span>
+    <div className="flex items-center justify-between gap-4 px-5 py-2">
+      <span className="shrink-0 text-[12px] tracking-wide text-muted-custom uppercase">{label}</span>
+      <div className="w-[60%] max-w-[260px]">{children}</div>
     </div>
   );
 }
 
-function AddressBlock({ address }: { address: OrderAddress }) {
-  const lines = [
-    [address.salutation, address.firstName, address.lastName].filter(Boolean).join(" "),
-    address.company ?? "",
-    [address.street, address.streetNo].filter(Boolean).join(" "),
-    [address.plz, address.city].filter(Boolean).join(" "),
-  ].filter(Boolean);
+function TextInput({
+  value,
+  onChange,
+  type = "text",
+  inputMode,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  inputMode?: "numeric" | "decimal";
+}) {
   return (
-    <div className="px-5 py-4">
-      {lines.length > 0 ? lines.map((line) => <p key={line} className="text-[13px] text-conditions">{line}</p>) : <p className="text-[13px] text-muted-custom">Keine Angaben.</p>}
-    </div>
+    <Input
+      type={type}
+      {...(inputMode ? { inputMode } : {})}
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className="h-8 text-[13px]"
+    />
+  );
+}
+
+function SelectInput({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className="h-8 w-full rounded-md border border-line bg-background px-2 text-[13px] text-conditions"
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>{option.label}</option>
+      ))}
+    </select>
+  );
+}
+
+function AddressFields({
+  address,
+  onChange,
+}: {
+  address: OrderAddress;
+  onChange: (key: keyof OrderAddress, value: string) => void;
+}) {
+  const fields: { key: keyof OrderAddress; label: string }[] = [
+    { key: "salutation", label: "Anrede" },
+    { key: "firstName", label: "Vorname" },
+    { key: "lastName", label: "Nachname" },
+    { key: "company", label: "Firma" },
+    { key: "street", label: "Straße" },
+    { key: "streetNo", label: "Hausnummer" },
+    { key: "plz", label: "PLZ" },
+    { key: "city", label: "Ort" },
+  ];
+  return (
+    <>
+      {fields.map((field) => (
+        <Field key={String(field.key)} label={field.label}>
+          <TextInput
+            value={(address[field.key] as string | null | undefined) ?? ""}
+            onChange={(value) => onChange(field.key, value)}
+          />
+        </Field>
+      ))}
+    </>
   );
 }
