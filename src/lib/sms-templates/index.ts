@@ -30,8 +30,7 @@ export function smsSender(branding: SmsBranding): string {
 }
 
 export function renderOrderConfirmationSms(branding: SmsBranding, data: SmsDemoData = DEMO_SMS): string {
-  const contact = branding.email ? ` Fragen? ${branding.email}` : "";
-  return `Ihre Bestellung ${data.orderNumber} bei ${shop(branding)} ist eingegangen. Vielen Dank!${contact}`;
+  return `Vielen Dank für Ihre Bestellung ${data.orderNumber} bei ${shop(branding)}. Wir haben diese erfolgreich erhalten und bearbeiten sie umgehend.`;
 }
 
 export function renderOrderInvoiceSms(branding: SmsBranding, data: SmsDemoData = DEMO_SMS): string {
