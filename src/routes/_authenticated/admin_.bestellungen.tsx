@@ -433,7 +433,7 @@ function OrdersPage() {
       ) : null}
 
       <OrderDetailDialog orderId={selectedId} onClose={() => setSelectedId(null)} />
-      <GenerateInvoiceDialog order={invoiceOrder} onClose={() => setInvoiceOrder(null)} />
+      {isAdmin ? <GenerateInvoiceDialog order={invoiceOrder} onClose={() => setInvoiceOrder(null)} /> : null}
     </AdminPageShell>
   );
 }
