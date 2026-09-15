@@ -1,3 +1,4 @@
+import { formatIban } from "@/lib/iban";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
 
 export type InvoiceCompany = {

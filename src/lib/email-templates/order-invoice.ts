@@ -1,3 +1,4 @@
+import { formatIban } from "@/lib/iban";
 import {
   addressBox,
   contactBox,
