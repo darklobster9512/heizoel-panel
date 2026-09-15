@@ -205,6 +205,16 @@
   --header-phone: #5b5b5b;
   --hero-text: #f0f0f0;
 
+  /* Status badge colors (dark mode) */
+  --status-info-bg: oklch(0.25 0.05 240);
+  --status-info-text: oklch(0.75 0.10 240);
+  --status-warning-bg: oklch(0.28 0.06 85);
+  --status-warning-text: oklch(0.85 0.10 75);
+  --status-success-bg: oklch(0.25 0.05 150);
+  --status-success-text: oklch(0.75 0.10 150);
+  --status-danger-bg: oklch(0.25 0.05 25);
+  --status-danger-text: oklch(0.80 0.12 25);
+
 
   --card: oklch(0.21 0.018 250);
   --card-foreground: oklch(0.98 0.002 250);
