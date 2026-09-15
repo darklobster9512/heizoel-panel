@@ -49,9 +49,14 @@ function BankkontenPage() {
   const saveAccount = useServerFn(saveBankAccount);
   const removeAccount = useServerFn(deleteBankAccount);
   const { data, isPending, isError, refetch } = useQuery({ queryKey: ["bank-accounts"], queryFn: () => fetchAccounts({}) });
+  const fetchUsage = useServerFn(getBankAccountUsage);
+  const usageQuery = useQuery({ queryKey: ["bank-usage"], queryFn: () => fetchUsage({}) });
+  const usageById = new Map((usageQuery.data ?? []).map((entry) => [entry.id, entry]));
+  const [ordersFor, setOrdersFor] = useState<BankAccount | null>(null);
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+
   const [formError, setFormError] = useState<string | null>(null);
 
   const saveMutation = useMutation({
