@@ -66,21 +66,39 @@ export type Order = {
   createdAt: string;
 };
 
-async function requireAdmin(context: {
+type OrdersContext = {
   supabase: {
     rpc: (
       name: "has_role",
-      args: { _user_id: string; _role: "admin" },
+      args: { _user_id: string; _role: "admin" | "caller" },
     ) => PromiseLike<{ data: boolean | null; error: unknown }>;
   };
   userId: string;
-}) {
-  const { data, error } = await context.supabase.rpc("has_role", {
-    _user_id: context.userId,
-    _role: "admin",
+};
+
+/** Admins und Caller dürfen Bestellungen sehen und Status/Notiz pflegen. */
+async function requireOrdersAccess(context: OrdersContext): Promise<"admin" | "caller"> {
+  const [admin, caller] = await Promise.all([
+    context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
+    context.supabase.rpc("has_role", { _user_id: context.userId, _role: "caller" }),
+  ]);
+  if (admin.error || caller.error) throw new Error("Die Berechtigung konnte nicht geprüft werden.");
+  if (admin.data === true) return "admin";
+  if (caller.data === true) return "caller";
+  throw new Error("Kein Zugriff auf die Bestellverwaltung.");
+}
+
+/** Caller dürfen die Branding-Tabelle nicht lesen — Namen serverseitig nachladen. */
+async function attachBrandingNames(orders: Order[]): Promise<Order[]> {
+  const ids = [...new Set(orders.map((o) => o.brandingId).filter((id): id is string => Boolean(id)))];
+  if (ids.length === 0) return orders;
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin.from("brandings").select("id, shop_name, company_name").in("id", ids);
+  const byId = new Map((data ?? []).map((row) => [String(row.id), row]));
+  return orders.map((order) => {
+    const row = order.brandingId ? byId.get(order.brandingId) : null;
+    return row ? { ...order, brandingName: row.shop_name ?? row.company_name ?? null } : order;
   });
-  if (error) throw new Error("Die Berechtigung konnte nicht geprüft werden.");
-  if (data !== true) throw new Error("Kein Zugriff auf die Bestellverwaltung.");
 }
 
 type Row = {
