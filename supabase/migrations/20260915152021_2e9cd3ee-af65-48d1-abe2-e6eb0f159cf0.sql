@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.notify_order_confirmation() FROM PUBLIC, anon, authenticated;
