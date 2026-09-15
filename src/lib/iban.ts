@@ -12,3 +12,12 @@ export function cleanRegisterNumber(value: string): string {
   const collapsed = value.replace(/\s+/g, " ").trim();
   return collapsed.replace(/^(HR[AB])\s+\1\s+/i, "$1 ");
 }
+
+/**
+ * Rechnungsnummer zu einer Bestellnummer: "RE-<Bestellnummer>".
+ * Ein bereits vorhandenes RE-Präfix wird nicht verdoppelt.
+ */
+export function invoiceNumberFor(orderNumber: string): string {
+  const value = orderNumber.trim();
+  return /^RE-/i.test(value) ? value : `RE-${value}`;
+}
