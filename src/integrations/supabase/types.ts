@@ -465,6 +465,7 @@ export type Database = {
       order_status:
         | "neu"
         | "mailbox"
+        | "kein_interesse"
         | "moechte_rechnung"
         | "rechnung_versendet"
         | "ueberwiesen"
@@ -602,6 +603,7 @@ export const Constants = {
       order_status: [
         "neu",
         "mailbox",
+        "kein_interesse",
         "moechte_rechnung",
         "rechnung_versendet",
         "ueberwiesen",

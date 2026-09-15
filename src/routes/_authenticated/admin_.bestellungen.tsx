@@ -107,6 +107,7 @@ export function paymentMethodLabel(order: Order) {
 export const STATUS_STYLE: Record<OrderStatus, string> = {
   neu: "bg-brand-soft text-brand-hover",
   mailbox: "bg-surface text-conditions",
+  kein_interesse: "bg-surface text-muted-custom",
   moechte_rechnung: "bg-surface text-conditions",
   rechnung_versendet: "bg-brand-soft text-brand-hover",
   ueberwiesen: "bg-brand-soft text-brand-hover",
@@ -181,10 +182,22 @@ function OrdersPage() {
   const [branding, setBranding] = useState<string>("alle");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [invoiceOrder, setInvoiceOrder] = useState<Order | null>(null);
+  const [showNoInterest, setShowNoInterest] = useState(false);
+
+  const noInterestCount = useMemo(
+    () => (data ?? []).filter((order) => order.status === "kein_interesse").length,
+    [data],
+  );
 
   const rows = useMemo(() => {
     const needle = search.trim().toLowerCase();
     return (data ?? []).filter((order) => {
+      const isNoInterest = order.status === "kein_interesse";
+      if (showNoInterest) {
+        if (!isNoInterest) return false;
+      } else if (isNoInterest && status !== "kein_interesse") {
+        return false;
+      }
       if (status !== "alle" && order.status !== status) return false;
       if (branding !== "alle" && order.brandingId !== branding) return false;
       if (!needle) return true;
@@ -193,7 +206,7 @@ function OrdersPage() {
         .toLowerCase()
         .includes(needle);
     });
-  }, [data, search, status, branding]);
+  }, [data, search, status, branding, showNoInterest]);
 
   return (
     <AdminPageShell active="orders">
@@ -220,6 +233,13 @@ function OrdersPage() {
             <option key={value} value={value}>{ORDER_STATUS_LABEL[value]}</option>
           ))}
         </select>
+        <Button
+          variant={showNoInterest ? "default" : "outline"}
+          size="sm"
+          onClick={() => setShowNoInterest((prev) => !prev)}
+        >
+          {showNoInterest ? "Alle anderen anzeigen" : `Kein Interesse anzeigen (${noInterestCount})`}
+        </Button>
         <Button variant="outline" size="sm" onClick={() => void refetch()}><RefreshCw /> Aktualisieren</Button>
       </div>
 
