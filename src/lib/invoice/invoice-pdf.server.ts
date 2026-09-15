@@ -24,6 +24,32 @@ function drawRight(ctx: Ctx, value: string, right: number, y: number, size: numb
   draw(ctx, text, right - font.widthOfTextAtSize(text, size), y, size, bold, color);
 }
 
+function drawShopName(ctx: Ctx, shop: string, x: number, y: number, size: number, color = HEADING) {
+  const match = shop.match(/^(.*?)(online)(.*)$/i);
+  if (!match) {
+    draw(ctx, shop, x, y, size, true, color);
+    return;
+  }
+  const prefix = match[1] ?? "";
+  const online = match[2] ?? "";
+  const suffix = match[3] ?? "";
+  let offset = 0;
+  if (prefix) {
+    const text = prefix.replace(/\u00a0/g, " ");
+    draw(ctx, text, x, y, size, true, color);
+    offset += ctx.bold.widthOfTextAtSize(text, size);
+  }
+  if (online) {
+    const text = online.replace(/\u00a0/g, " ");
+    draw(ctx, text, x + offset, y, size, false, color);
+    offset += ctx.regular.widthOfTextAtSize(text, size);
+  }
+  if (suffix) {
+    const text = suffix.replace(/\u00a0/g, " ");
+    draw(ctx, text, x + offset, y, size, true, color);
+  }
+}
+
 async function embedLogo(doc: PDFDocument, url: string | null) {
   if (!url) return null;
   try {
