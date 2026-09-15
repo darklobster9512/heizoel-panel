@@ -71,7 +71,9 @@ export function flagBar(big: boolean) {
 function shopLogoText(shop: string) {
   const match = shop.match(/^(.*?)(online)(.*)$/i);
   if (!match) return esc(shop);
-  const [, prefix, online, suffix] = match;
+  const prefix = match[1] ?? "";
+  const online = match[2] ?? "";
+  const suffix = match[3] ?? "";
   return `${esc(prefix)}<span style="font-weight:300">${esc(online)}</span>${esc(suffix)}`;
 }
 
