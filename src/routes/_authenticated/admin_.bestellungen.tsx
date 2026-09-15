@@ -230,6 +230,7 @@ function OrdersPage() {
                     <th className="px-4 py-3 font-semibold">ABW.</th>
                     <th className="px-4 py-3 font-semibold">Branding</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
+                    <th className="px-4 py-3 font-semibold">Aktionen</th>
                   </tr>
                 </thead>
                 <tbody>
