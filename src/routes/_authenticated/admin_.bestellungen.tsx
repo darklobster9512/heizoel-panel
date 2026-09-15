@@ -228,12 +228,14 @@ function OrdersPage() {
           <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-custom" />
           <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Bestellnummer, Name oder Ort suchen" className="pl-9" />
         </div>
-        <select value={branding} onChange={(event) => setBranding(event.target.value)} className="h-9 rounded-md border border-line bg-background px-3 text-[13px] text-conditions">
-          <option value="alle">Alle Brandings</option>
-          {(brandings.data ?? []).map((item) => (
-            <option key={item.id} value={item.id}>{item.shopName || item.companyName || "Unbenannt"}</option>
-          ))}
-        </select>
+        {isAdmin ? (
+          <select value={branding} onChange={(event) => setBranding(event.target.value)} className="h-9 rounded-md border border-line bg-background px-3 text-[13px] text-conditions">
+            <option value="alle">Alle Brandings</option>
+            {(brandings.data ?? []).map((item) => (
+              <option key={item.id} value={item.id}>{item.shopName || item.companyName || "Unbenannt"}</option>
+            ))}
+          </select>
+        ) : null}
         <select value={status} onChange={(event) => setStatus(event.target.value as OrderStatus | "alle")} className="h-9 rounded-md border border-line bg-background px-3 text-[13px] text-conditions">
           <option value="alle">Alle Status</option>
           {ORDER_STATUSES.map((value) => (
