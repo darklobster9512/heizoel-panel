@@ -1007,6 +1007,15 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
+function ReadRow({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-4 px-5 py-2.5">
+      <span className="shrink-0 text-[12px] tracking-wide text-muted-custom uppercase">{label}</span>
+      <span className={cn("text-right text-[13px] text-conditions", strong && "font-bold text-brand-hover")}>{value}</span>
+    </div>
+  );
+}
+
 function TextInput({
   value,
   onChange,
