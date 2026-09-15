@@ -217,7 +217,7 @@ function OrdersPage() {
                     <th className="px-4 py-3 font-semibold">Menge</th>
                     <th className="px-4 py-3 font-semibold">Ort</th>
                     <th className="px-4 py-3 font-semibold">Art</th>
-                    <th className="px-4 py-3 font-semibold">Abw. Lieferanschrift</th>
+                    <th className="px-4 py-3 font-semibold">ABW.</th>
                     <th className="px-4 py-3 font-semibold">Branding</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
                   </tr>
@@ -248,7 +248,7 @@ function OrdersPage() {
                           "—"
                         )}
                       </td>
-                      <td className="px-4 py-3 text-[13px] text-conditions">{order.liters.toLocaleString("de-DE")} L</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-[13px] text-conditions">{order.liters.toLocaleString("de-DE")} L</td>
                       <td className="px-4 py-3 text-[13px] text-conditions">{[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ") || "—"}</td>
                       <td className="px-4 py-3 text-[13px] text-conditions">
                         <span className="inline-flex rounded-full border border-line px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide">
@@ -257,12 +257,12 @@ function OrdersPage() {
                       </td>
                       <td className="px-4 py-3 text-[13px] text-conditions">
                         {hasDeviation(order) ? (
-                          <span className="inline-flex items-center gap-1.5 text-brand-hover" title="Abweichende Lieferanschrift">
-                            <Check className="size-4" /> Ja
+                          <span className="inline-flex" title="Abweichende Lieferanschrift">
+                            <Check className="size-4 text-brand-hover" />
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 text-destructive" title="Keine Abweichung">
-                            <X className="size-4" /> Nein
+                          <span className="inline-flex" title="Keine Abweichung">
+                            <X className="size-4 text-muted-custom" />
                           </span>
                         )}
                       </td>
@@ -308,7 +308,7 @@ function OrdersPage() {
                   </div>
                   <div>
                     <span className="text-[11px] uppercase text-muted-custom">Menge</span>
-                    <p className="text-conditions">{order.liters.toLocaleString("de-DE")} L</p>
+                    <p className="whitespace-nowrap text-conditions">{order.liters.toLocaleString("de-DE")} L</p>
                   </div>
                   <div>
                     <span className="text-[11px] uppercase text-muted-custom">Summe</span>
@@ -321,11 +321,10 @@ function OrdersPage() {
                     {variantLabel(order)}
                   </span>
                   <span
-                    className={cn("inline-flex items-center gap-1", hasDeviation(order) ? "text-brand-hover" : "text-destructive")}
+                    className={cn("inline-flex items-center", hasDeviation(order) ? "text-brand-hover" : "text-muted-custom")}
                     title={hasDeviation(order) ? "Abweichende Lieferanschrift" : "Keine Abweichung"}
                   >
                     {hasDeviation(order) ? <Check className="size-4" /> : <X className="size-4" />}
-                    {hasDeviation(order) ? "Abw. Anschrift" : "Keine Abw."}
                   </span>
                   {order.phone ? (
                     <span
