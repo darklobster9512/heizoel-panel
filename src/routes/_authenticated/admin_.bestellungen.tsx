@@ -377,6 +377,110 @@ function OrdersPage() {
   );
 }
 
+function GenerateInvoiceDialog({ order, onClose }: { order: Order | null; onClose: () => void }) {
+  const fetchUsage = useServerFn(getBankAccountUsage);
+  const createInvoice = useServerFn(generateInvoice);
+  const queryClient = useQueryClient();
+  const [accountId, setAccountId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAccountId(null);
+  }, [order?.id]);
+
+  const usage = useQuery({
+    queryKey: ["bank-usage"],
+    queryFn: () => fetchUsage({}),
+    enabled: Boolean(order),
+  });
+
+  const mutation = useMutation({
+    mutationFn: () => createInvoice({ data: { orderId: order!.id, bankAccountId: accountId! } }),
+    onSuccess: (result) => {
+      toast.success(`Rechnung ${result.invoiceNumber} wurde generiert.`);
+      void queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      void queryClient.invalidateQueries({ queryKey: ["bank-usage"] });
+      onClose();
+    },
+    onError: () => toast.error("Die Rechnung konnte nicht generiert werden."),
+  });
+
+  return (
+    <Dialog open={Boolean(order)} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Rechnung generieren</DialogTitle>
+          {order ? (
+            <p className="text-[13px] text-muted-custom">
+              Bestellung {order.orderNumber} · {formatEuro(order.total)} · {order.brandingName ?? "Ohne Branding"}
+            </p>
+          ) : null}
+        </DialogHeader>
+
+        {usage.isPending ? <div className="h-32 animate-pulse rounded-lg border border-line bg-surface" /> : null}
+        {usage.isError ? (
+          <p className="text-[13px] text-destructive">Bankkonten konnten nicht geladen werden.</p>
+        ) : null}
+        {!usage.isPending && !usage.isError && (usage.data ?? []).length === 0 ? (
+          <p className="text-[13px] text-muted-custom">
+            Es sind keine aktiven Bankkonten vorhanden. Lege zuerst unter Bankkonten ein Konto an.
+          </p>
+        ) : null}
+
+        <div className="space-y-3">
+          {(usage.data ?? []).map((account) => {
+            const percent = account.limitAmount > 0 ? (account.usedAmount / account.limitAmount) * 100 : 0;
+            const over = percent >= 100;
+            const active = accountId === account.id;
+            return (
+              <button
+                key={account.id}
+                type="button"
+                onClick={() => setAccountId(account.id)}
+                className={cn(
+                  "w-full rounded-lg border p-4 text-left transition",
+                  active ? "border-brand bg-brand-soft" : "border-line bg-card hover:border-brand/40",
+                )}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-[14px] font-bold text-conditions">{account.name}</p>
+                    <p className="text-[12px] text-muted-custom">
+                      {account.bankName} · {account.iban} · {account.bic}
+                    </p>
+                  </div>
+                  <span className="text-[12px] text-muted-custom">
+                    {account.invoiceCount} {account.invoiceCount === 1 ? "Bestellung" : "Bestellungen"}
+                  </span>
+                </div>
+                <Progress value={Math.min(percent, 100)} className="mt-3 h-2" />
+                <div className="mt-1.5 flex items-center justify-between text-[12px]">
+                  <span className={over ? "font-semibold text-destructive" : "text-muted-custom"}>
+                    {formatEuro(account.usedAmount)} von {formatEuro(account.limitAmount)} verwendet
+                  </span>
+                  <span className={over ? "font-semibold text-destructive" : "text-muted-custom"}>
+                    {Math.round(percent)} %
+                  </span>
+                </div>
+                {over ? (
+                  <p className="mt-1 text-[12px] font-semibold text-destructive">Limit erreicht bzw. überschritten.</p>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>Abbrechen</Button>
+          <Button onClick={() => mutation.mutate()} disabled={!accountId || mutation.isPending}>
+            {mutation.isPending ? <Loader2 className="animate-spin" /> : <FileText />} Rechnung generieren
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
 function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClose: () => void }) {
   const fetchOrder = useServerFn(getOrder);
   const saveOrder = useServerFn(updateOrder);
