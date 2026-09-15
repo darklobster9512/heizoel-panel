@@ -359,6 +359,11 @@ function OrdersPage() {
                       <Copy className="size-3.5" /> {order.phone}
                     </span>
                   ) : null}
+                  <span onClick={(event) => event.stopPropagation()}>
+                    <Button size="sm" variant="outline" onClick={() => setInvoiceOrder(order)}>
+                      <FileText /> Rechnung
+                    </Button>
+                  </span>
                 </div>
               </div>
             ))}
@@ -367,6 +372,7 @@ function OrdersPage() {
       ) : null}
 
       <OrderDetailDialog orderId={selectedId} onClose={() => setSelectedId(null)} />
+      <GenerateInvoiceDialog order={invoiceOrder} onClose={() => setInvoiceOrder(null)} />
     </AdminPageShell>
   );
 }
