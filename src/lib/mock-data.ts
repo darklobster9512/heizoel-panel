@@ -131,7 +131,7 @@ export const store = {
   ] as Bank[],
 
   users: [
-    { id: "user-admin", email: "admin@klaro.de", fullName: "Klaro Administrator", createdAt: daysAgo(210) },
+    { id: "user-admin", email: "admin@heizking.de", fullName: "HEIZKING Administrator", createdAt: daysAgo(210) },
     { id: "user-1", email: "maria.schmitt@beispiel.de", fullName: "Maria Schmitt", createdAt: daysAgo(64) },
     { id: "user-2", email: "thomas.becker@beispiel.de", fullName: "Thomas Becker", createdAt: daysAgo(31) },
     { id: "user-3", email: "l.hoffmann@beispiel.de", fullName: "Lena Hoffmann", createdAt: daysAgo(9) },

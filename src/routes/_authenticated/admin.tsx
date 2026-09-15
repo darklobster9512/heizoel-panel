@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { title: "Admin-Bereich — HEIZKING" },
       {
         name: "description",
-        content: "Interne Übersicht über Bestellungen, Umsatz und Brandings im Klaro Heizöl-System.",
+        content: "Interne Übersicht über Bestellungen, Umsatz und Brandings im HEIZKING-System.",
       },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Admin-Bereich — HEIZKING" },
