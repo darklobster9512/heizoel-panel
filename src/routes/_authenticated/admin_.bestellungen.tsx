@@ -716,6 +716,7 @@ function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClo
     },
     onSuccess: () => {
       toast.success("Bestellung aktualisiert.");
+      setEditing(false);
       void queryClient.invalidateQueries({ queryKey: ["order", orderId] });
       void queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
