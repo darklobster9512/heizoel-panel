@@ -89,6 +89,21 @@ export function slotLabel(order: Order) {
   return `${formatDate(order.slotDate)}${period ? ` · ${period}` : ""}`;
 }
 
+export function paymentMethodLabel(order: Order) {
+  switch (order.paymentMethod) {
+    case "vorkasse":
+      return "Vorkasse";
+    case "ec":
+    case "ec-karte":
+      return "EC-Karte";
+    case "bar":
+    case "barzahlung":
+      return "Barzahlung";
+    default:
+      return order.paymentMethod || "—";
+  }
+}
+
 export const STATUS_STYLE: Record<OrderStatus, string> = {
   neu: "bg-brand-soft text-brand-hover",
   mailbox: "bg-surface text-conditions",
@@ -242,6 +257,7 @@ function OrdersPage() {
                     <th className="px-4 py-3 font-semibold">Art</th>
                     <th className="px-4 py-3 font-semibold">ABW.</th>
                     <th className="px-4 py-3 font-semibold">Branding</th>
+                    <th className="px-4 py-3 font-semibold">Zahlungsart</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
                     <th className="px-4 py-3 font-semibold">Aktionen</th>
                   </tr>
@@ -291,6 +307,7 @@ function OrdersPage() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-[13px] text-conditions">{order.brandingName ?? "—"}</td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">{paymentMethodLabel(order)}</td>
                       <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
                         <StatusCell order={order} />
                       </td>
@@ -350,6 +367,10 @@ function OrdersPage() {
                   <div>
                     <span className="text-[11px] uppercase text-muted-custom">Summe</span>
                     <p className="font-semibold text-conditions">{formatEuro(order.total)}</p>
+                  </div>
+                  <div>
+                    <span className="text-[11px] uppercase text-muted-custom">Zahlungsart</span>
+                    <p className="text-conditions">{paymentMethodLabel(order)}</p>
                   </div>
                 </div>
 
