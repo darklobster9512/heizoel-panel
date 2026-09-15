@@ -89,6 +89,21 @@ export function slotLabel(order: Order) {
   return `${formatDate(order.slotDate)}${period ? ` · ${period}` : ""}`;
 }
 
+export function paymentMethodLabel(order: Order) {
+  switch (order.paymentMethod) {
+    case "vorkasse":
+      return "Vorkasse";
+    case "ec":
+    case "ec-karte":
+      return "EC-Karte";
+    case "bar":
+    case "barzahlung":
+      return "Barzahlung";
+    default:
+      return order.paymentMethod || "—";
+  }
+}
+
 export const STATUS_STYLE: Record<OrderStatus, string> = {
   neu: "bg-brand-soft text-brand-hover",
   mailbox: "bg-surface text-conditions",
