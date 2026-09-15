@@ -11,6 +11,7 @@ export type InvoiceCompany = {
   vatId: string;
   logoUrl: string | null;
   shopName: string;
+  director: string;
 };
 
 export type InvoiceBank = {
@@ -199,6 +200,7 @@ export function buildInvoiceModel(
   const period = order.slotPeriod ? (PERIOD_LABEL[order.slotPeriod] ?? order.slotPeriod) : null;
   const variantLabel = VARIANT_LABEL[order.variant] ?? "Heizöl Standard";
   const zipCity = [value(branding.postalCode, ""), value(branding.city, "")].filter(Boolean).join(" ");
+  const bank = bankFor(order, branding, gross, bankOverride ?? null);
 
   return {
     invoiceNumber: order.orderNumber,
@@ -217,8 +219,9 @@ export function buildInvoiceModel(
       vatId: value(branding.vatId, "—"),
       logoUrl: branding.logoUrl,
       shopName: value(branding.shopName, value(branding.companyName, "Heizöl Online")),
+      director: bank.accountHolder,
     },
-    bank: bankFor(order, branding, gross, bankOverride ?? null),
+    bank,
     recipientLines: addressLines(billing),
     salutation: salutationFor(billing),
     deliveryWindow: weekday ? [weekday, period].filter(Boolean).join(" ") : "Termin wird abgestimmt",

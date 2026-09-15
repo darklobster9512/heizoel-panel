@@ -183,7 +183,7 @@ export type ResolvedBranding = {
   director: string;
 };
 
-export function resolveBranding(branding: EmailBranding): ResolvedBranding {
+export function resolveBranding(branding: EmailBranding, directorOverride?: string | null): ResolvedBranding {
   return {
     shop: text(branding.shopName, "Heizöl Online"),
     company: text(branding.companyName, "Muster-Energie GmbH"),
@@ -193,7 +193,7 @@ export function resolveBranding(branding: EmailBranding): ResolvedBranding {
     mail: text(branding.email, "info@shop-domain.de"),
     register: `${text(branding.registryCourt, "Amtsgericht Musterstadt")} · ${branding.commercialRegisterNumber ? cleanRegisterNumber(branding.commercialRegisterNumber) : "HRB 00000"}`,
     vat: text(branding.vatId, "DE000000000"),
-    director: text(branding.managingDirector, "Max Mustermann"),
+    director: text((directorOverride ?? "").trim() || branding.managingDirector, "Max Mustermann"),
   };
 }
 

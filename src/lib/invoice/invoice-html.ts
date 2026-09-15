@@ -170,7 +170,7 @@ export function renderInvoiceHtml(model: InvoiceModel) {
     </div>
     <div style="flex:1;font:400 8px/13px ${FONT};color:${MUTED}">
       <div style="font:700 8.5px/13px ${FONT};color:${HEADING}">Handelsregister</div>
-      <div>${esc(model.company.registryCourt)}</div><div>${esc(model.company.registerNumber)}</div><div>USt-IdNr. ${esc(model.company.vatId)}</div>
+      <div>${esc(model.company.registryCourt)}</div><div>${esc(model.company.registerNumber)}</div><div>USt-IdNr. ${esc(model.company.vatId)}</div><div>Geschäftsführer: ${esc(model.company.director)}</div>
     </div>
     <div style="flex:1;font:400 8px/13px ${FONT};color:${MUTED}">
       <div style="font:700 8.5px/13px ${FONT};color:${HEADING}">Zahlung</div>
