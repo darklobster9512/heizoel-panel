@@ -70,28 +70,29 @@ export function InternalShell({
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-[1440px] gap-5 pl-3 pr-5 py-6">
+      <div className="mx-auto flex min-h-[calc(100vh-64px)] max-w-[1440px] items-stretch gap-5 px-4 py-6 lg:pl-0 lg:pr-5">
         <aside className="hidden w-max shrink-0 lg:block">
-          <nav className="sticky top-22 space-y-1">
-            {nav.map((item) => {
-              const className = `flex items-center gap-3 whitespace-nowrap rounded-lg px-3 py-2.5 text-[14px] transition-colors ${
-                item.active
-                  ? "bg-background font-semibold text-conditions shadow-sm"
-                  : "text-muted-custom hover:bg-background/70"
-              }`;
-              return item.to ? (
-                <Link key={item.label} to={item.to} className={className}>
-                  {item.icon}
-                  {item.label}
-                </Link>
-              ) : (
-                <span key={item.label} className={`${className} cursor-default`}>
-                  {item.icon}
-                  {item.label}
-                </span>
-              );
-            })}
-          </nav>
+          <div className="sticky top-1/2 w-max -translate-y-1/2 rounded-r-2xl rounded-l-none bg-brand p-2 shadow-xl">
+            <nav className="flex flex-col gap-1">
+              {nav.map((item) => {
+                const base = "flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 text-[14px] transition-colors";
+                const className = item.active
+                  ? `${base} bg-white font-semibold text-brand shadow-sm`
+                  : `${base} text-white/90 hover:bg-white/10`;
+                return item.to ? (
+                  <Link key={item.label} to={item.to} className={className}>
+                    {item.icon}
+                    {item.label}
+                  </Link>
+                ) : (
+                  <span key={item.label} className={`${className} cursor-default`}>
+                    {item.icon}
+                    {item.label}
+                  </span>
+                );
+              })}
+            </nav>
+          </div>
         </aside>
 
         <main className="min-w-0 flex-1 space-y-6">{children}</main>
