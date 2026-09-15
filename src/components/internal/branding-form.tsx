@@ -56,7 +56,7 @@ function initialValues(branding?: Branding | null): FormValues {
 }
 
 const REQUIRED: (keyof FormValues)[] = [
-  "logoPath", "companyName", "shopName", "streetAddress", "postalCode", "city",
+  "companyName", "shopName", "streetAddress", "postalCode", "city",
   "registryCourt", "commercialRegisterNumber", "managingDirector", "vatId", "email", "domain",
 ];
 
@@ -137,7 +137,7 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
   async function submit(status: "draft" | "active") {
     setError(null);
     if (status === "active" && !complete) {
-      setError("Für die Aktivierung müssen Logo und alle Pflichtfelder ausgefüllt sein.");
+      setError("Für die Aktivierung müssen alle Pflichtfelder ausgefüllt sein.");
       return;
     }
     if (values.sevenSenderName && values.sevenSenderName.length > 11) {
@@ -174,7 +174,7 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
       <div className="rounded-lg border border-line bg-card p-5 shadow-sm sm:p-7">
         <Section icon={<ImagePlus className="size-4" />} title="Marke" description="Logo und Namen, unter denen der Shop auftritt.">
           <div className="sm:col-span-2">
-            <Label htmlFor="logo">Logo <span className="text-brand">*</span></Label>
+            <Label htmlFor="logo">Logo <span className="text-muted-custom">(optional)</span></Label>
             <label htmlFor="logo" className="mt-2 flex min-h-28 cursor-pointer items-center gap-4 rounded-md border border-dashed border-line bg-surface p-4 transition-colors hover:border-brand">
               {logoUrl ? <img src={logoUrl} alt="Vorschau des Shop-Logos" className="h-16 w-28 rounded-md bg-background object-contain p-2" /> : <span className="flex size-14 items-center justify-center rounded-md bg-background text-muted-custom"><ImagePlus className="size-5" /></span>}
               <span><span className="block text-[13px] font-semibold text-conditions">{uploading ? "Logo wird hochgeladen …" : "Bild auswählen"}</span><span className="mt-1 block text-[12px] text-muted-custom">PNG, JPG, WebP oder SVG · maximal 5 MB</span></span>
