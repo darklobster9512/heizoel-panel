@@ -16,6 +16,7 @@ import {
   smsDataFrom,
 } from "@/lib/notify/order-payloads";
 import { renderOrderInvoiceSms, smsSender } from "@/lib/sms-templates";
+import { invoiceNumberFor } from "@/lib/iban";
 import type { Order, OrderAddress, OrderStatus } from "@/lib/orders.functions";
 
 export type GenerateInvoiceResult = {
@@ -339,7 +340,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
       order_id: order.id,
       bank_account_id: data.bankAccountId,
       branding_id: brandingId,
-      invoice_number: order.orderNumber,
+      invoice_number: invoiceNumberFor(order.orderNumber),
       amount: order.total,
       pdf_path: pdfPath,
       model: JSON.parse(JSON.stringify(model)),
@@ -368,7 +369,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
       try {
         const { sendResendEmail, senderLine, toBase64 } = await import("@/lib/notify/resend.server");
         const emailBranding = emailBrandingFrom(brandingRaw, brandingLogoUrl);
-        const html = renderOrderInvoiceEmail(emailBranding, invoiceDataFrom(order, order.orderNumber), {
+        const html = renderOrderInvoiceEmail(emailBranding, invoiceDataFrom(order, invoiceNumberFor(order.orderNumber)), {
           accountHolder: String(bankRow.name),
           iban: String(bankRow.iban),
           bic: String(bankRow.bic),
@@ -377,10 +378,10 @@ export const generateInvoice = createServerFn({ method: "POST" })
           apiKey: resendKey,
           from: senderLine(text(brandingRaw?.["resend_sender_name"]), resendFrom),
           to: order.email,
-          subject: `Ihre Rechnung ${order.orderNumber}`,
+          subject: `Ihre Rechnung ${invoiceNumberFor(order.orderNumber)}`,
           html,
           replyTo: text(brandingRaw?.["email"]),
-          attachments: [{ filename: `Rechnung_${order.orderNumber}.pdf`, content: toBase64(bytes) }],
+          attachments: [{ filename: `Rechnung_${invoiceNumberFor(order.orderNumber)}.pdf`, content: toBase64(bytes) }],
         });
         emailSent = true;
       } catch (caught) {
@@ -418,7 +419,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
       .eq("id", order.id);
     if (statusError) warnings.push("Der Status konnte nicht aktualisiert werden.");
 
-    return { id: String(saved.id), invoiceNumber: order.orderNumber, emailSent, smsSent, warnings };
+    return { id: String(saved.id), invoiceNumber: invoiceNumberFor(order.orderNumber), emailSent, smsSent, warnings };
   });
 
 export const downloadInvoice = createServerFn({ method: "POST" })

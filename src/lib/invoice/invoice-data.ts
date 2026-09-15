@@ -203,7 +203,7 @@ export function buildInvoiceModel(
   const bank = bankFor(order, branding, gross, bankOverride ?? null);
 
   return {
-    invoiceNumber: order.orderNumber,
+    invoiceNumber: invoiceNumberFor(order.orderNumber),
     customerNumber: customerNumber(order.orderNumber),
     date: formatDate(order.placedAt),
     paymentLabel: order.paymentMethod
