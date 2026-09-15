@@ -172,6 +172,8 @@ export const generateInvoice = createServerFn({ method: "POST" })
 
     const brandingId = text(orderRow.branding_id);
     let branding: InvoiceBranding = INVOICE_FALLBACK_BRANDING;
+    let brandingRaw: Record<string, unknown> | null = null;
+    let brandingLogoUrl: string | null = null;
     if (brandingId) {
       const { data: brandingRow } = await context.supabase
         .from("brandings")
@@ -179,10 +181,12 @@ export const generateInvoice = createServerFn({ method: "POST" })
         .eq("id", brandingId)
         .maybeSingle();
       if (brandingRow) {
+        brandingRaw = brandingRow as unknown as Record<string, unknown>;
         const logoPath = text(brandingRow.logo_path);
         const signed = logoPath
           ? await context.supabase.storage.from("branding-logos").createSignedUrl(logoPath, 3600)
           : null;
+        brandingLogoUrl = signed?.data?.signedUrl ?? null;
         branding = {
           companyName: text(brandingRow.company_name),
           shopName: text(brandingRow.shop_name),
