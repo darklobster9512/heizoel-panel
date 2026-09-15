@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import { cleanRegisterNumber } from "@/lib/iban";
 
 type BrandingRow = Database["public"]["Tables"]["brandings"]["Row"];
 
