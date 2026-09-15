@@ -390,10 +390,12 @@ export type Database = {
       branding_status: "draft" | "active"
       order_status:
         | "neu"
-        | "in_bearbeitung"
-        | "bestaetigt"
-        | "geliefert"
-        | "storniert"
+        | "mailbox"
+        | "moechte_rechnung"
+        | "rechnung_versendet"
+        | "ueberwiesen"
+        | "angekommen"
+        | "exchanged"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -525,10 +527,12 @@ export const Constants = {
       branding_status: ["draft", "active"],
       order_status: [
         "neu",
-        "in_bearbeitung",
-        "bestaetigt",
-        "geliefert",
-        "storniert",
+        "mailbox",
+        "moechte_rechnung",
+        "rechnung_versendet",
+        "ueberwiesen",
+        "angekommen",
+        "exchanged",
       ],
     },
   },
