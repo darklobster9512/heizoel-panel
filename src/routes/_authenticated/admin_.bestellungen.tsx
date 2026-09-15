@@ -286,7 +286,7 @@ function OrdersPage() {
                     <th className="px-4 py-3 font-semibold">Branding</th>
                     <th className="px-4 py-3 font-semibold">Zahlungsart</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
-                    <th className="px-4 py-3 font-semibold">Aktionen</th>
+                    {isAdmin ? <th className="px-4 py-3 font-semibold">Aktionen</th> : null}
                   </tr>
                 </thead>
                 <tbody>
