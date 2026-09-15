@@ -138,13 +138,21 @@ function StatusCell({ order }: { order: Order }) {
 function OrdersPage() {
   const fetchOrders = useServerFn(listOrders);
   const fetchBrandings = useServerFn(listBrandings);
+  const fetchInvoices = useServerFn(listInvoices);
   const { data, isPending, isError, refetch } = useQuery({ queryKey: ["orders"], queryFn: () => fetchOrders({}) });
   const brandings = useQuery({ queryKey: ["brandings"], queryFn: () => fetchBrandings({}) });
+  const invoices = useQuery({ queryKey: ["invoices"], queryFn: () => fetchInvoices({}) });
+
+  const invoicedOrderIds = useMemo(
+    () => new Set((invoices.data ?? []).map((entry) => entry.orderId)),
+    [invoices.data],
+  );
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<OrderStatus | "alle">("alle");
   const [branding, setBranding] = useState<string>("alle");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [invoiceOrder, setInvoiceOrder] = useState<Order | null>(null);
 
   const rows = useMemo(() => {
     const needle = search.trim().toLowerCase();
