@@ -105,6 +105,8 @@ export function InvoicePanel() {
         </div>
       </div>
 
+      <GeneratedInvoices />
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[300px_1fr]">
         <aside className="space-y-6">
           <div className="rounded-lg border border-line bg-card p-4">
