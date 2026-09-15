@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { deleteBankAccount, listBankAccounts, saveBankAccount, type BankAccount } from "@/lib/bank-accounts.functions";
+import { deleteBankAccount, formatIban, listBankAccounts, saveBankAccount, type BankAccount } from "@/lib/bank-accounts.functions";
 
 export const Route = createFileRoute("/_authenticated/admin_/bankkonten")({
   head: () => ({ meta: [
