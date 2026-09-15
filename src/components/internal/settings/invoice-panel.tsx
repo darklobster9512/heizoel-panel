@@ -1,6 +1,6 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, FileText, Loader2, RefreshCw, Search } from "lucide-react";
+import { Download, FileText, Loader2, RefreshCw, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -17,6 +17,7 @@ import {
   type InvoiceBranding,
 } from "@/lib/invoice/invoice-data";
 import { renderInvoiceHtml } from "@/lib/invoice/invoice-html";
+import { deleteInvoice, downloadInvoice, listInvoices } from "@/lib/invoices.functions";
 import { listOrders, type Order } from "@/lib/orders.functions";
 
 function customerOf(order: Order) {
@@ -104,6 +105,8 @@ export function InvoicePanel() {
           </Button>
         </div>
       </div>
+
+      <GeneratedInvoices />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[300px_1fr]">
         <aside className="space-y-6">
@@ -222,5 +225,105 @@ function OptionButton({
       <span className="min-w-0 truncate text-[13px] font-semibold text-conditions">{label}</span>
       <span className="shrink-0 text-[10px] font-bold text-muted-custom uppercase">{hint}</span>
     </button>
+  );
+}
+
+function GeneratedInvoices() {
+  const fetchInvoices = useServerFn(listInvoices);
+  const getDownload = useServerFn(downloadInvoice);
+  const removeInvoice = useServerFn(deleteInvoice);
+  const queryClient = useQueryClient();
+
+  const invoices = useQuery({ queryKey: ["invoices"], queryFn: () => fetchInvoices({}) });
+
+  const download = useMutation({
+    mutationFn: (id: string) => getDownload({ data: { id } }),
+    onSuccess: (result) => {
+      const link = document.createElement("a");
+      link.href = result.url;
+      link.download = result.fileName;
+      link.click();
+    },
+    onError: () => toast.error("Der Download konnte nicht gestartet werden."),
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) => removeInvoice({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Rechnung gelöscht.");
+      void queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      void queryClient.invalidateQueries({ queryKey: ["bank-usage"] });
+    },
+    onError: () => toast.error("Rechnung konnte nicht gelöscht werden."),
+  });
+
+  return (
+    <section className="mt-6 overflow-hidden rounded-lg border border-line bg-card shadow-sm">
+      <div className="flex items-center justify-between border-b border-line px-4 py-3">
+        <h2 className="text-[15px] font-bold text-conditions">Generierte Rechnungen</h2>
+        <Button variant="outline" size="sm" onClick={() => void invoices.refetch()}>
+          <RefreshCw /> Aktualisieren
+        </Button>
+      </div>
+
+      {invoices.isPending ? <div className="h-24 animate-pulse bg-surface" /> : null}
+      {invoices.isError ? (
+        <p className="px-4 py-6 text-[13px] text-muted-custom">Rechnungen konnten nicht geladen werden.</p>
+      ) : null}
+      {!invoices.isPending && !invoices.isError && (invoices.data ?? []).length === 0 ? (
+        <p className="px-4 py-6 text-[13px] text-muted-custom">
+          Noch keine Rechnung generiert. Erzeuge eine Rechnung über die Aktionen-Spalte bei den Bestellungen.
+        </p>
+      ) : null}
+
+      {(invoices.data ?? []).length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[820px] text-left">
+            <thead>
+              <tr className="border-b border-line text-[12px] tracking-wide text-muted-custom uppercase">
+                <th className="px-4 py-3 font-semibold">Datum</th>
+                <th className="px-4 py-3 font-semibold">Rechnung</th>
+                <th className="px-4 py-3 font-semibold">Kunde</th>
+                <th className="px-4 py-3 font-semibold">Branding</th>
+                <th className="px-4 py-3 font-semibold">Bankkonto</th>
+                <th className="px-4 py-3 font-semibold">Betrag</th>
+                <th className="px-4 py-3 font-semibold">Aktionen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(invoices.data ?? []).map((entry) => (
+                <tr key={entry.id} className="border-b border-line/70 last:border-0">
+                  <td className="px-4 py-3 text-[13px] text-muted-custom">{formatDate(entry.createdAt)}</td>
+                  <td className="px-4 py-3 text-[13px] font-semibold text-conditions">{entry.invoiceNumber}</td>
+                  <td className="px-4 py-3 text-[13px] text-conditions">{entry.customer}</td>
+                  <td className="px-4 py-3 text-[13px] text-conditions">{entry.brandingName ?? "—"}</td>
+                  <td className="px-4 py-3 text-[13px] text-conditions">
+                    {entry.bankAccountName ?? "—"}
+                    {entry.bankIban ? <span className="block text-[11px] text-muted-custom">{entry.bankIban}</span> : null}
+                  </td>
+                  <td className="px-4 py-3 text-[13px] font-semibold text-conditions">{euro.format(entry.amount)}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" variant="outline" onClick={() => download.mutate(entry.id)} disabled={download.isPending}>
+                        <Download /> PDF
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => remove.mutate(entry.id)}
+                        disabled={remove.isPending}
+                        title="Rechnung löschen"
+                      >
+                        <Trash2 />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+    </section>
   );
 }

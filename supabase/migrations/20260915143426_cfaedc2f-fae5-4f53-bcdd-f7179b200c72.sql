@@ -1,0 +1,4 @@
+CREATE POLICY "Admins can read invoice files" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'invoices' AND has_role(auth.uid(), 'admin'::app_role));
+CREATE POLICY "Admins can upload invoice files" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'invoices' AND has_role(auth.uid(), 'admin'::app_role));
+CREATE POLICY "Admins can update invoice files" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'invoices' AND has_role(auth.uid(), 'admin'::app_role)) WITH CHECK (bucket_id = 'invoices' AND has_role(auth.uid(), 'admin'::app_role));
+CREATE POLICY "Admins can delete invoice files" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'invoices' AND has_role(auth.uid(), 'admin'::app_role));

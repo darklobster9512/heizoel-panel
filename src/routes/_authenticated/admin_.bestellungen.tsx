@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Copy, Loader2, RefreshCw, Save, Search, ShoppingCart, X } from "lucide-react";
+import { Check, Copy, FileText, Loader2, RefreshCw, Save, Search, ShoppingCart, X } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -9,10 +9,12 @@ import { AdminPageShell } from "@/components/internal/admin-page-shell";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { listBrandings } from "@/lib/brandings.functions";
+import { generateInvoice, getBankAccountUsage, listInvoices } from "@/lib/invoices.functions";
 import {
   ORDER_STATUSES,
   ORDER_STATUS_LABEL,
@@ -136,13 +138,21 @@ function StatusCell({ order }: { order: Order }) {
 function OrdersPage() {
   const fetchOrders = useServerFn(listOrders);
   const fetchBrandings = useServerFn(listBrandings);
+  const fetchInvoices = useServerFn(listInvoices);
   const { data, isPending, isError, refetch } = useQuery({ queryKey: ["orders"], queryFn: () => fetchOrders({}) });
   const brandings = useQuery({ queryKey: ["brandings"], queryFn: () => fetchBrandings({}) });
+  const invoices = useQuery({ queryKey: ["invoices"], queryFn: () => fetchInvoices({}) });
+
+  const invoicedOrderIds = useMemo(
+    () => new Set((invoices.data ?? []).map((entry) => entry.orderId)),
+    [invoices.data],
+  );
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<OrderStatus | "alle">("alle");
   const [branding, setBranding] = useState<string>("alle");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [invoiceOrder, setInvoiceOrder] = useState<Order | null>(null);
 
   const rows = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -220,6 +230,7 @@ function OrdersPage() {
                     <th className="px-4 py-3 font-semibold">ABW.</th>
                     <th className="px-4 py-3 font-semibold">Branding</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
+                    <th className="px-4 py-3 font-semibold">Aktionen</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -269,6 +280,19 @@ function OrdersPage() {
                       <td className="px-4 py-3 text-[13px] text-conditions">{order.brandingName ?? "—"}</td>
                       <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
                         <StatusCell order={order} />
+                      </td>
+                      <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
+                        <button
+                          type="button"
+                          onClick={() => setInvoiceOrder(order)}
+                          title={invoicedOrderIds.has(order.id) ? "Rechnung neu generieren" : "Rechnung generieren"}
+                          className={cn(
+                            "inline-flex size-8 items-center justify-center rounded-md border border-line hover:bg-surface",
+                            invoicedOrderIds.has(order.id) ? "text-brand-hover" : "text-muted-custom",
+                          )}
+                        >
+                          <FileText className="size-4" />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -335,6 +359,11 @@ function OrdersPage() {
                       <Copy className="size-3.5" /> {order.phone}
                     </span>
                   ) : null}
+                  <span onClick={(event) => event.stopPropagation()}>
+                    <Button size="sm" variant="outline" onClick={() => setInvoiceOrder(order)}>
+                      <FileText /> Rechnung
+                    </Button>
+                  </span>
                 </div>
               </div>
             ))}
@@ -343,9 +372,114 @@ function OrdersPage() {
       ) : null}
 
       <OrderDetailDialog orderId={selectedId} onClose={() => setSelectedId(null)} />
+      <GenerateInvoiceDialog order={invoiceOrder} onClose={() => setInvoiceOrder(null)} />
     </AdminPageShell>
   );
 }
+
+function GenerateInvoiceDialog({ order, onClose }: { order: Order | null; onClose: () => void }) {
+  const fetchUsage = useServerFn(getBankAccountUsage);
+  const createInvoice = useServerFn(generateInvoice);
+  const queryClient = useQueryClient();
+  const [accountId, setAccountId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAccountId(null);
+  }, [order?.id]);
+
+  const usage = useQuery({
+    queryKey: ["bank-usage"],
+    queryFn: () => fetchUsage({}),
+    enabled: Boolean(order),
+  });
+
+  const mutation = useMutation({
+    mutationFn: () => createInvoice({ data: { orderId: order!.id, bankAccountId: accountId! } }),
+    onSuccess: (result) => {
+      toast.success(`Rechnung ${result.invoiceNumber} wurde generiert.`);
+      void queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      void queryClient.invalidateQueries({ queryKey: ["bank-usage"] });
+      onClose();
+    },
+    onError: () => toast.error("Die Rechnung konnte nicht generiert werden."),
+  });
+
+  return (
+    <Dialog open={Boolean(order)} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Rechnung generieren</DialogTitle>
+          {order ? (
+            <p className="text-[13px] text-muted-custom">
+              Bestellung {order.orderNumber} · {formatEuro(order.total)} · {order.brandingName ?? "Ohne Branding"}
+            </p>
+          ) : null}
+        </DialogHeader>
+
+        {usage.isPending ? <div className="h-32 animate-pulse rounded-lg border border-line bg-surface" /> : null}
+        {usage.isError ? (
+          <p className="text-[13px] text-destructive">Bankkonten konnten nicht geladen werden.</p>
+        ) : null}
+        {!usage.isPending && !usage.isError && (usage.data ?? []).length === 0 ? (
+          <p className="text-[13px] text-muted-custom">
+            Es sind keine aktiven Bankkonten vorhanden. Lege zuerst unter Bankkonten ein Konto an.
+          </p>
+        ) : null}
+
+        <div className="space-y-3">
+          {(usage.data ?? []).map((account) => {
+            const percent = account.limitAmount > 0 ? (account.usedAmount / account.limitAmount) * 100 : 0;
+            const over = percent >= 100;
+            const active = accountId === account.id;
+            return (
+              <button
+                key={account.id}
+                type="button"
+                onClick={() => setAccountId(account.id)}
+                className={cn(
+                  "w-full rounded-lg border p-4 text-left transition",
+                  active ? "border-brand bg-brand-soft" : "border-line bg-card hover:border-brand/40",
+                )}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-[14px] font-bold text-conditions">{account.name}</p>
+                    <p className="text-[12px] text-muted-custom">
+                      {account.bankName} · {account.iban} · {account.bic}
+                    </p>
+                  </div>
+                  <span className="text-[12px] text-muted-custom">
+                    {account.invoiceCount} {account.invoiceCount === 1 ? "Bestellung" : "Bestellungen"}
+                  </span>
+                </div>
+                <Progress value={Math.min(percent, 100)} className="mt-3 h-2" />
+                <div className="mt-1.5 flex items-center justify-between text-[12px]">
+                  <span className={over ? "font-semibold text-destructive" : "text-muted-custom"}>
+                    {formatEuro(account.usedAmount)} von {formatEuro(account.limitAmount)} verwendet
+                  </span>
+                  <span className={over ? "font-semibold text-destructive" : "text-muted-custom"}>
+                    {Math.round(percent)} %
+                  </span>
+                </div>
+                {over ? (
+                  <p className="mt-1 text-[12px] font-semibold text-destructive">Limit erreicht bzw. überschritten.</p>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>Abbrechen</Button>
+          <Button onClick={() => mutation.mutate()} disabled={!accountId || mutation.isPending}>
+            {mutation.isPending ? <Loader2 className="animate-spin" /> : <FileText />} Rechnung generieren
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClose: () => void }) {
   const fetchOrder = useServerFn(getOrder);
