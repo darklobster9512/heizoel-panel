@@ -222,20 +222,24 @@ function OrdersPage() {
 
           <div className="grid gap-4 lg:hidden">
             {rows.map((order) => (
-              <button
+              <div
                 key={order.id}
-                type="button"
+                role="button"
+                tabIndex={0}
                 onClick={() => setSelectedId(order.id)}
-                className="rounded-lg border border-line bg-card p-4 text-left shadow-sm"
+                onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedId(order.id); } }}
+                className="cursor-pointer rounded-lg border border-line bg-card p-4 text-left shadow-sm"
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[14px] font-bold text-conditions">{order.orderNumber}</span>
-                  <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLE[order.status]}`}>{ORDER_STATUS_LABEL[order.status]}</span>
+                  <div onClick={(event) => event.stopPropagation()}>
+                    <StatusCell order={order} />
+                  </div>
                 </div>
                 <p className="mt-1 text-[13px] text-muted-custom">{formatDate(order.placedAt)} · {order.brandingName ?? "Ohne Branding"}</p>
                 <p className="mt-2 text-[13px] text-conditions">{customerName(order)} · {[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ")}</p>
                 <p className="mt-1 text-[13px] text-conditions">{order.liters.toLocaleString("de-DE")} L · <span className="font-semibold">{formatEuro(order.total)}</span></p>
-              </button>
+              </div>
             ))}
           </div>
         </>
