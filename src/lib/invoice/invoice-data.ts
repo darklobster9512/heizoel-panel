@@ -11,6 +11,7 @@ export type InvoiceCompany = {
   vatId: string;
   logoUrl: string | null;
   shopName: string;
+  director: string;
 };
 
 export type InvoiceBank = {

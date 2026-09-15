@@ -89,8 +89,8 @@ function bankRow(label: string, value: string) {
 }
 
 export function renderOrderInvoiceEmail(branding: EmailBranding, invoice: OrderInvoiceData = DEMO_INVOICE) {
-  const r = resolveBranding(branding);
   const bank = bankFrom(branding);
+  const r = resolveBranding(branding, bank.accountHolder);
   const net = invoice.totalPrice / 1.19;
   const vatAmount = invoice.totalPrice - net;
 
