@@ -1,4 +1,4 @@
-import { formatIban } from "@/lib/iban";
+import { cleanRegisterNumber, formatIban } from "@/lib/iban";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
 
 export type InvoiceCompany = {
@@ -213,7 +213,7 @@ export function buildInvoiceModel(
       zipCity: zipCity || "19357 Karstädt",
       email: value(branding.email, "info@heizoel-online.com"),
       registryCourt: value(branding.registryCourt, "—"),
-      registerNumber: value(branding.commercialRegisterNumber, "—"),
+      registerNumber: cleanRegisterNumber(value(branding.commercialRegisterNumber, "—")),
       vatId: value(branding.vatId, "—"),
       logoUrl: branding.logoUrl,
       shopName: value(branding.shopName, value(branding.companyName, "Heizöl Online")),

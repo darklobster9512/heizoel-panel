@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import { cleanRegisterNumber } from "@/lib/iban";
 
 type BrandingRow = Database["public"]["Tables"]["brandings"]["Row"];
 
@@ -199,7 +200,7 @@ export const saveBranding = createServerFn({ method: "POST" })
       postal_code: data.postalCode,
       city: data.city,
       registry_court: data.registryCourt,
-      commercial_register_number: data.commercialRegisterNumber,
+      commercial_register_number: data.commercialRegisterNumber ? cleanRegisterNumber(data.commercialRegisterNumber) : null,
       managing_director: data.managingDirector,
       vat_id: data.vatId || null,
       email: data.email || null,
