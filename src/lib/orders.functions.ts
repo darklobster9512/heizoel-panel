@@ -167,17 +167,54 @@ function mapRow(row: Row): Order {
   };
 }
 
+export type CallerScope = { brandingIds: string[]; visibleFrom: string | null };
+
+/** Liest Branding-Zuordnung und Startdatum des angemeldeten Callers. */
+async function callerScope(context: { supabase: any; userId: string }): Promise<CallerScope> {
+  const [{ data: assignments }, { data: settings }] = await Promise.all([
+    context.supabase.from("caller_brandings").select("branding_id").eq("user_id", context.userId),
+    context.supabase.from("caller_settings").select("visible_from").eq("user_id", context.userId).maybeSingle(),
+  ]);
+  return {
+    brandingIds: (assignments ?? []).map((row: { branding_id: unknown }) => String(row.branding_id)),
+    visibleFrom: (settings?.visible_from as string | null | undefined) ?? null,
+  };
+}
+
+function inCallerScope(order: Order, scope: CallerScope): boolean {
+  if (scope.brandingIds.length > 0 && (!order.brandingId || !scope.brandingIds.includes(order.brandingId))) {
+    return false;
+  }
+  if (scope.visibleFrom && order.placedAt.slice(0, 10) < scope.visibleFrom) return false;
+  return true;
+}
+
+export const getCallerScope = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<CallerScope> => {
+    await requireOrdersAccess(context);
+    return callerScope(context);
+  });
+
 const SELECT = "*, brandings(shop_name, company_name)";
 
 export const listOrders = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<Order[]> => {
     const role = await requireOrdersAccess(context);
-    const { data, error } = await context.supabase
+    let query = context.supabase
       .from("orders")
       .select(SELECT)
       .order("created_at", { ascending: false })
       .limit(500);
+
+    if (role === "caller") {
+      const scope = await callerScope(context);
+      if (scope.brandingIds.length > 0) query = query.in("branding_id", scope.brandingIds);
+      if (scope.visibleFrom) query = query.gte("placed_at", scope.visibleFrom);
+    }
+
+    const { data, error } = await query;
     if (error) throw new Error("Bestellungen konnten nicht geladen werden.");
     const orders = (data ?? []).map((row) => mapRow(row as Row));
     return role === "caller" ? attachBrandingNames(orders) : orders;
@@ -196,7 +233,12 @@ export const getOrder = createServerFn({ method: "GET" })
     if (error) throw new Error("Bestellung konnte nicht geladen werden.");
     if (!row) return null;
     const order = mapRow(row as Row);
-    return role === "caller" ? (await attachBrandingNames([order]))[0]! : order;
+    if (role === "caller") {
+      const scope = await callerScope(context);
+      if (!inCallerScope(order, scope)) throw new Error("Kein Zugriff auf diese Bestellung.");
+      return (await attachBrandingNames([order]))[0]!;
+    }
+    return order;
   });
 
 const addressSchema = z.object({
@@ -271,7 +313,17 @@ export const updateOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: UpdateOrderInput) => updateSchema.parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
-    await requireOrdersAccess(context);
+    const role = await requireOrdersAccess(context);
+
+    if (role === "caller") {
+      const [{ data: existing }, scope] = await Promise.all([
+        context.supabase.from("orders").select(SELECT).eq("id", data.id).maybeSingle(),
+        callerScope(context),
+      ]);
+      if (!existing || !inCallerScope(mapRow(existing as Row), scope)) {
+        throw new Error("Kein Zugriff auf diese Bestellung.");
+      }
+    }
 
     const payload: Record<string, unknown> = {};
     if (data.status) payload["status"] = data.status;

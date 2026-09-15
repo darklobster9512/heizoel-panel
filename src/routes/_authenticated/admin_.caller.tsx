@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Headphones, KeyRound, Loader2, Trash2, UserPlus } from "lucide-react";
-import { useState } from "react";
+import { Headphones, KeyRound, Loader2, ShieldCheck, Trash2, UserPlus } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AdminPageShell } from "@/components/internal/admin-page-shell";
@@ -10,8 +10,10 @@ import { SettingsMobileTabs, SettingsSubDock } from "@/components/internal/setti
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { listBrandings } from "@/lib/brandings.functions";
 import {
   createCallerAccount,
+  updateCallerAccess,
   deleteCallerAccount,
   listCallerAccounts,
   resetCallerPassword,
@@ -33,6 +35,38 @@ export const Route = createFileRoute("/_authenticated/admin_/caller")({
   component: CallerAccountsPage,
 });
 
+const dateLabel = (value: string | null) =>
+  value ? new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" }).format(new Date(value)) : null;
+
+function BrandingPicker({
+  brandings,
+  selected,
+  onToggle,
+}: {
+  brandings: { id: string; label: string }[];
+  selected: string[];
+  onToggle: (id: string) => void;
+}) {
+  if (brandings.length === 0) {
+    return <p className="text-[13px] text-muted-custom">Noch keine Brandings angelegt.</p>;
+  }
+  return (
+    <div className="grid gap-2 sm:grid-cols-2">
+      {brandings.map((branding) => (
+        <label key={branding.id} className="flex items-center gap-2 text-[13px] text-conditions">
+          <input
+            type="checkbox"
+            className="size-4 accent-[var(--color-brand)]"
+            checked={selected.includes(branding.id)}
+            onChange={() => onToggle(branding.id)}
+          />
+          {branding.label}
+        </label>
+      ))}
+    </div>
+  );
+}
+
 function errorText(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
 }
@@ -49,14 +83,38 @@ function CallerAccountsPage() {
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [resetFor, setResetFor] = useState<CallerAccount | null>(null);
+  const [accessFor, setAccessFor] = useState<CallerAccount | null>(null);
+  const [brandingIds, setBrandingIds] = useState<string[]>([]);
+  const [visibleFrom, setVisibleFrom] = useState("");
+
+  const fetchBrandings = useServerFn(listBrandings);
+  const brandingsQuery = useQuery({ queryKey: ["brandings"], queryFn: () => fetchBrandings({}) });
+  const brandingOptions = (brandingsQuery.data ?? []).map((branding) => ({
+    id: branding.id,
+    label: branding.shopName || branding.companyName || "Ohne Namen",
+  }));
+  const brandingLabel = (id: string) => brandingOptions.find((option) => option.id === id)?.label ?? "Branding";
+  const toggleBranding = (id: string) =>
+    setBrandingIds((prev) => (prev.includes(id) ? prev.filter((entry) => entry !== id) : [...prev, id]));
 
   const create = useMutation({
-    mutationFn: () => createAccount({ data: fullName ? { email, password, fullName } : { email, password } }),
+    mutationFn: () =>
+      createAccount({
+        data: {
+          email,
+          password,
+          ...(fullName ? { fullName } : {}),
+          brandingIds,
+          visibleFrom: visibleFrom || null,
+        },
+      }),
     onSuccess: () => {
       toast.success("Caller-Konto angelegt");
       setEmail("");
       setFullName("");
       setPassword("");
+      setBrandingIds([]);
+      setVisibleFrom("");
       void queryClient.invalidateQueries({ queryKey: ["caller-accounts"] });
     },
     onError: (error) => toast.error(errorText(error, "Konto konnte nicht angelegt werden.")),
@@ -129,6 +187,24 @@ function CallerAccountsPage() {
               className="mt-1"
             />
           </div>
+          <div className="sm:col-span-2">
+            <span className="text-[12px] font-semibold text-muted-custom">Brandings (leer = alle)</span>
+            <div className="mt-2">
+              <BrandingPicker brandings={brandingOptions} selected={brandingIds} onToggle={toggleBranding} />
+            </div>
+          </div>
+          <div>
+            <label className="text-[12px] font-semibold text-muted-custom" htmlFor="caller-visible">
+              Bestellungen sichtbar ab (optional)
+            </label>
+            <Input
+              id="caller-visible"
+              type="date"
+              value={visibleFrom}
+              onChange={(event) => setVisibleFrom(event.target.value)}
+              className="mt-1"
+            />
+          </div>
           <div className="sm:col-span-3">
             <Button type="submit" disabled={create.isPending}>
               {create.isPending ? <Loader2 className="animate-spin" /> : <UserPlus />}
@@ -155,6 +231,8 @@ function CallerAccountsPage() {
               <tr className="border-b border-line text-[12px] tracking-wide text-muted-custom uppercase">
                 <th className="px-4 py-3 font-semibold">E-Mail</th>
                 <th className="px-4 py-3 font-semibold">Name</th>
+                <th className="px-4 py-3 font-semibold">Brandings</th>
+                <th className="px-4 py-3 font-semibold">Sichtbar ab</th>
                 <th className="px-4 py-3 font-semibold">Angelegt</th>
                 <th className="px-4 py-3 font-semibold">Aktionen</th>
               </tr>
@@ -164,6 +242,22 @@ function CallerAccountsPage() {
                 <tr key={account.userId} className="border-b border-line/70 last:border-0">
                   <td className="px-4 py-3 text-[13px] font-semibold text-conditions">{account.email ?? "—"}</td>
                   <td className="px-4 py-3 text-[13px] text-conditions">{account.fullName ?? "—"}</td>
+                  <td className="px-4 py-3">
+                    {account.brandingIds.length === 0 ? (
+                      <span className="text-[13px] text-muted-custom">Alle</span>
+                    ) : (
+                      <div className="flex flex-wrap gap-1">
+                        {account.brandingIds.map((id) => (
+                          <span key={id} className="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-semibold text-brand-hover">
+                            {brandingLabel(id)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-[13px] text-conditions">
+                    {dateLabel(account.visibleFrom) ?? "—"}
+                  </td>
                   <td className="px-4 py-3 text-[13px] text-muted-custom">
                     {account.createdAt
                       ? new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" }).format(new Date(account.createdAt))
@@ -171,6 +265,9 @@ function CallerAccountsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
+                      <Button size="sm" variant="outline" onClick={() => setAccessFor(account)}>
+                        <ShieldCheck /> Zugriff
+                      </Button>
                       <Button size="sm" variant="outline" onClick={() => setResetFor(account)}>
                         <KeyRound /> Passwort
                       </Button>
@@ -196,6 +293,12 @@ function CallerAccountsPage() {
       </section>
 
       <ResetPasswordDialog account={resetFor} onClose={() => setResetFor(null)} />
+      <AccessDialog
+        account={accessFor}
+        brandings={brandingOptions}
+        onClose={() => setAccessFor(null)}
+        onSaved={() => void queryClient.invalidateQueries({ queryKey: ["caller-accounts"] })}
+      />
     </AdminPageShell>
   );
 }
@@ -241,6 +344,81 @@ function ResetPasswordDialog({ account, onClose }: { account: CallerAccount | nu
             Passwort speichern
           </Button>
         </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AccessDialog({
+  account,
+  brandings,
+  onClose,
+  onSaved,
+}: {
+  account: CallerAccount | null;
+  brandings: { id: string; label: string }[];
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const saveAccess = useServerFn(updateCallerAccess);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [visibleFrom, setVisibleFrom] = useState("");
+
+  useEffect(() => {
+    setSelected(account?.brandingIds ?? []);
+    setVisibleFrom(account?.visibleFrom ?? "");
+  }, [account?.userId, account]);
+
+  const save = useMutation({
+    mutationFn: () =>
+      saveAccess({
+        data: { userId: account!.userId, brandingIds: selected, visibleFrom: visibleFrom || null },
+      }),
+    onSuccess: () => {
+      toast.success("Zugriff gespeichert");
+      onSaved();
+      onClose();
+    },
+    onError: (error) => toast.error(errorText(error, "Zugriff konnte nicht gespeichert werden.")),
+  });
+
+  return (
+    <Dialog open={Boolean(account)} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Zugriff bearbeiten</DialogTitle>
+        </DialogHeader>
+        <p className="text-[13px] text-muted-custom">{account?.email}</p>
+        <div className="space-y-4">
+          <div>
+            <span className="text-[12px] font-semibold text-muted-custom">Brandings (leer = alle)</span>
+            <div className="mt-2">
+              <BrandingPicker
+                brandings={brandings}
+                selected={selected}
+                onToggle={(id) =>
+                  setSelected((prev) => (prev.includes(id) ? prev.filter((entry) => entry !== id) : [...prev, id]))
+                }
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-[12px] font-semibold text-muted-custom" htmlFor="access-visible">
+              Bestellungen sichtbar ab (optional)
+            </label>
+            <Input
+              id="access-visible"
+              type="date"
+              value={visibleFrom}
+              onChange={(event) => setVisibleFrom(event.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <Button onClick={() => save.mutate()} disabled={save.isPending}>
+            {save.isPending ? <Loader2 className="animate-spin" /> : <ShieldCheck />}
+            Speichern
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
