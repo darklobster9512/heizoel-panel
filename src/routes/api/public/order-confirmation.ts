@@ -2,8 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { renderOrderConfirmationEmail } from "@/lib/email-templates/order-confirmation";
-import { confirmationDataFrom, emailBrandingFrom } from "@/lib/notify/order-payloads";
+import {
+  confirmationDataFrom,
+  emailBrandingFrom,
+  smsBrandingFrom,
+  smsDataFrom,
+} from "@/lib/notify/order-payloads";
 import { sendResendEmail, senderLine } from "@/lib/notify/resend.server";
+import { normalizePhone, sendSevenSms } from "@/lib/notify/seven.server";
+import { renderOrderConfirmationSms } from "@/lib/sms-templates";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
 
 const schema = z.object({ orderId: z.string().uuid(), secret: z.string().min(1) });
@@ -97,6 +104,9 @@ export const Route = createFileRoute("/api/public/order-confirmation")({
           createdAt: String(raw["created_at"]),
         } as Order;
 
+        let emailSent = false;
+        let smsSent = false;
+
         try {
           const branding = emailBrandingFrom(brandingRaw, logoUrl);
           await sendResendEmail({
@@ -107,12 +117,34 @@ export const Route = createFileRoute("/api/public/order-confirmation")({
             html: renderOrderConfirmationEmail(branding, confirmationDataFrom(order)),
             replyTo: text(brandingRaw?.["email"]),
           });
+          emailSent = true;
         } catch (caught) {
           console.error("[order-confirmation] send failed", caught);
-          return Response.json({ ok: false, error: "send_failed" }, { status: 502 });
+          return Response.json({ ok: false, error: "send_failed", emailSent, smsSent }, { status: 502 });
         }
 
-        return Response.json({ ok: true });
+        const sevenApiKey = text(brandingRaw?.["seven_api_key"]);
+        const phone = order.phone ? normalizePhone(order.phone) : null;
+        if (sevenApiKey && phone) {
+          try {
+            await sendSevenSms({
+              apiKey: sevenApiKey,
+              to: phone,
+              text: renderOrderConfirmationSms(smsBrandingFrom(brandingRaw), smsDataFrom(order)),
+              from: text(brandingRaw?.["seven_sender_name"]),
+            });
+            smsSent = true;
+          } catch (smsError) {
+            console.error("[order-confirmation] sms failed", smsError);
+          }
+        } else {
+          console.log("[order-confirmation] sms skipped: no seven api key or phone", {
+            hasKey: !!sevenApiKey,
+            phone: order.phone,
+          });
+        }
+
+        return Response.json({ ok: true, emailSent, smsSent });
       },
     },
   },
