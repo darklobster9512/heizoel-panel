@@ -172,28 +172,31 @@ const SELECT = "*, brandings(shop_name, company_name)";
 export const listOrders = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<Order[]> => {
-    await requireAdmin(context);
+    const role = await requireOrdersAccess(context);
     const { data, error } = await context.supabase
       .from("orders")
       .select(SELECT)
       .order("created_at", { ascending: false })
       .limit(500);
     if (error) throw new Error("Bestellungen konnten nicht geladen werden.");
-    return (data ?? []).map((row) => mapRow(row as Row));
+    const orders = (data ?? []).map((row) => mapRow(row as Row));
+    return role === "caller" ? attachBrandingNames(orders) : orders;
   });
 
 export const getOrder = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<Order | null> => {
-    await requireAdmin(context);
+    const role = await requireOrdersAccess(context);
     const { data: row, error } = await context.supabase
       .from("orders")
       .select(SELECT)
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error("Bestellung konnte nicht geladen werden.");
-    return row ? mapRow(row as Row) : null;
+    if (!row) return null;
+    const order = mapRow(row as Row);
+    return role === "caller" ? (await attachBrandingNames([order]))[0]! : order;
   });
 
 export const updateOrder = createServerFn({ method: "POST" })
@@ -208,7 +211,7 @@ export const updateOrder = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
-    await requireAdmin(context);
+    await requireOrdersAccess(context);
     const payload: { status?: OrderStatus; internal_note?: string | null } = {};
     if (data.status) payload.status = data.status;
     if (data.internalNote !== undefined) payload.internal_note = data.internalNote || null;
