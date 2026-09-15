@@ -217,7 +217,7 @@ export function buildInvoiceModel(
       logoUrl: branding.logoUrl,
       shopName: value(branding.shopName, value(branding.companyName, "Heizöl Online")),
     },
-    bank: bankFor(order, branding, gross),
+    bank: bankFor(order, branding, gross, bankOverride ?? null),
     recipientLines: addressLines(billing),
     salutation: salutationFor(billing),
     deliveryWindow: weekday ? [weekday, period].filter(Boolean).join(" ") : "Termin wird abgestimmt",
