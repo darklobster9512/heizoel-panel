@@ -70,6 +70,42 @@ export const STATUS_STYLE: Record<OrderStatus, string> = {
   exchanged: "bg-surface text-muted-custom",
 };
 
+function StatusCell({ order }: { order: Order }) {
+  const saveOrder = useServerFn(updateOrder);
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: (nextStatus: OrderStatus) => saveOrder({ data: { id: order.id, status: nextStatus } }),
+    onSuccess: () => {
+      toast.success("Status aktualisiert.");
+      void queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+    onError: () => toast.error("Status konnte nicht gespeichert werden."),
+  });
+  return (
+    <Select
+      value={order.status}
+      onValueChange={(value) => mutation.mutate(value as OrderStatus)}
+      disabled={mutation.isPending}
+    >
+      <SelectTrigger
+        className={cn(
+          "h-7 w-auto min-w-[152px] rounded-full border-0 px-2.5 py-1 text-[11px] font-semibold focus:ring-0 focus:ring-offset-0",
+          STATUS_STYLE[order.status],
+        )}
+      >
+        <SelectValue placeholder="Status" />
+      </SelectTrigger>
+      <SelectContent align="end">
+        {ORDER_STATUSES.map((value) => (
+          <SelectItem key={value} value={value} className="text-[13px]">
+            {ORDER_STATUS_LABEL[value]}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
 function OrdersPage() {
   const fetchOrders = useServerFn(listOrders);
   const fetchBrandings = useServerFn(listBrandings);
