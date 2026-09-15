@@ -179,6 +179,56 @@ export type Database = {
           },
         ]
       }
+      caller_brandings: {
+        Row: {
+          branding_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          branding_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          branding_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caller_brandings_branding_id_fkey"
+            columns: ["branding_id"]
+            isOneToOne: false
+            referencedRelation: "brandings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      caller_settings: {
+        Row: {
+          created_at: string
+          updated_at: string
+          user_id: string
+          visible_from: string | null
+        }
+        Insert: {
+          created_at?: string
+          updated_at?: string
+          user_id: string
+          visible_from?: string | null
+        }
+        Update: {
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+          visible_from?: string | null
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           amount: number
