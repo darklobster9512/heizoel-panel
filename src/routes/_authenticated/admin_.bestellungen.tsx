@@ -726,10 +726,17 @@ function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClo
     if (!form) return;
     const liters = Math.round(Number(form.liters.replace(",", ".")) || 0);
     const price = Number(form.pricePer100.replace(",", ".")) || 0;
-    if (liters <= 0) return toast.error("Die Menge muss größer als 0 sein.");
-    if (price < 0) return toast.error("Der Preis darf nicht negativ sein.");
+    if (liters <= 0) {
+      toast.error("Die Menge muss größer als 0 sein.");
+      return;
+    }
+    if (price < 0) {
+      toast.error("Der Preis darf nicht negativ sein.");
+      return;
+    }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
-      return toast.error("Bitte eine gültige E-Mail-Adresse angeben.");
+      toast.error("Bitte eine gültige E-Mail-Adresse angeben.");
+      return;
     }
     mutation.mutate();
   }

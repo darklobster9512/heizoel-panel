@@ -262,7 +262,7 @@ const updateSchema = z.object({
 const clean = (value: string | null | undefined): string | null =>
   value === undefined || value === null || value === "" ? null : value;
 
-const cleanAddress = (value: OrderAddress): OrderAddress =>
+const cleanAddress = (value: Record<string, string | null | undefined>): OrderAddress =>
   Object.fromEntries(
     Object.entries(value).map(([key, entry]) => [key, typeof entry === "string" && entry ? entry : null]),
   ) as OrderAddress;
@@ -307,7 +307,7 @@ export const updateOrder = createServerFn({ method: "POST" })
       payload["total"] = Math.round(((liters / 100) * pricePer100 + Number.EPSILON) * 100) / 100;
     }
 
-    const { error } = await context.supabase.from("orders").update(payload).eq("id", data.id);
+    const { error } = await context.supabase.from("orders").update(payload as never).eq("id", data.id);
     if (error) throw new Error("Bestellung konnte nicht aktualisiert werden.");
     return { ok: true };
   });
