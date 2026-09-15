@@ -402,9 +402,10 @@ function GenerateInvoiceDialog({ order, onClose }: { order: Order | null; onClos
 
   const usage = useQuery({
     queryKey: ["bank-usage"],
-    queryFn: () => fetchUsage({}),
+    queryFn: async () => (await fetchUsage({})).filter((account) => account.isActive),
     enabled: Boolean(order),
   });
+
 
   const mutation = useMutation({
     mutationFn: () => createInvoice({ data: { orderId: order!.id, bankAccountId: accountId! } }),
