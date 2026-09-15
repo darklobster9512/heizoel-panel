@@ -254,7 +254,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
       invoice_number: order.orderNumber,
       amount: order.total,
       pdf_path: pdfPath,
-      model: model as unknown as Record<string, unknown>,
+      model: JSON.parse(JSON.stringify(model)),
       created_by: context.userId,
     };
 
