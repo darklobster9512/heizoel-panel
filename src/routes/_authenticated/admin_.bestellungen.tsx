@@ -141,10 +141,17 @@ function StatusCell({ order }: { order: Order }) {
       >
         <SelectValue placeholder="Status" />
       </SelectTrigger>
-      <SelectContent align="end">
+      <SelectContent noScrollbar align="end">
         {ORDER_STATUSES.map((value) => (
-          <SelectItem key={value} value={value} className="text-[13px]">
-            {ORDER_STATUS_LABEL[value]}
+          <SelectItem key={value} value={value} className="text-[13px] cursor-pointer">
+            <span
+              className={cn(
+                "inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold",
+                STATUS_STYLE[value],
+              )}
+            >
+              {ORDER_STATUS_LABEL[value]}
+            </span>
           </SelectItem>
         ))}
       </SelectContent>

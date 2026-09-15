@@ -46,8 +46,8 @@ function countSelectNodes(children: React.ReactNode): number {
 
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = "popper", ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & { noScrollbar?: boolean }
+>(({ className, children, position = "popper", noScrollbar, ...props }, ref) => {
   const viewportRef = React.useRef<HTMLDivElement | null>(null);
   const dragStartRef = React.useRef({ pointerY: 0, scrollTop: 0 });
   const itemCount = countSelectNodes(children);
@@ -56,7 +56,7 @@ const SelectContent = React.forwardRef<
     thumbHeight: 0,
     thumbTop: 0,
   });
-  const showScrollbar = scrollState.visible || itemCount > 8;
+  const showScrollbar = !noScrollbar && (scrollState.visible || itemCount > 8);
   const displayedThumbHeight = scrollState.thumbHeight || Math.max(36, 320 * (8 / itemCount));
 
   const updateScrollbar = React.useCallback(() => {
@@ -128,7 +128,10 @@ const SelectContent = React.forwardRef<
           ref={viewportRef}
           onScroll={updateScrollbar}
           className={cn(
-            "select-content-scrollbar max-h-[320px] overflow-y-scroll p-0",
+            "p-0",
+            noScrollbar
+              ? "max-h-none overflow-y-auto"
+              : "select-content-scrollbar max-h-[320px] overflow-y-scroll",
             showScrollbar && "pr-3",
             position === "popper" &&
               "w-full min-w-[var(--radix-select-trigger-width)]",
