@@ -13,6 +13,7 @@ Beim Eingang einer Bestellung geht zusätzlich zur E-Mail automatisch die Bestel
 
 ## Technische Details
 
-- `src/routes/api/public/order-confirmation.ts`: nach dem E-Mail-Versand zusätzlich `sendSevenSms` (`@/lib/notify/seven.server`) mit `renderOrderConfirmationSms(smsBrandingFrom(brandingRaw), smsDataFrom(order))`, `apiKey` aus `branding.seven_api_key`, `from` aus `seven_sender_name`, `to` aus `order.phone`.
+- `src/routes/api/public/order-confirmation.ts`: nach dem E-Mail-Versand zusätzlich `sendSevenSms` (`@/lib/notify/seven.server`) mit `renderOrderConfirmationSms(smsBrandingFrom(brandingRaw), smsDataFrom(order))`, `apiKey` aus `branding.seven_api_key`, `from` aus `seven_sender_name`, `to` aus `normalizePhone(order.phone)`.
+- Die Rufnummer wird mit der vorhandenen `normalizePhone`-Hilfe aus `seven.server.ts` aufbereitet: `0176…` → `+49176…`, Leerzeichen, Schrägstriche und andere Nicht-Ziffern entfernt, führende Null ersetzt durch `+49`, `00`-Präfix durch `+`.
 - E-Mail- und SMS-Versand jeweils in eigenem `try/catch`; Antwort um `{ emailSent, smsSent }` erweitert, damit im Test sichtbar ist, was lief.
 - Anschließend Test mit einer echten Testbestellung und Prüfung der Antwort.
