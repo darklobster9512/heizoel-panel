@@ -338,19 +338,21 @@ function OrdersPage() {
                       <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
                         <StatusCell order={order} />
                       </td>
-                      <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
-                        <button
-                          type="button"
-                          onClick={() => setInvoiceOrder(order)}
-                          title={invoicedOrderIds.has(order.id) ? "Rechnung neu generieren" : "Rechnung generieren"}
-                          className={cn(
-                            "inline-flex size-8 cursor-pointer items-center justify-center rounded-md border border-line hover:bg-surface",
-                            invoicedOrderIds.has(order.id) ? "text-brand-hover" : "text-muted-custom",
-                          )}
-                        >
-                          <FileText className="size-4" />
-                        </button>
-                      </td>
+                      {isAdmin ? (
+                        <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
+                          <button
+                            type="button"
+                            onClick={() => setInvoiceOrder(order)}
+                            title={invoicedOrderIds.has(order.id) ? "Rechnung neu generieren" : "Rechnung generieren"}
+                            className={cn(
+                              "inline-flex size-8 cursor-pointer items-center justify-center rounded-md border border-line hover:bg-surface",
+                              invoicedOrderIds.has(order.id) ? "text-brand-hover" : "text-muted-custom",
+                            )}
+                          >
+                            <FileText className="size-4" />
+                          </button>
+                        </td>
+                      ) : null}
                     </tr>
                   ))}
                 </tbody>
