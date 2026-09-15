@@ -8,7 +8,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
-  server: {
-    allowedHosts: ["backend.heizoel-deutschland.com"],
+  vite: {
+    server: {
+      allowedHosts: ["backend.heizoel-deutschland.com"],
+    },
   },
 });
