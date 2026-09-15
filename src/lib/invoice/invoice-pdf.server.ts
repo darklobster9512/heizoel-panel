@@ -85,7 +85,7 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
     page.drawRectangle({ x: M, y: y - 4, width: 5, height: 8, color: rgb(1, 0.808, 0) });
     page.drawRectangle({ x: M, y: y + 4, width: 5, height: 8, color: rgb(0.867, 0, 0) });
     page.drawRectangle({ x: M, y: y + 12, width: 5, height: 8, color: rgb(0, 0, 0) });
-    draw(ctx, model.company.shopName, M + 12, y + 2, 17, true, HEADING);
+    drawShopName(ctx, model.company.shopName, M + 12, y + 2, 17);
   }
 
   drawRight(ctx, model.company.name, right, y + 14, 8.5, true, HEADING);
