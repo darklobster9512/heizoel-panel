@@ -307,6 +307,7 @@ function OrdersPage() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-[13px] text-conditions">{order.brandingName ?? "—"}</td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">{paymentMethodLabel(order)}</td>
                       <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
                         <StatusCell order={order} />
                       </td>
