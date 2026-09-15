@@ -652,6 +652,11 @@ function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClo
 
   const [form, setForm] = useState<OrderForm | null>(null);
   const [initial, setInitial] = useState<string>("");
+  const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    setEditing(false);
+  }, [orderId]);
 
   useEffect(() => {
     if (!data) {
