@@ -162,8 +162,8 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${GREEN_SOFT};border:1px solid ${GREEN_BORDER};border-radius:8px;overflow:hidden">
   <tr><td style="padding:18px 18px 10px">
-    <div style="font:700 10px/14px ${FONT};color:${GREEN_DARK};text-transform:uppercase;letter-spacing:.9px">Bitte überweisen Sie</div>
-    <div style="margin-top:4px;font:700 22px/28px ${FONT};color:${GREEN_DARK}">${euro.format(invoice.totalPrice)}</div>
+    <div style="font:700 10px/14px ${FONT};color:${GREEN_DARK};text-transform:uppercase;letter-spacing:.9px">${payTitle}</div>
+    <div style="margin-top:4px;font:700 22px/28px ${FONT};color:${GREEN_DARK}">${euro.format(payAmount)}</div>
   </td></tr>
   <tr><td style="padding:4px 2px 8px">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
