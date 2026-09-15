@@ -209,7 +209,7 @@ function BankkontenPage() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="ba-iban">IBAN</Label>
-              <Input id="ba-iban" required value={form.iban} onChange={(e) => setForm((f) => ({ ...f, iban: e.target.value }))} placeholder="DE89 3704 0044 0532 0130 00" />
+              <Input id="ba-iban" required value={form.iban} onChange={(e) => setForm((f) => ({ ...f, iban: formatIban(e.target.value) }))} placeholder="DE89 3704 0044 0532 0130 00" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
