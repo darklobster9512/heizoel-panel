@@ -3,6 +3,7 @@ import type { OrderConfirmationData } from "@/lib/email-templates/order-confirma
 import type { OrderInvoiceData } from "@/lib/email-templates/order-invoice";
 import type { SmsBranding, SmsDemoData } from "@/lib/sms-templates";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
+import { invoiceNumberFor } from "@/lib/iban";
 
 const VARIANT_LABEL: Record<string, string> = {
   standard: "Heizöl Standard",
@@ -58,7 +59,7 @@ export function smsBrandingFrom(row: BrandingRow | null): SmsBranding {
 }
 
 export function smsDataFrom(order: Order): SmsDemoData {
-  return { orderNumber: order.orderNumber, invoiceNumber: order.orderNumber };
+  return { orderNumber: order.orderNumber, invoiceNumber: invoiceNumberFor(order.orderNumber) };
 }
 
 function addressLines(address: OrderAddress): string[] {
