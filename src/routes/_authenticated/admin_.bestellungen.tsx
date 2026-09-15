@@ -216,7 +216,7 @@ function OrdersPage() {
   }, [data, search, status, branding, showNoInterest]);
 
   return (
-    <AdminPageShell active="orders">
+    <AdminPageShell active="orders" allowCaller>
       <div>
         <p className="text-[12px] font-semibold tracking-wide text-brand-hover uppercase">Vertrieb</p>
         <h1 className="mt-1 text-[24px] font-bold text-hero-text">Bestellungen</h1>
