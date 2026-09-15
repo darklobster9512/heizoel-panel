@@ -79,14 +79,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "smava — Kreditvergleich" },
-      { name: "description", content: "Unabhängiger Kreditvergleich für Deutschland. Transparent, kostenlos und ohne versteckte Kosten." },
-      { name: "author", content: "smava" },
-      { property: "og:title", content: "smava — Kreditvergleich" },
-      { property: "og:description", content: "Unabhängiger Kreditvergleich für Deutschland. Transparent, kostenlos und ohne versteckte Kosten." },
+      { title: "HEIZKING — Heizöl günstig online bestellen" },
+      { name: "description", content: "HEIZKING vergleicht Heizölpreise regionaler Händler in Deutschland – kostenlos, transparent und unverbindlich." },
+      { name: "author", content: "HEIZKING" },
+      { property: "og:site_name", content: "HEIZKING" },
+      { property: "og:title", content: "HEIZKING — Heizöl günstig online bestellen" },
+      { property: "og:description", content: "HEIZKING vergleicht Heizölpreise regionaler Händler in Deutschland – kostenlos, transparent und unverbindlich." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@smava" },
     ],
     links: [
       {
