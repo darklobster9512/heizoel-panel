@@ -199,22 +199,114 @@ export const getOrder = createServerFn({ method: "GET" })
     return role === "caller" ? (await attachBrandingNames([order]))[0]! : order;
   });
 
+const addressSchema = z.object({
+  salutation: z.string().trim().max(40).nullish(),
+  company: z.string().trim().max(160).nullish(),
+  firstName: z.string().trim().max(80).nullish(),
+  lastName: z.string().trim().max(80).nullish(),
+  street: z.string().trim().max(160).nullish(),
+  streetNo: z.string().trim().max(20).nullish(),
+  plz: z.string().trim().max(10).nullish(),
+  city: z.string().trim().max(120).nullish(),
+});
+
+const optionalText = (max: number) => z.string().trim().max(max).nullish();
+const optionalDate = z
+  .string()
+  .trim()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Bitte ein gültiges Datum angeben.")
+  .nullish();
+
+export type UpdateOrderInput = {
+  id: string;
+  status?: OrderStatus;
+  internalNote?: string;
+  variant?: string;
+  liters?: number;
+  pricePer100?: number;
+  deliveryPoints?: number;
+  hose?: string | null;
+  truck?: string | null;
+  paymentMethod?: string | null;
+  email?: string;
+  phone?: string | null;
+  earliestDate?: string | null;
+  slotDate?: string | null;
+  slotPeriod?: string | null;
+  notes?: string | null;
+  deliveryAddress?: OrderAddress;
+  billingAddress?: OrderAddress | null;
+};
+
+const updateSchema = z.object({
+  id: z.string().uuid(),
+  status: z.enum(ORDER_STATUSES).optional(),
+  internalNote: z.string().max(4000).optional(),
+  variant: z.enum(["standard", "premium"]).optional(),
+  liters: z.number().int().min(1, "Die Menge muss größer als 0 sein.").max(1_000_000).optional(),
+  pricePer100: z.number().min(0, "Der Preis darf nicht negativ sein.").max(100_000).optional(),
+  deliveryPoints: z.number().int().min(1).max(20).optional(),
+  hose: optionalText(80),
+  truck: optionalText(80),
+  paymentMethod: optionalText(40),
+  email: z.string().trim().email("Bitte eine gültige E-Mail-Adresse angeben.").max(200).optional(),
+  phone: optionalText(40),
+  earliestDate: optionalDate,
+  slotDate: optionalDate,
+  slotPeriod: optionalText(40),
+  notes: optionalText(4000),
+  deliveryAddress: addressSchema.optional(),
+  billingAddress: addressSchema.nullish(),
+});
+
+const clean = (value: string | null | undefined): string | null =>
+  value === undefined || value === null || value === "" ? null : value;
+
+const cleanAddress = (value: OrderAddress): OrderAddress =>
+  Object.fromEntries(
+    Object.entries(value).map(([key, entry]) => [key, typeof entry === "string" && entry ? entry : null]),
+  ) as OrderAddress;
+
 export const updateOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { id: string; status?: OrderStatus; internalNote?: string }) =>
-    z
-      .object({
-        id: z.string().uuid(),
-        status: z.enum(ORDER_STATUSES).optional(),
-        internalNote: z.string().max(4000).optional(),
-      })
-      .parse(input),
-  )
+  .inputValidator((input: UpdateOrderInput) => updateSchema.parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     await requireOrdersAccess(context);
-    const payload: { status?: OrderStatus; internal_note?: string | null } = {};
-    if (data.status) payload.status = data.status;
-    if (data.internalNote !== undefined) payload.internal_note = data.internalNote || null;
+
+    const payload: Record<string, unknown> = {};
+    if (data.status) payload["status"] = data.status;
+    if (data.internalNote !== undefined) payload["internal_note"] = data.internalNote || null;
+    if (data.variant !== undefined) payload["variant"] = data.variant;
+    if (data.liters !== undefined) payload["liters"] = data.liters;
+    if (data.pricePer100 !== undefined) payload["price_per_100"] = data.pricePer100;
+    if (data.deliveryPoints !== undefined) payload["delivery_points"] = data.deliveryPoints;
+    if (data.hose !== undefined) payload["hose"] = clean(data.hose);
+    if (data.truck !== undefined) payload["truck"] = clean(data.truck);
+    if (data.paymentMethod !== undefined) payload["payment_method"] = clean(data.paymentMethod);
+    if (data.email !== undefined) payload["email"] = data.email;
+    if (data.phone !== undefined) payload["phone"] = clean(data.phone);
+    if (data.earliestDate !== undefined) payload["earliest_date"] = clean(data.earliestDate);
+    if (data.slotDate !== undefined) payload["slot_date"] = clean(data.slotDate);
+    if (data.slotPeriod !== undefined) payload["slot_period"] = clean(data.slotPeriod);
+    if (data.notes !== undefined) payload["notes"] = clean(data.notes);
+    if (data.deliveryAddress !== undefined) payload["delivery_address"] = cleanAddress(data.deliveryAddress);
+    if (data.billingAddress !== undefined) {
+      payload["billing_address"] = data.billingAddress ? cleanAddress(data.billingAddress) : null;
+    }
+
+    // Gesamtpreis immer serverseitig aus Menge und Preis pro 100 L berechnen.
+    if (data.liters !== undefined || data.pricePer100 !== undefined) {
+      const { data: current, error: readError } = await context.supabase
+        .from("orders")
+        .select("liters, price_per_100")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (readError || !current) throw new Error("Bestellung konnte nicht geladen werden.");
+      const liters = data.liters ?? num(current.liters);
+      const pricePer100 = data.pricePer100 ?? num(current.price_per_100);
+      payload["total"] = Math.round(((liters / 100) * pricePer100 + Number.EPSILON) * 100) / 100;
+    }
+
     const { error } = await context.supabase.from("orders").update(payload).eq("id", data.id);
     if (error) throw new Error("Bestellung konnte nicht aktualisiert werden.");
     return { ok: true };
