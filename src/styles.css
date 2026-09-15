@@ -238,6 +238,18 @@
   --status-success-text: oklch(0.75 0.10 150);
   --status-danger-bg: oklch(0.25 0.05 25);
   --status-danger-text: oklch(0.80 0.12 25);
+  --status-red-bg: oklch(0.25 0.05 25);
+  --status-red-text: oklch(0.80 0.12 25);
+  --status-orange-bg: oklch(0.27 0.05 55);
+  --status-orange-text: oklch(0.85 0.10 55);
+  --status-blue-bg: oklch(0.25 0.05 240);
+  --status-blue-text: oklch(0.75 0.10 240);
+  --status-greenish-bg: oklch(0.25 0.05 160);
+  --status-greenish-text: oklch(0.75 0.10 160);
+  --status-green-bg: oklch(0.25 0.05 150);
+  --status-green-text: oklch(0.75 0.10 150);
+  --status-gray-bg: oklch(0.24 0.005 250);
+  --status-gray-text: oklch(0.70 0.012 250);
 
 
   --card: oklch(0.21 0.018 250);
