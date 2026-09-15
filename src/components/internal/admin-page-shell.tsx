@@ -8,7 +8,7 @@ import { getAdminNav } from "@/components/internal/admin-nav";
 import { InternalShell } from "@/components/internal/app-shell";
 import { getMyAccount } from "@/lib/roles.functions";
 
-export function AdminPageShell({ children, active = "brandings" }: { children: ReactNode; active?: "overview" | "brandings" | "bank" | "orders" | "settings" }) {
+export function AdminPageShell({ children, active = "brandings", subDock }: { children: ReactNode; active?: "overview" | "brandings" | "bank" | "orders" | "settings"; subDock?: ReactNode }) {
   const navigate = useNavigate();
   const fetchAccount = useServerFn(getMyAccount);
   const { data, isPending } = useQuery({ queryKey: ["my-account"], queryFn: () => fetchAccount({}) });
@@ -21,5 +21,5 @@ export function AdminPageShell({ children, active = "brandings" }: { children: R
     return <div className="flex min-h-screen items-center justify-center bg-surface"><Loader2 className="size-6 animate-spin text-brand" /></div>;
   }
 
-  return <InternalShell role="Admin" name={data.fullName ?? "Admin"} email={data.email ?? ""} nav={getAdminNav(active)}><div className="pb-16 lg:pb-0">{children}</div></InternalShell>;
+  return <InternalShell role="Admin" name={data.fullName ?? "Admin"} email={data.email ?? ""} nav={getAdminNav(active)} subDock={subDock}><div className="pb-16 lg:pb-0">{children}</div></InternalShell>;
 }
