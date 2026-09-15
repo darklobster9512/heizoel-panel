@@ -48,7 +48,21 @@ export type BankAccountUsage = {
   limitAmount: number;
   usedAmount: number;
   invoiceCount: number;
+  isActive: boolean;
 };
+
+export type BankAccountOrder = {
+  invoiceId: string;
+  orderId: string;
+  orderNumber: string;
+  invoiceNumber: string;
+  amount: number;
+  customer: string;
+  status: OrderStatus;
+  placedAt: string;
+  createdAt: string;
+};
+
 
 async function requireAdmin(context: {
   supabase: {
