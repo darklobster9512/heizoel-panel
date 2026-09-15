@@ -51,7 +51,7 @@ function CallerAccountsPage() {
   const [resetFor, setResetFor] = useState<CallerAccount | null>(null);
 
   const create = useMutation({
-    mutationFn: () => createAccount({ data: { email, password, fullName: fullName || undefined } }),
+    mutationFn: () => createAccount({ data: fullName ? { email, password, fullName } : { email, password } }),
     onSuccess: () => {
       toast.success("Caller-Konto angelegt");
       setEmail("");
