@@ -77,21 +77,27 @@ function useCryptoPrices() {
 
   useEffect(() => {
     const controller = new AbortController();
+    let failures = 0;
 
     async function loadPrices() {
       try {
-        const response = await fetch(
-          "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,monero,solana&vs_currencies=eur&include_24hr_change=true",
-          { signal: controller.signal },
-        );
+        const response = await fetch("/api/public/crypto-prices", {
+          signal: controller.signal,
+          headers: { accept: "application/json" },
+        });
         if (!response.ok) throw new Error("Kursabruf fehlgeschlagen");
         const data = (await response.json()) as CryptoPrices;
+        if (!data || typeof data !== "object" || !("bitcoin" in data)) {
+          throw new Error("Kursabruf unvollständig");
+        }
+        failures = 0;
         setPrices(data);
         setUpdatedAt(new Date());
         setFailed(false);
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") return;
-        setFailed(true);
+        failures += 1;
+        if (failures >= 2) setFailed(true);
       } finally {
         setLoading(false);
       }
