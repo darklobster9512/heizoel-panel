@@ -48,6 +48,33 @@ export function formatDate(value: string | null) {
   return new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" }).format(date);
 }
 
+export function formatDateTime(value: string | null) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" }).format(date);
+}
+
+async function copyPhone(phone: string | null) {
+  if (!phone) return;
+  try {
+    await navigator.clipboard.writeText(phone);
+    toast.success("Telefonnummer kopiert");
+  } catch {
+    toast.error("Kopieren fehlgeschlagen");
+  }
+}
+
+export function variantLabel(order: Order) {
+  return order.variant === "premium" ? "Premium" : "Standard";
+}
+
+export function hasDeviation(order: Order) {
+  if (!order.billingAddress) return false;
+  const a = order.billingAddress;
+  return Boolean(a.salutation || a.company || a.firstName || a.lastName || a.street || a.streetNo || a.plz || a.city);
+}
+
 export function customerName(order: Order) {
   const a = order.deliveryAddress;
   return [a.firstName, a.lastName].filter(Boolean).join(" ") || a.company || order.email;
