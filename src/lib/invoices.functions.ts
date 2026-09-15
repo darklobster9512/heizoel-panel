@@ -8,7 +8,24 @@ import {
   type InvoiceBranding,
   type InvoiceModel,
 } from "@/lib/invoice/invoice-data";
+import { renderOrderInvoiceEmail } from "@/lib/email-templates/order-invoice";
+import {
+  confirmationDataFrom,
+  emailBrandingFrom,
+  invoiceDataFrom,
+  smsBrandingFrom,
+  smsDataFrom,
+} from "@/lib/notify/order-payloads";
+import { renderOrderConfirmationSms, smsSender } from "@/lib/sms-templates";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
+
+export type GenerateInvoiceResult = {
+  id: string;
+  invoiceNumber: string;
+  emailSent: boolean;
+  smsSent: boolean;
+  warnings: string[];
+};
 
 export type InvoiceRecord = {
   id: string;
@@ -153,7 +170,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
   .inputValidator((input: { orderId: string; bankAccountId: string }) =>
     z.object({ orderId: z.string().uuid(), bankAccountId: z.string().uuid() }).parse(input),
   )
-  .handler(async ({ data, context }): Promise<{ id: string; invoiceNumber: string }> => {
+  .handler(async ({ data, context }): Promise<GenerateInvoiceResult> => {
     await requireAdmin(context);
 
     const { data: orderRow, error: orderError } = await context.supabase
