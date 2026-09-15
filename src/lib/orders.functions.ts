@@ -104,6 +104,7 @@ type Row = {
   status: unknown;
   internal_note: unknown;
   placed_at: unknown;
+  status_changed_at?: unknown;
   created_at: unknown;
   brandings?: { shop_name: string | null; company_name: string | null } | null;
 };

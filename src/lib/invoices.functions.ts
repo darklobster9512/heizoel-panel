@@ -223,6 +223,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
     }
 
     const order: Order = {
+      statusChangedAt: text(orderRow.status_changed_at),
       id: String(orderRow.id),
       orderNumber: String(orderRow.order_number),
       brandingId,
