@@ -55,6 +55,8 @@ export type OrderInvoiceData = {
   deliveryWindow: string;
   totalPrice: number;
   phone: string;
+  /** "vorkasse" | "ec" | "barzahlung" — steuert Anzahlung vs. voller Betrag. */
+  paymentMethod?: string | null;
 };
 
 export const DEMO_INVOICE: OrderInvoiceData = {
