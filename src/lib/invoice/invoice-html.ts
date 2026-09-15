@@ -13,13 +13,22 @@ function esc(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+function shopNameLogo(shop: string) {
+  const match = shop.match(/^(.*?)(online)(.*)$/i);
+  if (!match) return esc(shop);
+  const prefix = match[1] ?? "";
+  const online = match[2] ?? "";
+  const suffix = match[3] ?? "";
+  return `${esc(prefix)}<span style="font-weight:300">${esc(online)}</span>${esc(suffix)}`;
+}
+
 function logo(model: InvoiceModel) {
   if (model.company.logoUrl) {
     return `<img src="${esc(model.company.logoUrl)}" alt="${esc(model.company.shopName)}" style="max-height:52px;max-width:190px;display:block" />`;
   }
   return `<div style="display:flex;align-items:center;gap:9px">
     <span style="display:block;width:7px;height:34px;background:linear-gradient(to bottom,#000 0 33.3%,#DD0000 33.3% 66.6%,#FFCE00 66.6% 100%)"></span>
-    <span style="font:700 24px/26px ${FONT};letter-spacing:-.5px;color:${HEADING}">${esc(model.company.shopName)}</span>
+    <span style="font:700 24px/26px ${FONT};letter-spacing:-.5px;color:${HEADING}">${shopNameLogo(model.company.shopName)}</span>
   </div>`;
 }
 
