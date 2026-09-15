@@ -272,6 +272,7 @@ export type Database = {
           slot_date: string | null
           slot_period: string | null
           status: Database["public"]["Enums"]["order_status"]
+          status_changed_at: string | null
           total: number
           truck: string | null
           updated_at: string
@@ -298,6 +299,7 @@ export type Database = {
           slot_date?: string | null
           slot_period?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          status_changed_at?: string | null
           total?: number
           truck?: string | null
           updated_at?: string
@@ -324,6 +326,7 @@ export type Database = {
           slot_date?: string | null
           slot_period?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          status_changed_at?: string | null
           total?: number
           truck?: string | null
           updated_at?: string
