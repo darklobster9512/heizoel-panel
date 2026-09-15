@@ -13,12 +13,14 @@ export function InternalShell({
   name,
   email,
   nav,
+  subDock,
   children,
 }: {
   role: string;
   name: string;
   email: string;
   nav: NavItem[];
+  subDock?: ReactNode;
   children: ReactNode;
 }) {
   const navigate = useNavigate();
@@ -110,7 +112,13 @@ export function InternalShell({
         </div>
       </header>
 
-      <div className="mx-auto min-h-screen w-full px-4 py-6 pb-20 lg:px-8 lg:pb-8 lg:pt-24">
+      {subDock ? (
+        <div className="fixed top-[4.75rem] left-1/2 z-40 hidden w-max max-w-[95vw] -translate-x-1/2 lg:block">
+          <div className="flex items-center gap-1 rounded-[1.75rem] bg-brand px-3 py-2 shadow-xl">{subDock}</div>
+        </div>
+      ) : null}
+
+      <div className={`mx-auto min-h-screen w-full px-4 py-6 pb-20 lg:px-8 lg:pb-8 ${subDock ? "lg:pt-36" : "lg:pt-24"}`}>
         <main className="min-w-0 space-y-6">{children}</main>
       </div>
 
