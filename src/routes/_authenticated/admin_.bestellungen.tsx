@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, RefreshCw, Save, Search, ShoppingCart } from "lucide-react";
+import { Check, Copy, Loader2, RefreshCw, Save, Search, ShoppingCart, X } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -46,6 +46,33 @@ export function formatDate(value: string | null) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" }).format(date);
+}
+
+export function formatDateTime(value: string | null) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" }).format(date);
+}
+
+async function copyPhone(phone: string | null) {
+  if (!phone) return;
+  try {
+    await navigator.clipboard.writeText(phone);
+    toast.success("Telefonnummer kopiert");
+  } catch {
+    toast.error("Kopieren fehlgeschlagen");
+  }
+}
+
+export function variantLabel(order: Order) {
+  return order.variant === "premium" ? "Premium" : "Standard";
+}
+
+export function hasDeviation(order: Order) {
+  if (!order.billingAddress) return false;
+  const a = order.billingAddress;
+  return Boolean(a.salutation || a.company || a.firstName || a.lastName || a.street || a.streetNo || a.plz || a.city);
 }
 
 export function customerName(order: Order) {
@@ -179,18 +206,19 @@ function OrdersPage() {
         <>
           <section className="hidden overflow-hidden rounded-lg border border-line bg-card shadow-sm lg:block">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[960px] text-left">
+              <table className="w-full min-w-[1100px] text-left">
                 <thead>
                   <tr className="border-b border-line text-[12px] tracking-wide text-muted-custom uppercase">
-                    <th className="px-4 py-3 font-semibold">Nr.</th>
-                    <th className="px-4 py-3 font-semibold">Datum</th>
-                    <th className="px-4 py-3 font-semibold">Branding</th>
-                    <th className="px-4 py-3 font-semibold">Kunde</th>
-                    <th className="px-4 py-3 font-semibold">Ort</th>
-                    <th className="px-4 py-3 font-semibold">Menge</th>
+                    <th className="px-4 py-3 font-semibold">Datum (& Uhrzeit)</th>
+                    <th className="px-4 py-3 font-semibold">NR</th>
                     <th className="px-4 py-3 font-semibold">Summe</th>
-                    <th className="px-4 py-3 font-semibold">Zahlung</th>
-                    <th className="px-4 py-3 font-semibold">Termin</th>
+                    <th className="px-4 py-3 font-semibold">Kunde</th>
+                    <th className="px-4 py-3 font-semibold">Telefonnummer</th>
+                    <th className="px-4 py-3 font-semibold">Menge</th>
+                    <th className="px-4 py-3 font-semibold">Ort</th>
+                    <th className="px-4 py-3 font-semibold">Art</th>
+                    <th className="px-4 py-3 font-semibold">Abw. Lieferanschrift</th>
+                    <th className="px-4 py-3 font-semibold">Branding</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
                   </tr>
                 </thead>
@@ -201,15 +229,44 @@ function OrdersPage() {
                       onClick={() => setSelectedId(order.id)}
                       className="cursor-pointer border-b border-line/70 last:border-0 hover:bg-surface/60"
                     >
+                      <td className="px-4 py-3 text-[13px] text-muted-custom">{formatDateTime(order.placedAt)}</td>
                       <td className="px-4 py-3 text-[13px] font-semibold text-conditions">{order.orderNumber}</td>
-                      <td className="px-4 py-3 text-[13px] text-muted-custom">{formatDate(order.placedAt)}</td>
-                      <td className="px-4 py-3 text-[13px] text-conditions">{order.brandingName ?? "—"}</td>
-                      <td className="px-4 py-3 text-[13px] text-conditions">{customerName(order)}</td>
-                      <td className="px-4 py-3 text-[13px] text-conditions">{[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ") || "—"}</td>
-                      <td className="px-4 py-3 text-[13px] text-conditions">{order.liters.toLocaleString("de-DE")} L</td>
                       <td className="px-4 py-3 text-[13px] font-semibold text-conditions">{formatEuro(order.total)}</td>
-                      <td className="px-4 py-3 text-[13px] text-muted-custom">{order.paymentMethod ?? "—"}</td>
-                      <td className="px-4 py-3 text-[13px] text-muted-custom">{slotLabel(order)}</td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">{customerName(order)}</td>
+                      <td className="px-4 py-3 text-[13px] text-conditions" onClick={(event) => event.stopPropagation()}>
+                        {order.phone ? (
+                          <button
+                            type="button"
+                            onClick={() => void copyPhone(order.phone)}
+                            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 hover:bg-surface/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-hover"
+                            title="In Zwischenablage kopieren"
+                          >
+                            {order.phone}
+                            <Copy className="size-3.5 text-muted-custom" />
+                          </button>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">{order.liters.toLocaleString("de-DE")} L</td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">{[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ") || "—"}</td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">
+                        <span className="inline-flex rounded-full border border-line px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide">
+                          {variantLabel(order)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">
+                        {hasDeviation(order) ? (
+                          <span className="inline-flex items-center gap-1.5 text-brand-hover" title="Abweichende Lieferanschrift">
+                            <Check className="size-4" /> Ja
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 text-destructive" title="Keine Abweichung">
+                            <X className="size-4" /> Nein
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-[13px] text-conditions">{order.brandingName ?? "—"}</td>
                       <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
                         <StatusCell order={order} />
                       </td>
@@ -230,15 +287,56 @@ function OrdersPage() {
                 onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedId(order.id); } }}
                 className="cursor-pointer rounded-lg border border-line bg-card p-4 text-left shadow-sm"
               >
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[14px] font-bold text-conditions">{order.orderNumber}</span>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <span className="text-[14px] font-bold text-conditions">{order.orderNumber}</span>
+                    <p className="text-[12px] text-muted-custom">{formatDateTime(order.placedAt)} · {order.brandingName ?? "Ohne Branding"}</p>
+                  </div>
                   <div onClick={(event) => event.stopPropagation()}>
                     <StatusCell order={order} />
                   </div>
                 </div>
-                <p className="mt-1 text-[13px] text-muted-custom">{formatDate(order.placedAt)} · {order.brandingName ?? "Ohne Branding"}</p>
-                <p className="mt-2 text-[13px] text-conditions">{customerName(order)} · {[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ")}</p>
-                <p className="mt-1 text-[13px] text-conditions">{order.liters.toLocaleString("de-DE")} L · <span className="font-semibold">{formatEuro(order.total)}</span></p>
+
+                <div className="mt-3 grid grid-cols-2 gap-2 text-[13px]">
+                  <div>
+                    <span className="text-[11px] uppercase text-muted-custom">Kunde</span>
+                    <p className="text-conditions">{customerName(order)}</p>
+                  </div>
+                  <div>
+                    <span className="text-[11px] uppercase text-muted-custom">Ort</span>
+                    <p className="text-conditions">{[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ") || "—"}</p>
+                  </div>
+                  <div>
+                    <span className="text-[11px] uppercase text-muted-custom">Menge</span>
+                    <p className="text-conditions">{order.liters.toLocaleString("de-DE")} L</p>
+                  </div>
+                  <div>
+                    <span className="text-[11px] uppercase text-muted-custom">Summe</span>
+                    <p className="font-semibold text-conditions">{formatEuro(order.total)}</p>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center gap-3 text-[13px]">
+                  <span className="inline-flex rounded-full border border-line px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide">
+                    {variantLabel(order)}
+                  </span>
+                  <span
+                    className={cn("inline-flex items-center gap-1", hasDeviation(order) ? "text-brand-hover" : "text-destructive")}
+                    title={hasDeviation(order) ? "Abweichende Lieferanschrift" : "Keine Abweichung"}
+                  >
+                    {hasDeviation(order) ? <Check className="size-4" /> : <X className="size-4" />}
+                    {hasDeviation(order) ? "Abw. Anschrift" : "Keine Abw."}
+                  </span>
+                  {order.phone ? (
+                    <span
+                      className="inline-flex cursor-pointer items-center gap-1 text-conditions hover:text-brand-hover"
+                      onClick={(event) => { event.stopPropagation(); void copyPhone(order.phone); }}
+                      title="In Zwischenablage kopieren"
+                    >
+                      <Copy className="size-3.5" /> {order.phone}
+                    </span>
+                  ) : null}
+                </div>
               </div>
             ))}
           </div>
