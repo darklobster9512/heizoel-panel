@@ -831,108 +831,148 @@ function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClo
 
             <div className="grid gap-4 md:grid-cols-2">
               <Card title="Produkt & Preis">
-                <Field label="Heizölart">
-                  <SelectInput
-                    value={form.variant}
-                    onChange={(value) => set("variant", value === "premium" ? "premium" : "standard")}
-                    options={[
-                      { value: "standard", label: "Heizöl Standard" },
-                      { value: "premium", label: "Heizöl Premium" },
-                    ]}
-                  />
-                </Field>
-                <Field label="Liefermenge (L)">
-                  <TextInput value={form.liters} onChange={(value) => set("liters", value)} inputMode="numeric" />
-                </Field>
-                <Field label="Preis / 100 L">
-                  <TextInput value={form.pricePer100} onChange={(value) => set("pricePer100", value)} inputMode="decimal" />
-                </Field>
-                <div className="flex items-center justify-between gap-4 px-5 py-2.5">
-                  <span className="text-[12px] tracking-wide text-muted-custom uppercase">Gesamtpreis</span>
-                  <span className="text-right text-[13px] font-bold text-brand-hover">{formatEuro(total)}</span>
-                </div>
-                <Field label="Lieferstellen">
-                  <TextInput value={form.deliveryPoints} onChange={(value) => set("deliveryPoints", value)} inputMode="numeric" />
-                </Field>
-                <Field label="Schlauchlänge">
-                  <TextInput value={form.hose} onChange={(value) => set("hose", value)} />
-                </Field>
-                <Field label="Tankwagen">
-                  <TextInput value={form.truck} onChange={(value) => set("truck", value)} />
-                </Field>
-                <Field label="Zahlungsart">
-                  <SelectInput
-                    value={form.paymentMethod}
-                    onChange={(value) => set("paymentMethod", value)}
-                    options={[
-                      { value: "", label: "— keine Angabe —" },
-                      ...PAYMENT_OPTIONS,
-                      ...(form.paymentMethod &&
-                      !PAYMENT_OPTIONS.some((option) => option.value === form.paymentMethod)
-                        ? [{ value: form.paymentMethod, label: form.paymentMethod }]
-                        : []),
-                    ]}
-                  />
-                </Field>
+                {editing ? (
+                  <>
+                    <Field label="Heizölart">
+                      <SelectInput
+                        value={form.variant}
+                        onChange={(value) => set("variant", value === "premium" ? "premium" : "standard")}
+                        options={[
+                          { value: "standard", label: "Heizöl Standard" },
+                          { value: "premium", label: "Heizöl Premium" },
+                        ]}
+                      />
+                    </Field>
+                    <Field label="Liefermenge (L)">
+                      <TextInput value={form.liters} onChange={(value) => set("liters", value)} inputMode="numeric" />
+                    </Field>
+                    <Field label="Preis / 100 L">
+                      <TextInput value={form.pricePer100} onChange={(value) => set("pricePer100", value)} inputMode="decimal" />
+                    </Field>
+                    <div className="flex items-center justify-between gap-4 px-5 py-2.5">
+                      <span className="text-[12px] tracking-wide text-muted-custom uppercase">Gesamtpreis</span>
+                      <span className="text-right text-[13px] font-bold text-brand-hover">{formatEuro(total)}</span>
+                    </div>
+                    <Field label="Lieferstellen">
+                      <TextInput value={form.deliveryPoints} onChange={(value) => set("deliveryPoints", value)} inputMode="numeric" />
+                    </Field>
+                    <Field label="Schlauchlänge">
+                      <TextInput value={form.hose} onChange={(value) => set("hose", value)} />
+                    </Field>
+                    <Field label="Tankwagen">
+                      <TextInput value={form.truck} onChange={(value) => set("truck", value)} />
+                    </Field>
+                    <Field label="Zahlungsart">
+                      <SelectInput
+                        value={form.paymentMethod}
+                        onChange={(value) => set("paymentMethod", value)}
+                        options={[
+                          { value: "", label: "— keine Angabe —" },
+                          ...PAYMENT_OPTIONS,
+                          ...(form.paymentMethod &&
+                          !PAYMENT_OPTIONS.some((option) => option.value === form.paymentMethod)
+                            ? [{ value: form.paymentMethod, label: form.paymentMethod }]
+                            : []),
+                        ]}
+                      />
+                    </Field>
+                  </>
+                ) : (
+                  <>
+                    <ReadRow label="Heizölart" value={form.variant === "premium" ? "Heizöl Premium" : "Heizöl Standard"} />
+                    <ReadRow label="Liefermenge" value={`${form.liters} L`} />
+                    <ReadRow label="Preis / 100 L" value={`${form.pricePer100} €`} />
+                    <ReadRow label="Gesamtpreis" value={formatEuro(total)} strong />
+                    <ReadRow label="Lieferstellen" value={form.deliveryPoints} />
+                    <ReadRow label="Schlauchlänge" value={form.hose || "—"} />
+                    <ReadRow label="Tankwagen" value={form.truck || "—"} />
+                    <ReadRow label="Zahlungsart" value={paymentLabel(form.paymentMethod)} />
+                  </>
+                )}
               </Card>
 
               <Card title="Liefertermin & Kontakt">
-                <Field label="Frühestes Datum">
-                  <TextInput type="date" value={form.earliestDate} onChange={(value) => set("earliestDate", value)} />
-                </Field>
-                <Field label="Termin-Datum">
-                  <TextInput type="date" value={form.slotDate} onChange={(value) => set("slotDate", value)} />
-                </Field>
-                <Field label="Zeitfenster">
-                  <SelectInput
-                    value={form.slotPeriod}
-                    onChange={(value) => set("slotPeriod", value)}
-                    options={[
-                      ...SLOT_OPTIONS,
-                      ...(form.slotPeriod && !SLOT_OPTIONS.some((option) => option.value === form.slotPeriod)
-                        ? [{ value: form.slotPeriod, label: form.slotPeriod }]
-                        : []),
-                    ]}
-                  />
-                </Field>
-                <Field label="E-Mail">
-                  <TextInput type="email" value={form.email} onChange={(value) => set("email", value)} />
-                </Field>
-                <Field label="Telefon">
-                  <TextInput value={form.phone} onChange={(value) => set("phone", value)} />
-                </Field>
-                <Field label="Hinweise">
-                  <TextInput value={form.notes} onChange={(value) => set("notes", value)} />
-                </Field>
+                {editing ? (
+                  <>
+                    <Field label="Frühestes Datum">
+                      <TextInput type="date" value={form.earliestDate} onChange={(value) => set("earliestDate", value)} />
+                    </Field>
+                    <Field label="Termin-Datum">
+                      <TextInput type="date" value={form.slotDate} onChange={(value) => set("slotDate", value)} />
+                    </Field>
+                    <Field label="Zeitfenster">
+                      <SelectInput
+                        value={form.slotPeriod}
+                        onChange={(value) => set("slotPeriod", value)}
+                        options={[
+                          ...SLOT_OPTIONS,
+                          ...(form.slotPeriod && !SLOT_OPTIONS.some((option) => option.value === form.slotPeriod)
+                            ? [{ value: form.slotPeriod, label: form.slotPeriod }]
+                            : []),
+                        ]}
+                      />
+                    </Field>
+                    <Field label="E-Mail">
+                      <TextInput type="email" value={form.email} onChange={(value) => set("email", value)} />
+                    </Field>
+                    <Field label="Telefon">
+                      <TextInput value={form.phone} onChange={(value) => set("phone", value)} />
+                    </Field>
+                    <Field label="Hinweise">
+                      <TextInput value={form.notes} onChange={(value) => set("notes", value)} />
+                    </Field>
+                  </>
+                ) : (
+                  <>
+                    <ReadRow label="Frühestes Datum" value={formatDate(form.earliestDate || null)} />
+                    <ReadRow label="Termin-Datum" value={formatDate(form.slotDate || null)} />
+                    <ReadRow label="Zeitfenster" value={slotText(form.slotPeriod)} />
+                    <ReadRow label="E-Mail" value={form.email || "—"} />
+                    <ReadRow label="Telefon" value={form.phone || "—"} />
+                    <ReadRow label="Hinweise" value={form.notes || "—"} />
+                  </>
+                )}
               </Card>
 
               <Card title="Lieferadresse">
-                <AddressFields
-                  address={form.deliveryAddress}
-                  onChange={(key, value) => setAddress("deliveryAddress", key, value)}
-                />
+                {editing ? (
+                  <AddressFields
+                    address={form.deliveryAddress}
+                    onChange={(key, value) => setAddress("deliveryAddress", key, value)}
+                  />
+                ) : (
+                  <p className="px-5 py-4 text-[13px] text-conditions">{addressText(form.deliveryAddress)}</p>
+                )}
               </Card>
 
               <Card title="Rechnungsadresse">
-                <div className="flex items-center gap-2 px-5 py-3">
-                  <input
-                    id="billing-toggle"
-                    type="checkbox"
-                    className="size-4 accent-[var(--color-brand)]"
-                    checked={form.billingAddress !== null}
-                    onChange={(event) => set("billingAddress", event.target.checked ? { ...EMPTY_ADDRESS } : null)}
-                  />
-                  <label htmlFor="billing-toggle" className="text-[13px] text-conditions">
-                    Abweichende Rechnungsadresse
-                  </label>
-                </div>
-                {form.billingAddress ? (
-                  <AddressFields
-                    address={form.billingAddress}
-                    onChange={(key, value) => setAddress("billingAddress", key, value)}
-                  />
+                {editing ? (
+                  <>
+                    <div className="flex items-center gap-2 px-5 py-3">
+                      <input
+                        id="billing-toggle"
+                        type="checkbox"
+                        className="size-4 accent-[var(--color-brand)]"
+                        checked={form.billingAddress !== null}
+                        onChange={(event) => set("billingAddress", event.target.checked ? { ...EMPTY_ADDRESS } : null)}
+                      />
+                      <label htmlFor="billing-toggle" className="text-[13px] text-conditions">
+                        Abweichende Rechnungsadresse
+                      </label>
+                    </div>
+                    {form.billingAddress ? (
+                      <AddressFields
+                        address={form.billingAddress}
+                        onChange={(key, value) => setAddress("billingAddress", key, value)}
+                      />
+                    ) : (
+                      <p className="px-5 py-4 text-[13px] text-muted-custom">Entspricht der Lieferadresse.</p>
+                    )}
+                  </>
                 ) : (
-                  <p className="px-5 py-4 text-[13px] text-muted-custom">Entspricht der Lieferadresse.</p>
+                  <p className="px-5 py-4 text-[13px] text-conditions">
+                    {form.billingAddress ? addressText(form.billingAddress) : "Entspricht der Lieferadresse."}
+                  </p>
                 )}
               </Card>
             </div>
