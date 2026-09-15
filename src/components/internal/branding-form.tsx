@@ -60,6 +60,23 @@ const REQUIRED: (keyof FormValues)[] = [
   "registryCourt", "commercialRegisterNumber", "managingDirector", "vatId", "email", "domain",
 ];
 
+const FIELD_ERRORS: Record<string, string> = {
+  domain: "Bitte eine gültige Domain angeben, z. B. mein-shop.de.",
+  email: "Bitte eine gültige E-Mail-Adresse angeben.",
+  vatId: "Die USt-IdNr. muss im Format DE123456789 angegeben werden.",
+  resendSenderEmail: "Bitte eine gültige Absender-E-Mail für Resend angeben.",
+  sevenSenderName: "Der Seven.io-Absendername darf höchstens 11 Zeichen lang sein.",
+};
+
+function saveErrorMessage(caught: unknown): string {
+  const raw = caught instanceof Error ? caught.message : typeof caught === "string" ? caught : "";
+  for (const [field, message] of Object.entries(FIELD_ERRORS)) {
+    if (raw.includes(`"${field}"`)) return message;
+  }
+  return "Das Branding konnte nicht gespeichert werden. Bitte prüfe deine Angaben.";
+}
+
+
 function Field({ id, label, value, onChange, required, type = "text", placeholder, maxLength }: {
   id: keyof FormValues;
   label: string;
