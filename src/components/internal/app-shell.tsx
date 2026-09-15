@@ -40,7 +40,7 @@ export function InternalShell({
   return (
     <div className="min-h-screen bg-surface">
       <header className="sticky top-0 z-40 border-b border-line bg-background">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5">
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 pl-3 pr-5">
           <div className="flex items-center gap-3">
             <Link to="/" className="rounded-md">
               <Logo className="h-auto w-[100px] text-smava-logo" />
@@ -70,8 +70,8 @@ export function InternalShell({
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-7xl gap-6 px-5 py-6">
-        <aside className="hidden w-56 shrink-0 lg:block">
+      <div className="mx-auto flex max-w-[1440px] gap-5 pl-3 pr-5 py-6">
+        <aside className="hidden w-52 shrink-0 lg:block">
           <nav className="sticky top-22 space-y-1">
             {nav.map((item) => {
               const className = `flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] transition-colors ${
