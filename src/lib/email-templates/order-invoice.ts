@@ -176,7 +176,7 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
       </tr>
     </table>
   </td></tr>
-  <tr><td style="padding:8px 18px 18px;font:400 12px/19px ${FONT};color:${GREEN_DARK}">Ihre Lieferung wird <strong style="color:${HEADING}">nach Zahlungseingang</strong> disponiert. Bitte geben Sie unbedingt den Verwendungszweck an, damit wir Ihre Zahlung zuordnen können.</td></tr>
+  <tr><td style="padding:8px 18px 18px;font:400 12px/19px ${FONT};color:${GREEN_DARK}">${payHint}</td></tr>
 </table>`, "0 32px 26px")}
 
 ${trustBar()}
