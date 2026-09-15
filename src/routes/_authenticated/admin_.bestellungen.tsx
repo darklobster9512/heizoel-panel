@@ -805,10 +805,21 @@ function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClo
                   <option key={value} value={value}>{ORDER_STATUS_LABEL[value]}</option>
                 ))}
               </select>
-              <Button size="sm" onClick={handleSave} disabled={mutation.isPending}>
-                {mutation.isPending ? <Loader2 className="animate-spin" /> : <Save />} Speichern
-              </Button>
-              {dirty ? <span className="text-[12px] text-muted-custom">Ungespeicherte Änderungen</span> : null}
+              {editing ? (
+                <>
+                  <Button size="sm" onClick={handleSave} disabled={mutation.isPending}>
+                    {mutation.isPending ? <Loader2 className="animate-spin" /> : <Save />} Speichern
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleCancelEdit} disabled={mutation.isPending}>
+                    <X /> Abbrechen
+                  </Button>
+                  {dirty ? <span className="text-[12px] text-muted-custom">Ungespeicherte Änderungen</span> : null}
+                </>
+              ) : (
+                <Button size="sm" variant="outline" onClick={() => setEditing(true)} title="Werte bearbeiten">
+                  <Pencil /> Bearbeiten
+                </Button>
+              )}
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
