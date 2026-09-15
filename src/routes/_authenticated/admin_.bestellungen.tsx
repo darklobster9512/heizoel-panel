@@ -9,7 +9,9 @@ import { AdminPageShell } from "@/components/internal/admin-page-shell";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { listBrandings } from "@/lib/brandings.functions";
 import {
   ORDER_STATUSES,
@@ -67,6 +69,42 @@ export const STATUS_STYLE: Record<OrderStatus, string> = {
   angekommen: "bg-surface text-conditions",
   exchanged: "bg-surface text-muted-custom",
 };
+
+function StatusCell({ order }: { order: Order }) {
+  const saveOrder = useServerFn(updateOrder);
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: (nextStatus: OrderStatus) => saveOrder({ data: { id: order.id, status: nextStatus } }),
+    onSuccess: () => {
+      toast.success("Status aktualisiert.");
+      void queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+    onError: () => toast.error("Status konnte nicht gespeichert werden."),
+  });
+  return (
+    <Select
+      value={order.status}
+      onValueChange={(value) => mutation.mutate(value as OrderStatus)}
+      disabled={mutation.isPending}
+    >
+      <SelectTrigger
+        className={cn(
+          "h-7 w-auto min-w-[152px] rounded-full border-0 px-2.5 py-1 text-[11px] font-semibold focus:ring-0 focus:ring-offset-0",
+          STATUS_STYLE[order.status],
+        )}
+      >
+        <SelectValue placeholder="Status" />
+      </SelectTrigger>
+      <SelectContent align="end">
+        {ORDER_STATUSES.map((value) => (
+          <SelectItem key={value} value={value} className="text-[13px]">
+            {ORDER_STATUS_LABEL[value]}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
 
 function OrdersPage() {
   const fetchOrders = useServerFn(listOrders);
@@ -172,7 +210,9 @@ function OrdersPage() {
                       <td className="px-4 py-3 text-[13px] font-semibold text-conditions">{formatEuro(order.total)}</td>
                       <td className="px-4 py-3 text-[13px] text-muted-custom">{order.paymentMethod ?? "—"}</td>
                       <td className="px-4 py-3 text-[13px] text-muted-custom">{slotLabel(order)}</td>
-                      <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLE[order.status]}`}>{ORDER_STATUS_LABEL[order.status]}</span></td>
+                      <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
+                        <StatusCell order={order} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -182,20 +222,24 @@ function OrdersPage() {
 
           <div className="grid gap-4 lg:hidden">
             {rows.map((order) => (
-              <button
+              <div
                 key={order.id}
-                type="button"
+                role="button"
+                tabIndex={0}
                 onClick={() => setSelectedId(order.id)}
-                className="rounded-lg border border-line bg-card p-4 text-left shadow-sm"
+                onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedId(order.id); } }}
+                className="cursor-pointer rounded-lg border border-line bg-card p-4 text-left shadow-sm"
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[14px] font-bold text-conditions">{order.orderNumber}</span>
-                  <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLE[order.status]}`}>{ORDER_STATUS_LABEL[order.status]}</span>
+                  <div onClick={(event) => event.stopPropagation()}>
+                    <StatusCell order={order} />
+                  </div>
                 </div>
                 <p className="mt-1 text-[13px] text-muted-custom">{formatDate(order.placedAt)} · {order.brandingName ?? "Ohne Branding"}</p>
                 <p className="mt-2 text-[13px] text-conditions">{customerName(order)} · {[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ")}</p>
                 <p className="mt-1 text-[13px] text-conditions">{order.liters.toLocaleString("de-DE")} L · <span className="font-semibold">{formatEuro(order.total)}</span></p>
-              </button>
+              </div>
             ))}
           </div>
         </>
