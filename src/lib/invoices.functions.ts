@@ -16,7 +16,7 @@ import {
   smsDataFrom,
 } from "@/lib/notify/order-payloads";
 import { renderOrderInvoiceSms, smsSender } from "@/lib/sms-templates";
-import type { Order, OrderAddress } from "@/lib/orders.functions";
+import type { Order, OrderAddress, OrderStatus } from "@/lib/orders.functions";
 
 export type GenerateInvoiceResult = {
   id: string;
