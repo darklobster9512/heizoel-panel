@@ -179,7 +179,13 @@ function OrdersPage() {
   const fetchAccount = useServerFn(getMyAccount);
   const account = useQuery({ queryKey: ["my-account"], queryFn: () => fetchAccount({}) });
   const isAdmin = account.data?.role === "admin";
-  const { data, isPending, isError, refetch } = useQuery({ queryKey: ["orders"], queryFn: () => fetchOrders({}) });
+  const { data, isPending, isError, refetch } = useQuery({
+    queryKey: ["orders"],
+    queryFn: () => fetchOrders({}),
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
+  });
+  useOrdersRealtime();
   const brandings = useQuery({ queryKey: ["brandings"], queryFn: () => fetchBrandings({}), enabled: isAdmin });
   const invoices = useQuery({ queryKey: ["invoices"], queryFn: () => fetchInvoices({}), enabled: isAdmin });
 
