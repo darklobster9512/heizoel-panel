@@ -128,7 +128,7 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
 </tr></table>`, "24px 32px 4px")}
 
 ${section(`<p style="margin:0 0 14px;font:400 15px/23px ${FONT};color:${TEXT}">${esc(invoice.salutation)},</p>
-<p style="margin:0;font:400 15px/23px ${FONT};color:${TEXT}">vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Bitte überweisen Sie den Rechnungsbetrag auf das unten genannte Konto.</p>`, "8px 32px 22px")}
+<p style="margin:0;font:400 15px/23px ${FONT};color:${TEXT}">${intro}</p>`, "8px 32px 22px")}
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:6px"><tr>
   <td width="33%" align="center" style="padding:12px 8px">
