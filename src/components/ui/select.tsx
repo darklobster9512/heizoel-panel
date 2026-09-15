@@ -128,7 +128,10 @@ const SelectContent = React.forwardRef<
           ref={viewportRef}
           onScroll={updateScrollbar}
           className={cn(
-            "select-content-scrollbar max-h-[320px] overflow-y-scroll p-0",
+            "p-0",
+            noScrollbar
+              ? "max-h-none overflow-y-auto"
+              : "select-content-scrollbar max-h-[320px] overflow-y-scroll",
             showScrollbar && "pr-3",
             position === "popper" &&
               "w-full min-w-[var(--radix-select-trigger-width)]",
