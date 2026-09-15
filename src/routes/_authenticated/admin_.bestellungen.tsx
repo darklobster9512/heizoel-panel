@@ -287,15 +287,56 @@ function OrdersPage() {
                 onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedId(order.id); } }}
                 className="cursor-pointer rounded-lg border border-line bg-card p-4 text-left shadow-sm"
               >
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[14px] font-bold text-conditions">{order.orderNumber}</span>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <span className="text-[14px] font-bold text-conditions">{order.orderNumber}</span>
+                    <p className="text-[12px] text-muted-custom">{formatDateTime(order.placedAt)} · {order.brandingName ?? "Ohne Branding"}</p>
+                  </div>
                   <div onClick={(event) => event.stopPropagation()}>
                     <StatusCell order={order} />
                   </div>
                 </div>
-                <p className="mt-1 text-[13px] text-muted-custom">{formatDate(order.placedAt)} · {order.brandingName ?? "Ohne Branding"}</p>
-                <p className="mt-2 text-[13px] text-conditions">{customerName(order)} · {[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ")}</p>
-                <p className="mt-1 text-[13px] text-conditions">{order.liters.toLocaleString("de-DE")} L · <span className="font-semibold">{formatEuro(order.total)}</span></p>
+
+                <div className="mt-3 grid grid-cols-2 gap-2 text-[13px]">
+                  <div>
+                    <span className="text-[11px] uppercase text-muted-custom">Kunde</span>
+                    <p className="text-conditions">{customerName(order)}</p>
+                  </div>
+                  <div>
+                    <span className="text-[11px] uppercase text-muted-custom">Ort</span>
+                    <p className="text-conditions">{[order.deliveryAddress.plz, order.deliveryAddress.city].filter(Boolean).join(" ") || "—"}</p>
+                  </div>
+                  <div>
+                    <span className="text-[11px] uppercase text-muted-custom">Menge</span>
+                    <p className="text-conditions">{order.liters.toLocaleString("de-DE")} L</p>
+                  </div>
+                  <div>
+                    <span className="text-[11px] uppercase text-muted-custom">Summe</span>
+                    <p className="font-semibold text-conditions">{formatEuro(order.total)}</p>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center gap-3 text-[13px]">
+                  <span className="inline-flex rounded-full border border-line px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide">
+                    {variantLabel(order)}
+                  </span>
+                  <span
+                    className={cn("inline-flex items-center gap-1", hasDeviation(order) ? "text-brand-hover" : "text-destructive")}
+                    title={hasDeviation(order) ? "Abweichende Lieferanschrift" : "Keine Abweichung"}
+                  >
+                    {hasDeviation(order) ? <Check className="size-4" /> : <X className="size-4" />}
+                    {hasDeviation(order) ? "Abw. Anschrift" : "Keine Abw."}
+                  </span>
+                  {order.phone ? (
+                    <span
+                      className="inline-flex cursor-pointer items-center gap-1 text-conditions hover:text-brand-hover"
+                      onClick={(event) => { event.stopPropagation(); void copyPhone(order.phone); }}
+                      title="In Zwischenablage kopieren"
+                    >
+                      <Copy className="size-3.5" /> {order.phone}
+                    </span>
+                  ) : null}
+                </div>
               </div>
             ))}
           </div>
