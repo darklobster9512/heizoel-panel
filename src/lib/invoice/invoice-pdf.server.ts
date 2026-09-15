@@ -235,7 +235,16 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
   page.drawRectangle({ x: M, y: fy, width: right - M, height: 0.6, color: LINE });
   const cols: [number, string[]][] = [
     [M, [model.company.name, model.company.street, model.company.zipCity, model.company.email]],
-    [M + 165, ["Handelsregister", model.company.registryCourt, model.company.registerNumber, `USt-IdNr. ${model.company.vatId}`]],
+    [
+      M + 165,
+      [
+        "Handelsregister",
+        model.company.registryCourt,
+        model.company.registerNumber,
+        `USt-IdNr. ${model.company.vatId}`,
+        `Geschäftsführer: ${model.company.director}`,
+      ],
+    ],
     [M + 330, ["Zahlung", model.bank.accountHolder, model.bank.bankName, `IBAN ${model.bank.iban}`]],
   ];
   for (const [x, lines] of cols) {
