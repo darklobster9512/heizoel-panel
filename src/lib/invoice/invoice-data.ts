@@ -200,6 +200,7 @@ export function buildInvoiceModel(
   const period = order.slotPeriod ? (PERIOD_LABEL[order.slotPeriod] ?? order.slotPeriod) : null;
   const variantLabel = VARIANT_LABEL[order.variant] ?? "Heizöl Standard";
   const zipCity = [value(branding.postalCode, ""), value(branding.city, "")].filter(Boolean).join(" ");
+  const bank = bankFor(order, branding, gross, bankOverride ?? null);
 
   return {
     invoiceNumber: order.orderNumber,
