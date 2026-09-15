@@ -753,6 +753,26 @@ function OrderDetailDialog({ orderId, onClose }: { orderId: string | null; onClo
     onClose();
   }
 
+  function handleCancelEdit() {
+    if (dirty && !window.confirm("Änderungen verwerfen?")) return;
+    if (initial) setForm(JSON.parse(initial) as OrderForm);
+    setEditing(false);
+  }
+
+  const paymentLabel = (value: string) =>
+    PAYMENT_OPTIONS.find((option) => option.value === value)?.label ?? (value || "— keine Angabe —");
+  const slotText = (value: string) =>
+    SLOT_OPTIONS.find((option) => option.value === value)?.label ?? (value || "— kein Zeitfenster —");
+  const addressText = (address: OrderAddress) =>
+    [
+      [address.salutation, address.firstName, address.lastName].filter(Boolean).join(" "),
+      address.company || "",
+      [address.street, address.streetNo].filter(Boolean).join(" "),
+      [address.plz, address.city].filter(Boolean).join(" "),
+    ]
+      .filter(Boolean)
+      .join(", ") || "—";
+
   return (
     <Dialog open={Boolean(orderId)} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
