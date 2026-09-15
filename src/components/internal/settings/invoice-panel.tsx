@@ -1,6 +1,6 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, FileText, Loader2, RefreshCw, Search } from "lucide-react";
+import { Download, FileText, Loader2, RefreshCw, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -17,6 +17,7 @@ import {
   type InvoiceBranding,
 } from "@/lib/invoice/invoice-data";
 import { renderInvoiceHtml } from "@/lib/invoice/invoice-html";
+import { deleteInvoice, downloadInvoice, listInvoices } from "@/lib/invoices.functions";
 import { listOrders, type Order } from "@/lib/orders.functions";
 
 function customerOf(order: Order) {
