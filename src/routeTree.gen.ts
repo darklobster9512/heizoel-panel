@@ -13,7 +13,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedCallerRouteImport } from './routes/_authenticated/caller'
 import { Route as AuthenticatedWeiterleitungRouteImport } from './routes/_authenticated/weiterleitung'
 import { Route as AuthenticatedAdminBankkontenRouteImport } from './routes/_authenticated/admin_.bankkonten'
 import { Route as AuthenticatedAdminBestellungenRouteImport } from './routes/_authenticated/admin_.bestellungen'
@@ -46,11 +45,6 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedCallerRoute = AuthenticatedCallerRouteImport.update({
-  id: '/caller',
-  path: '/caller',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedWeiterleitungRoute =
@@ -140,7 +134,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/caller': typeof AuthenticatedCallerRoute
   '/weiterleitung': typeof AuthenticatedWeiterleitungRoute
   '/admin/bankkonten': typeof AuthenticatedAdminBankkontenRoute
   '/admin/bestellungen': typeof AuthenticatedAdminBestellungenRoute
@@ -160,7 +153,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/caller': typeof AuthenticatedCallerRoute
   '/weiterleitung': typeof AuthenticatedWeiterleitungRoute
   '/admin/bankkonten': typeof AuthenticatedAdminBankkontenRoute
   '/admin/bestellungen': typeof AuthenticatedAdminBestellungenRoute
@@ -182,7 +174,6 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
-  '/_authenticated/caller': typeof AuthenticatedCallerRoute
   '/_authenticated/weiterleitung': typeof AuthenticatedWeiterleitungRoute
   '/_authenticated/admin_/bankkonten': typeof AuthenticatedAdminBankkontenRoute
   '/_authenticated/admin_/bestellungen': typeof AuthenticatedAdminBestellungenRoute
@@ -204,7 +195,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
-    | '/caller'
     | '/weiterleitung'
     | '/admin/bankkonten'
     | '/admin/bestellungen'
@@ -224,7 +214,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
-    | '/caller'
     | '/weiterleitung'
     | '/admin/bankkonten'
     | '/admin/bestellungen'
@@ -245,7 +234,6 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
-    | '/_authenticated/caller'
     | '/_authenticated/weiterleitung'
     | '/_authenticated/admin_/bankkonten'
     | '/_authenticated/admin_/bestellungen'
@@ -298,13 +286,6 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/caller': {
-      id: '/_authenticated/caller'
-      path: '/caller'
-      fullPath: '/caller'
-      preLoaderRoute: typeof AuthenticatedCallerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/weiterleitung': {
@@ -410,7 +391,6 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
-  AuthenticatedCallerRoute: typeof AuthenticatedCallerRoute
   AuthenticatedWeiterleitungRoute: typeof AuthenticatedWeiterleitungRoute
   AuthenticatedAdminBankkontenRoute: typeof AuthenticatedAdminBankkontenRoute
   AuthenticatedAdminBestellungenRoute: typeof AuthenticatedAdminBestellungenRoute
@@ -427,7 +407,6 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
-  AuthenticatedCallerRoute: AuthenticatedCallerRoute,
   AuthenticatedWeiterleitungRoute: AuthenticatedWeiterleitungRoute,
   AuthenticatedAdminBankkontenRoute: AuthenticatedAdminBankkontenRoute,
   AuthenticatedAdminBestellungenRoute: AuthenticatedAdminBestellungenRoute,
