@@ -233,6 +233,13 @@ function OrdersPage() {
             <option key={value} value={value}>{ORDER_STATUS_LABEL[value]}</option>
           ))}
         </select>
+        <Button
+          variant={showNoInterest ? "default" : "outline"}
+          size="sm"
+          onClick={() => setShowNoInterest((prev) => !prev)}
+        >
+          {showNoInterest ? "Alle anderen anzeigen" : `Kein Interesse anzeigen (${noInterestCount})`}
+        </Button>
         <Button variant="outline" size="sm" onClick={() => void refetch()}><RefreshCw /> Aktualisieren</Button>
       </div>
 
