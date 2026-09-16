@@ -133,6 +133,7 @@ export const Route = createFileRoute("/api/public/orders")({
                 pricePer100: data.pricePer100,
                 postalCode: addr.plz ?? null,
                 city: addr.city ?? null,
+                paymentMethod: data.paymentMethod ?? null,
               });
             } catch (notifyError) {
               console.error("[orders] telegram notification failed", notifyError);
