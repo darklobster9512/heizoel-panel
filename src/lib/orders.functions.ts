@@ -223,7 +223,7 @@ export const listOrders = createServerFn({ method: "GET" })
     const { data, error } = await query;
     if (error) throw new Error("Bestellungen konnten nicht geladen werden.");
     const orders = (data ?? []).map((row) => mapRow(row as Row));
-    return role === "caller" ? attachBrandingNames(orders) : orders;
+    return role === "caller" ? attachBrandingNames(orders, context.supabase) : orders;
   });
 
 export const getOrder = createServerFn({ method: "GET" })
@@ -242,7 +242,7 @@ export const getOrder = createServerFn({ method: "GET" })
     if (role === "caller") {
       const scope = await callerScope(context);
       if (!inCallerScope(order, scope)) throw new Error("Kein Zugriff auf diese Bestellung.");
-      return (await attachBrandingNames([order]))[0]!;
+      return (await attachBrandingNames([order], context.supabase))[0]!;
     }
     return order;
   });
