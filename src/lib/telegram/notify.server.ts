@@ -1,3 +1,5 @@
+import { PAYMENT_LABEL } from "@/lib/notify/order-payloads";
+
 const TELEGRAM_API_BASE = "https://api.telegram.org";
 
 const euro = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
