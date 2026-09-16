@@ -85,6 +85,7 @@ function AdminPage() {
   const { data, isPending } = useQuery({
     queryKey: ["my-account"],
     queryFn: () => fetchAccount({}),
+    retry: 1,
   });
 
   const isAdmin = data?.role === "admin";
@@ -92,11 +93,14 @@ function AdminPage() {
   const stats = useQuery({
     queryKey: ["admin-stats"],
     queryFn: () => fetchStats({}),
-    enabled: isAdmin,
+    enabled: isAdmin === true,
+    retry: false,
   });
 
   useEffect(() => {
-    if (data && data.role !== "admin") navigate({ to: "/weiterleitung", replace: true });
+    if (!data || data.role === "admin") return;
+    if (data.role === "caller") navigate({ to: "/admin/bestellungen", replace: true });
+    else navigate({ to: "/weiterleitung", replace: true });
   }, [data, navigate]);
 
   if (isPending || !data || !isAdmin) {

@@ -92,13 +92,18 @@ async function requireOrdersAccess(context: OrdersContext): Promise<"admin" | "c
 async function attachBrandingNames(orders: Order[]): Promise<Order[]> {
   const ids = [...new Set(orders.map((o) => o.brandingId).filter((id): id is string => Boolean(id)))];
   if (ids.length === 0) return orders;
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data } = await supabaseAdmin.from("brandings").select("id, shop_name, company_name").in("id", ids);
-  const byId = new Map((data ?? []).map((row) => [String(row.id), row]));
-  return orders.map((order) => {
-    const row = order.brandingId ? byId.get(order.brandingId) : null;
-    return row ? { ...order, brandingName: row.shop_name ?? row.company_name ?? null } : order;
-  });
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin.from("brandings").select("id, shop_name, company_name").in("id", ids);
+    const byId = new Map((data ?? []).map((row) => [String(row.id), row]));
+    return orders.map((order) => {
+      const row = order.brandingId ? byId.get(order.brandingId) : null;
+      return row ? { ...order, brandingName: row.shop_name ?? row.company_name ?? null } : order;
+    });
+  } catch (caught) {
+    console.error("[orders] Branding-Namen konnten nicht geladen werden", caught);
+    return orders;
+  }
 }
 
 type Row = {
