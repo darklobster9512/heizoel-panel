@@ -129,6 +129,7 @@ export const sendTelegramTest = createServerFn({ method: "POST" })
       pricePer100: 128.07,
       postalCode: "12345",
       city: "Musterstadt",
+      paymentMethod: "vorkasse",
     })}`;
     await sendTelegramMessage(String(row.chat_id), text);
     return { ok: true };
