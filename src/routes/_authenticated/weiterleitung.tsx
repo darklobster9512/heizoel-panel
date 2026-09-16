@@ -27,9 +27,10 @@ export const Route = createFileRoute("/_authenticated/weiterleitung")({
 function RedirectPage() {
   const navigate = useNavigate();
   const fetchAccount = useServerFn(getMyAccount);
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError, error, refetch, isFetching } = useQuery({
     queryKey: ["my-account"],
     queryFn: () => fetchAccount({}),
+    retry: 1,
   });
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { getAdminNav, type AdminNavKey } from "@/components/internal/admin-nav";
 import { InternalShell } from "@/components/internal/app-shell";
+import { Button } from "@/components/ui/button";
 import { getMyAccount } from "@/lib/roles.functions";
 
 export function AdminPageShell({
