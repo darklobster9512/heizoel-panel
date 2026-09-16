@@ -203,13 +203,6 @@ export type Database = {
             foreignKeyName: "caller_brandings_branding_id_fkey"
             columns: ["branding_id"]
             isOneToOne: false
-            referencedRelation: "branding_names"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "caller_brandings_branding_id_fkey"
-            columns: ["branding_id"]
-            isOneToOne: false
             referencedRelation: "brandings"
             referencedColumns: ["id"]
           },
@@ -282,13 +275,6 @@ export type Database = {
             columns: ["bank_account_id"]
             isOneToOne: false
             referencedRelation: "bank_accounts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "invoices_branding_id_fkey"
-            columns: ["branding_id"]
-            isOneToOne: false
-            referencedRelation: "branding_names"
             referencedColumns: ["id"]
           },
           {
@@ -401,13 +387,6 @@ export type Database = {
             foreignKeyName: "orders_branding_id_fkey"
             columns: ["branding_id"]
             isOneToOne: false
-            referencedRelation: "branding_names"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_branding_id_fkey"
-            columns: ["branding_id"]
-            isOneToOne: false
             referencedRelation: "brandings"
             referencedColumns: ["id"]
           },
@@ -476,13 +455,6 @@ export type Database = {
             foreignKeyName: "telegram_recipients_branding_id_fkey"
             columns: ["branding_id"]
             isOneToOne: false
-            referencedRelation: "branding_names"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "telegram_recipients_branding_id_fkey"
-            columns: ["branding_id"]
-            isOneToOne: false
             referencedRelation: "brandings"
             referencedColumns: ["id"]
           },
@@ -525,26 +497,17 @@ export type Database = {
       }
     }
     Views: {
-      branding_names: {
-        Row: {
-          company_name: string | null
-          id: string | null
-          shop_name: string | null
-        }
-        Insert: {
-          company_name?: string | null
-          id?: string | null
-          shop_name?: string | null
-        }
-        Update: {
-          company_name?: string | null
-          id?: string | null
-          shop_name?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
+      branding_names: {
+        Args: never
+        Returns: {
+          company_name: string
+          id: string
+          shop_name: string
+        }[]
+      }
       generate_order_number: { Args: never; Returns: string }
       has_role: {
         Args: {
