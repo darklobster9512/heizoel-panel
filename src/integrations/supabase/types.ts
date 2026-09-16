@@ -500,6 +500,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      branding_names: {
+        Args: never
+        Returns: {
+          company_name: string
+          id: string
+          shop_name: string
+        }[]
+      }
       generate_order_number: { Args: never; Returns: string }
       has_role: {
         Args: {

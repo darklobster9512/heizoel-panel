@@ -88,14 +88,15 @@ async function requireOrdersAccess(context: OrdersContext): Promise<"admin" | "c
   throw new Error("Kein Zugriff auf die Bestellverwaltung.");
 }
 
-/** Caller dürfen die Branding-Tabelle nicht lesen — Namen serverseitig nachladen. */
-async function attachBrandingNames(orders: Order[]): Promise<Order[]> {
+type BrandingNameRow = { id: string; shop_name: string | null; company_name: string | null };
+
+/** Caller dürfen die Branding-Tabelle nicht lesen — nur die Namensliste über die geprüfte Datenbankfunktion. */
+async function attachBrandingNames(orders: Order[], supabase: any): Promise<Order[]> {
   const ids = [...new Set(orders.map((o) => o.brandingId).filter((id): id is string => Boolean(id)))];
   if (ids.length === 0) return orders;
   try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin.from("brandings").select("id, shop_name, company_name").in("id", ids);
-    const byId = new Map((data ?? []).map((row) => [String(row.id), row]));
+    const { data } = await supabase.rpc("branding_names");
+    const byId = new Map(((data ?? []) as BrandingNameRow[]).map((row) => [String(row.id), row]));
     return orders.map((order) => {
       const row = order.brandingId ? byId.get(order.brandingId) : null;
       return row ? { ...order, brandingName: row.shop_name ?? row.company_name ?? null } : order;
@@ -222,7 +223,7 @@ export const listOrders = createServerFn({ method: "GET" })
     const { data, error } = await query;
     if (error) throw new Error("Bestellungen konnten nicht geladen werden.");
     const orders = (data ?? []).map((row) => mapRow(row as Row));
-    return role === "caller" ? attachBrandingNames(orders) : orders;
+    return role === "caller" ? attachBrandingNames(orders, context.supabase) : orders;
   });
 
 export const getOrder = createServerFn({ method: "GET" })
@@ -241,7 +242,7 @@ export const getOrder = createServerFn({ method: "GET" })
     if (role === "caller") {
       const scope = await callerScope(context);
       if (!inCallerScope(order, scope)) throw new Error("Kein Zugriff auf diese Bestellung.");
-      return (await attachBrandingNames([order]))[0]!;
+      return (await attachBrandingNames([order], context.supabase))[0]!;
     }
     return order;
   });
