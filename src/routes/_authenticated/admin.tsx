@@ -82,9 +82,10 @@ function AdminPage() {
   const fetchAccount = useServerFn(getMyAccount);
   const fetchStats = useServerFn(getAdminStats);
 
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError, error, refetch, isFetching } = useQuery({
     queryKey: ["my-account"],
     queryFn: () => fetchAccount({}),
+    retry: 1,
   });
 
   const isAdmin = data?.role === "admin";
@@ -92,12 +93,36 @@ function AdminPage() {
   const stats = useQuery({
     queryKey: ["admin-stats"],
     queryFn: () => fetchStats({}),
-    enabled: isAdmin,
+    enabled: isAdmin === true,
+    retry: false,
   });
 
   useEffect(() => {
-    if (data && data.role !== "admin") navigate({ to: "/weiterleitung", replace: true });
+    if (!data || data.role === "admin") return;
+    if (data.role === "caller") navigate({ to: "/admin/bestellungen", replace: true });
+    else navigate({ to: "/weiterleitung", replace: true });
   }, [data, navigate]);
+
+  if (isError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-surface px-5">
+        <div className="w-full max-w-md rounded-xl border border-line bg-card p-8 text-center shadow-sm">
+          <h1 className="text-[18px] font-bold text-hero-text">Verbindung zum Server fehlgeschlagen</h1>
+          <p className="mt-3 break-words text-[13px] leading-relaxed text-conditions">
+            {error instanceof Error ? error.message : "Unbekannter Fehler"}
+          </p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            disabled={isFetching}
+            className="mt-6 rounded-lg bg-brand px-4 py-2 text-[13px] font-semibold text-white disabled:opacity-60"
+          >
+            Erneut versuchen
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isPending || !data || !isAdmin) {
     return (
