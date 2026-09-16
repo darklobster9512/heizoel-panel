@@ -1,3 +1,5 @@
+import { PAYMENT_LABEL } from "@/lib/notify/order-payloads";
+
 const TELEGRAM_API_BASE = "https://api.telegram.org";
 
 const euro = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
@@ -45,6 +47,7 @@ export type OrderNotification = {
   pricePer100: number;
   postalCode: string | null;
   city: string | null;
+  paymentMethod: string | null;
 };
 
 const VARIANT_LABEL: Record<string, string> = {
@@ -62,6 +65,7 @@ export function renderOrderNotification(order: OrderNotification): string {
     `<b>Telefon:</b> ${esc(order.phone ?? "—")}`,
     `<b>Menge:</b> ${number.format(order.liters)} Liter`,
     `<b>Heizöl:</b> ${esc(VARIANT_LABEL[order.variant ?? ""] ?? order.variant ?? "—")}`,
+    `<b>Zahlungsart:</b> ${esc(PAYMENT_LABEL[order.paymentMethod ?? ""] ?? order.paymentMethod ?? "—")}`,
     `<b>Preis:</b> ${euro.format(order.total)} (${euro.format(order.pricePer100)} / 100 L)`,
     `<b>Lieferort:</b> ${esc([order.postalCode, order.city].filter(Boolean).join(" ") || "—")}`,
   ];

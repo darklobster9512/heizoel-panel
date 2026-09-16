@@ -10,7 +10,7 @@ const VARIANT_LABEL: Record<string, string> = {
   premium: "Heizöl Premium",
 };
 
-const PAYMENT_LABEL: Record<string, string> = {
+export const PAYMENT_LABEL: Record<string, string> = {
   vorkasse: "Vorkasse",
   vorauskasse: "Vorkasse",
   ueberweisung: "Überweisung",
