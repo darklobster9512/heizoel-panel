@@ -17,11 +17,22 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   }
 });
 
+// Eigene Adressen, unter denen das Panel erreichbar ist.
+const ALLOWED_ORIGINS = ["https://backend.heizoel-deutschland.com"];
+
 // Start installs this automatically when src/start.ts is absent; defining the
 // file opts out, so re-add it explicitly to keep server functions protected
 // from cross-site requests.
 const csrfMiddleware = createCsrfMiddleware({
   filter: (ctx) => ctx.handlerType === "serverFn",
+  origin: (value, ctx) => {
+    if (ALLOWED_ORIGINS.includes(value)) return true;
+    try {
+      return value === new URL(ctx.request.url).origin;
+    } catch {
+      return false;
+    }
+  },
 });
 
 // Hängt das Supabase-Zugriffstoken an jeden Server-Funktionsaufruf.
@@ -29,8 +40,14 @@ const attachSupabaseAuth = createMiddleware({ type: "function" }).client(async (
   if (typeof window === "undefined") return next();
   try {
     const { supabase } = await import("./integrations/supabase/client");
-    const { data } = await supabase.auth.getSession();
-    const token = data.session?.access_token;
+    let { data } = await supabase.auth.getSession();
+    let token = data.session?.access_token;
+    if (!token) {
+      // Auf eigenen Domains kann die Sitzung beim ersten Aufruf noch nicht
+      // geladen sein — einmal auffrischen, bevor ohne Token gesendet wird.
+      const refreshed = await supabase.auth.refreshSession();
+      token = refreshed.data.session?.access_token;
+    }
     if (token) {
       return next({ headers: { Authorization: `Bearer ${token}` } });
     }

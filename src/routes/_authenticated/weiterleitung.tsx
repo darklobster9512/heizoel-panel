@@ -27,9 +27,10 @@ export const Route = createFileRoute("/_authenticated/weiterleitung")({
 function RedirectPage() {
   const navigate = useNavigate();
   const fetchAccount = useServerFn(getMyAccount);
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError, error, refetch, isFetching } = useQuery({
     queryKey: ["my-account"],
     queryFn: () => fetchAccount({}),
+    retry: 1,
   });
 
   useEffect(() => {
@@ -41,6 +42,31 @@ function RedirectPage() {
   async function handleSignOut() {
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
+  }
+
+  if (isError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-surface px-5">
+        <div className="w-full max-w-md rounded-xl border border-line bg-card p-8 text-center shadow-sm">
+          <Logo className="mx-auto h-auto w-[110px] text-smava-logo" />
+          <h1 className="mt-6 text-[20px] font-bold text-hero-text">
+            Verbindung zum Server fehlgeschlagen
+          </h1>
+          <p className="mt-3 break-words text-[13px] leading-relaxed text-conditions">
+            {error instanceof Error ? error.message : "Unbekannter Fehler"}
+          </p>
+          <div className="mt-6 flex justify-center gap-3">
+            <Button onClick={() => void refetch()} disabled={isFetching}>
+              Erneut versuchen
+            </Button>
+            <Button variant="outline" onClick={handleSignOut} className="border-line text-conditions">
+              <LogOut className="size-4" />
+              Abmelden
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (isPending || data?.role) {
