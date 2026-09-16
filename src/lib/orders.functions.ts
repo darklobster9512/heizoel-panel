@@ -88,14 +88,15 @@ async function requireOrdersAccess(context: OrdersContext): Promise<"admin" | "c
   throw new Error("Kein Zugriff auf die Bestellverwaltung.");
 }
 
-/** Caller dürfen die Branding-Tabelle nicht lesen — Namen serverseitig nachladen. */
-async function attachBrandingNames(orders: Order[]): Promise<Order[]> {
+type BrandingNameRow = { id: string; shop_name: string | null; company_name: string | null };
+
+/** Caller dürfen die Branding-Tabelle nicht lesen — nur die Namensliste über die geprüfte Datenbankfunktion. */
+async function attachBrandingNames(orders: Order[], supabase: any): Promise<Order[]> {
   const ids = [...new Set(orders.map((o) => o.brandingId).filter((id): id is string => Boolean(id)))];
   if (ids.length === 0) return orders;
   try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin.from("brandings").select("id, shop_name, company_name").in("id", ids);
-    const byId = new Map((data ?? []).map((row) => [String(row.id), row]));
+    const { data } = await supabase.rpc("branding_names");
+    const byId = new Map(((data ?? []) as BrandingNameRow[]).map((row) => [String(row.id), row]));
     return orders.map((order) => {
       const row = order.brandingId ? byId.get(order.brandingId) : null;
       return row ? { ...order, brandingName: row.shop_name ?? row.company_name ?? null } : order;
