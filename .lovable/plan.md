@@ -39,6 +39,12 @@ Danach 24 Stunden warten und erneut testen — allein das löst in vielen Fälle
 
 Bleibt die Meldung, Antrag über das Formular in der Fehlermeldung stellen (postmaster.web.de, Fall `r1102`). Da es eine geteilte IP von Resend ist, muss parallel der Resend-Support informiert werden — nur der IP-Betreiber kann eine IP-Reputation bereinigen. Text dafür liefere ich fertig mit.
 
+## Ist unsere Domain jetzt dauerhaft „verbrannt"?
+
+Nein. Die Meldung `r1102` mit dem Zusatz `v=54.240.3.14` bezieht sich ausdrücklich auf die **IP-Adresse**, nicht auf heizoel-deutschland.com. Die Mails wurden abgelehnt, bevor der Inhalt oder die Domain bewertet wurde.
+
+Trotzdem gilt: Mit einer eigenen IP, aber weiterhin ohne DMARC, ist eine erneute Blockade wahrscheinlich — web.de und GMX bewerten dann die Domain, und die ist ohne DMARC schlecht eingestuft. Deshalb ist Schritt 1 in jedem Fall zuerst zu machen, unabhängig davon, ob wir später eine eigene IP holen.
+
 ## Schritt 3 — Dauerhafte Lösung wählen
 
 Wenn Schritt 1 und 2 nicht innerhalb weniger Tage greifen, gibt es zwei belastbare Wege:
