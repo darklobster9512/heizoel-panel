@@ -131,8 +131,7 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
   draw(ctx, `Nr. ${model.invoiceNumber}`, M + ctx.bold.widthOfTextAtSize("Rechnung", 15) + 7, y + 1, 10, false, MUTED);
 
   y -= 24;
-  const restText =
-    model.paymentLabel === "EC-Karte" ? "bei Lieferung vor Ort per EC-Karte" : "bei Lieferung vor Ort in bar";
+  const restText = restTextFor(model.paymentLabel) ?? "bei Lieferung vor Ort";
   const paragraphs = [
     `${model.salutation},`,
     model.bank.isDeposit
