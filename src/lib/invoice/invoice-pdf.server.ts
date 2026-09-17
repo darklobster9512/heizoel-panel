@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 
+import { restTextFor, restTextShortFor } from "@/lib/payment-method";
 import { euro, type InvoiceModel } from "./invoice-data";
 
 const A4 = { width: 595.28, height: 841.89 };
@@ -131,8 +132,7 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
   draw(ctx, `Nr. ${model.invoiceNumber}`, M + ctx.bold.widthOfTextAtSize("Rechnung", 15) + 7, y + 1, 10, false, MUTED);
 
   y -= 24;
-  const restText =
-    model.paymentLabel === "EC-Karte" ? "bei Lieferung vor Ort per EC-Karte" : "bei Lieferung vor Ort in bar";
+  const restText = restTextFor(model.paymentLabel) ?? "bei Lieferung vor Ort";
   const paragraphs = [
     `${model.salutation},`,
     model.bank.isDeposit
@@ -229,8 +229,7 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
   drawRight(ctx, model.bank.amount, right - 12, y - 70, 11, true, GREEN_DARK);
   if (model.bank.isDeposit) {
     drawRight(ctx, "Anzahlung (50 %)", right - 12, y - 81, 6.5, false, MUTED);
-    const remainingMethod =
-      model.paymentLabel === "EC-Karte" ? "bei Lieferung per EC-Karte" : "bei Lieferung in bar";
+    const remainingMethod = restTextShortFor(model.paymentLabel) ?? "bei Lieferung";
     draw(ctx, `Restbetrag: ${model.bank.remaining ?? ""} · ${remainingMethod}`, M + 12, y - 84, 8, false, GREEN_DARK);
   }
   y -= bankHeight;

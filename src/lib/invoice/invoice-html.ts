@@ -1,3 +1,4 @@
+import { restTextFor } from "@/lib/payment-method";
 import { euro, type InvoiceModel } from "./invoice-data";
 
 const GREEN = "#22C55E";
@@ -94,7 +95,7 @@ export function renderInvoiceHtml(model: InvoiceModel) {
     <p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">${model.bank.isDeposit ? "Vielen Dank für Ihre Bestellung. Mit der erforderlichen Anzahlung von 50 % sichern Sie sich den vereinbarten Tagespreis." : "Vielen Dank für Ihre Bestellung. Mit der Vorauszahlung sichern Sie sich den vereinbarten Tagespreis."}</p>
     ${
       model.bank.isDeposit
-        ? `<p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Zur Sicherung des Tagespreises ist eine Anzahlung von 50 % (<strong>${esc(model.bank.amount)}</strong>) erforderlich. Bitte überweisen Sie diese unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}). Den Restbetrag von <strong>${esc(model.bank.remaining ?? "")}</strong> zahlen Sie ${model.paymentLabel === "EC-Karte" ? "bei Lieferung vor Ort per EC-Karte" : "bei Lieferung vor Ort in bar"}.</p>`
+        ? `<p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Zur Sicherung des Tagespreises ist eine Anzahlung von 50 % (<strong>${esc(model.bank.amount)}</strong>) erforderlich. Bitte überweisen Sie diese unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}). Den Restbetrag von <strong>${esc(model.bank.remaining ?? "")}</strong> zahlen Sie ${restTextFor(model.paymentLabel) ?? "bei Lieferung vor Ort"}.</p>`
         : `<p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Bitte überweisen Sie den Gesamtbetrag von <strong>${esc(model.bank.amount)}</strong> unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}).</p>`
     }
   </div>

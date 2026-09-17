@@ -104,13 +104,13 @@ export function renderOrderInvoiceEmail(
   const vatAmount = invoice.totalPrice - net;
   const terms = paymentTerms(invoice.paymentMethod, invoice.totalPrice);
   const { isDeposit, paymentAmount: payAmount, remainingAmount: remaining } = terms;
-  const restText = terms.restText ?? "vor Ort";
+  const restText = terms.restText ?? "bei Lieferung vor Ort";
   const payTitle = isDeposit ? "Bitte überweisen Sie als Anzahlung" : "Bitte überweisen Sie";
   const payHint = isDeposit
-    ? `Zur Sicherung des Tagespreises ist eine <strong style="color:${HEADING}">Anzahlung von 50 %</strong> (${euro.format(payAmount)}) per Überweisung erforderlich. Der Restbetrag von <strong style="color:${HEADING}">${euro.format(remaining)}</strong> wird bei der Lieferung ${restText} bezahlt.`
+    ? `Zur Sicherung des Tagespreises ist eine <strong style="color:${HEADING}">Anzahlung von 50 %</strong> (${euro.format(payAmount)}) per Überweisung erforderlich. Der Restbetrag von <strong style="color:${HEADING}">${euro.format(remaining)}</strong> wird ${restText} bezahlt.`
     : `Ihre Lieferung wird <strong style="color:${HEADING}">nach Zahlungseingang</strong> disponiert. Bitte geben Sie unbedingt den Verwendungszweck an, damit wir Ihre Zahlung zuordnen können.`;
   const intro = isDeposit
-    ? `vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Um den vereinbarten Tagespreis zu sichern, überweisen Sie bitte die Anzahlung von 50 % auf das unten genannte Konto. Den Restbetrag begleichen Sie bei der Lieferung ${restText}.`
+    ? `vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Um den vereinbarten Tagespreis zu sichern, überweisen Sie bitte die Anzahlung von 50 % auf das unten genannte Konto. Den Restbetrag begleichen Sie ${restText}.`
     : `vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Bitte überweisen Sie den Rechnungsbetrag auf das unten genannte Konto.`;
 
   const content = `${emailHeader(branding, r, "Rechnung")}
