@@ -229,7 +229,9 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
   drawRight(ctx, model.bank.amount, right - 12, y - 70, 11, true, GREEN_DARK);
   if (model.bank.isDeposit) {
     drawRight(ctx, "Anzahlung (50 %)", right - 12, y - 81, 6.5, false, MUTED);
-    draw(ctx, model.bank.note ?? "", M + 12, y - 84, 8, false, GREEN_DARK);
+    const remainingMethod =
+      model.paymentLabel === "EC-Karte" ? "bei Lieferung per EC-Karte" : "bei Lieferung in bar";
+    draw(ctx, `Restbetrag: ${model.bank.remaining ?? ""} · ${remainingMethod}`, M + 12, y - 84, 8, false, GREEN_DARK);
   }
   y -= bankHeight;
 
