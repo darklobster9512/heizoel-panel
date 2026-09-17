@@ -104,7 +104,7 @@ export function renderOrderInvoiceEmail(
   const vatAmount = invoice.totalPrice - net;
   const terms = paymentTerms(invoice.paymentMethod, invoice.totalPrice);
   const { isDeposit, paymentAmount: payAmount, remainingAmount: remaining } = terms;
-  const restText = terms.restText ?? "vor Ort";
+  const restText = terms.restText ?? "bei Lieferung vor Ort";
   const payTitle = isDeposit ? "Bitte überweisen Sie als Anzahlung" : "Bitte überweisen Sie";
   const payHint = isDeposit
     ? `Zur Sicherung des Tagespreises ist eine <strong style="color:${HEADING}">Anzahlung von 50 %</strong> (${euro.format(payAmount)}) per Überweisung erforderlich. Der Restbetrag von <strong style="color:${HEADING}">${euro.format(remaining)}</strong> wird bei der Lieferung ${restText} bezahlt.`
