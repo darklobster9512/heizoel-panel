@@ -31,3 +31,9 @@
 - [x] Kurze SMS-Texte: Bestellbestätigung + Rechnung (verweist auf E-Mail, keine Bankdaten)
 - [x] Handy-Vorschau, Zeichenzähler und Kopier-Button
 - [x] Typecheck und Vorschau-Build prüfen
+
+## 2026-09-17 Rechnungsanzahlung
+- [x] Zahlungswerte `bar`, `barzahlung` und EC-Schreibweisen zentral vereinheitlichen
+- [x] 50-%-Anzahlung in E-Mail, HTML-Rechnung und PDF eindeutig ausweisen
+- [x] Bankkonto-Auslastung mit dem tatsächlichen Überweisungsbetrag speichern
+- [x] Zahlungsarten prüfen und Build kontrollieren

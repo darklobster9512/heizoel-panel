@@ -1,4 +1,5 @@
 import { formatIban } from "@/lib/iban";
+import { paymentTerms } from "@/lib/payment-method";
 import {
   addressBox,
   contactBox,
@@ -55,7 +56,7 @@ export type OrderInvoiceData = {
   deliveryWindow: string;
   totalPrice: number;
   phone: string;
-  /** "vorkasse" | "ec" | "barzahlung" — steuert Anzahlung vs. voller Betrag. */
+  /** Zahlungsart; "ec", "bar" und "barzahlung" steuern die 50-%-Anzahlung. */
   paymentMethod?: string | null;
 };
 
@@ -101,17 +102,15 @@ export function renderOrderInvoiceEmail(
   const r = resolveBranding(branding, bank.accountHolder);
   const net = invoice.totalPrice / 1.19;
   const vatAmount = invoice.totalPrice - net;
-  const method = (invoice.paymentMethod ?? "").toLowerCase();
-  const isDeposit = method === "ec" || method === "barzahlung";
-  const payAmount = isDeposit ? Math.round((invoice.totalPrice / 2) * 100) / 100 : invoice.totalPrice;
-  const remaining = Math.round((invoice.totalPrice - payAmount) * 100) / 100;
-  const restText = method === "ec" ? "vor Ort per EC-Karte" : "vor Ort in bar";
+  const terms = paymentTerms(invoice.paymentMethod, invoice.totalPrice);
+  const { isDeposit, paymentAmount: payAmount, remainingAmount: remaining } = terms;
+  const restText = terms.restText ?? "vor Ort";
   const payTitle = isDeposit ? "Bitte überweisen Sie als Anzahlung" : "Bitte überweisen Sie";
   const payHint = isDeposit
-    ? `Es ist eine <strong style="color:${HEADING}">Anzahlung von 50 %</strong> (${euro.format(payAmount)}) per Überweisung fällig. Der Restbetrag von <strong style="color:${HEADING}">${euro.format(remaining)}</strong> wird bei der Lieferung ${restText} bezahlt.`
+    ? `Zur Sicherung des Tagespreises ist eine <strong style="color:${HEADING}">Anzahlung von 50 %</strong> (${euro.format(payAmount)}) per Überweisung erforderlich. Der Restbetrag von <strong style="color:${HEADING}">${euro.format(remaining)}</strong> wird bei der Lieferung ${restText} bezahlt.`
     : `Ihre Lieferung wird <strong style="color:${HEADING}">nach Zahlungseingang</strong> disponiert. Bitte geben Sie unbedingt den Verwendungszweck an, damit wir Ihre Zahlung zuordnen können.`;
   const intro = isDeposit
-    ? `vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Bitte überweisen Sie die Anzahlung von 50 % auf das unten genannte Konto — den Restbetrag begleichen Sie bei der Lieferung ${restText}.`
+    ? `vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Um den vereinbarten Tagespreis zu sichern, überweisen Sie bitte die Anzahlung von 50 % auf das unten genannte Konto. Den Restbetrag begleichen Sie bei der Lieferung ${restText}.`
     : `vielen Dank für Ihre Bestellung bei <strong style="color:${HEADING}">${r.shop}</strong>. Anbei erhalten Sie Ihre Rechnung. Bitte überweisen Sie den Rechnungsbetrag auf das unten genannte Konto.`;
 
   const content = `${emailHeader(branding, r, "Rechnung")}
@@ -192,12 +191,12 @@ ${section(`<div style="font:700 10px/14px ${FONT};color:${MUTED};text-transform:
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
   ${stepRow("&#10003;", "Bestellung eingegangen", "", "done", false)}
   ${stepRow("&#10003;", "Rechnung erhalten", "", "done", false)}
-  ${stepRow("3", "Zahlung", "Überweisen Sie den Rechnungsbetrag unter Angabe des Verwendungszwecks.", "active", false)}
-  ${stepRow("4", "Lieferung", `Nach Zahlungseingang liefern wir zum vereinbarten Termin: ${esc(invoice.deliveryWindow)}.`, "todo", true)}
+  ${stepRow("3", "Zahlung", isDeposit ? "Überweisen Sie die 50-%-Anzahlung unter Angabe des Verwendungszwecks." : "Überweisen Sie den Rechnungsbetrag unter Angabe des Verwendungszwecks.", "active", false)}
+  ${stepRow("4", "Lieferung", isDeposit ? `Nach Eingang der Anzahlung liefern wir zum vereinbarten Termin: ${esc(invoice.deliveryWindow)}. Den Restbetrag zahlen Sie ${restText}.` : `Nach Zahlungseingang liefern wir zum vereinbarten Termin: ${esc(invoice.deliveryWindow)}.`, "todo", true)}
 </table>`)}
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${SURFACE};border-radius:6px"><tr><td style="padding:18px 20px;font:400 13px/24px ${FONT};color:${TEXT}">
-  • Bitte überweisen Sie <strong style="color:${HEADING}">selbstständig</strong> — es erfolgt kein Bankeinzug<br />
+  • Bitte überweisen Sie ${isDeposit ? `die <strong style="color:${HEADING}">50-%-Anzahlung zur Sicherung des Tagespreises</strong>` : `<strong style="color:${HEADING}">selbstständig</strong>`} — es erfolgt kein Bankeinzug<br />
   • Geben Sie als Verwendungszweck Ihre <strong style="color:${HEADING}">Auftragsnummer ${esc(invoice.orderNumber)}</strong> an<br />
   • Stellen Sie sicher, dass am Liefertag <strong style="color:${HEADING}">jemand vor Ort ist</strong><br />
   • Bei Fragen antworten Sie einfach auf diese E-Mail
@@ -217,7 +216,9 @@ ${emailFooter(branding, r)}`;
 
   return emailShell(
     `Rechnung ${esc(invoice.invoiceNumber)}`,
-    `Ihre Rechnung ${esc(invoice.invoiceNumber)} über ${euro.format(invoice.totalPrice)}.`,
+    isDeposit
+      ? `Ihre Rechnung ${esc(invoice.invoiceNumber)}: 50 % Anzahlung zur Sicherung des Tagespreises.`
+      : `Ihre Rechnung ${esc(invoice.invoiceNumber)} über ${euro.format(invoice.totalPrice)}.`,
     content,
   );
 }

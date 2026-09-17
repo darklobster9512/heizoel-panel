@@ -1,5 +1,6 @@
 import { cleanRegisterNumber, formatIban, invoiceNumberFor } from "@/lib/iban";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
+import { paymentTerms } from "@/lib/payment-method";
 
 export type InvoiceCompany = {
   name: string;
@@ -86,14 +87,6 @@ export const number = new Intl.NumberFormat("de-DE");
 
 const VARIANT_LABEL: Record<string, string> = { standard: "Heizöl Standard", premium: "Heizöl Premium" };
 
-const PAYMENT_LABEL: Record<string, string> = {
-  vorkasse: "Vorkasse",
-  vorauskasse: "Vorkasse",
-  ueberweisung: "Überweisung",
-  barzahlung: "Barzahlung",
-  ec: "EC-Karte",
-};
-
 const PERIOD_LABEL: Record<string, string> = {
   vormittag: "8:00 - 12:00 Uhr",
   nachmittag: "12:00 - 17:00 Uhr",
@@ -162,14 +155,7 @@ function bankFor(
   gross: number,
   override?: InvoiceBankOverride | null,
 ): InvoiceBank {
-  const deposit = order.paymentMethod === "ec" || order.paymentMethod === "barzahlung";
-  const half = Math.round((gross / 2) * 100) / 100;
-  const restLabel =
-    order.paymentMethod === "ec"
-      ? "bei Lieferung vor Ort per EC-Karte"
-      : order.paymentMethod === "barzahlung"
-        ? "bei Lieferung vor Ort in bar"
-        : null;
+  const terms = paymentTerms(order.paymentMethod, gross);
   return {
     accountHolder: override
       ? override.accountHolder
@@ -177,13 +163,13 @@ function bankFor(
     bankName: override ? override.bankName : value(branding.bankName, "Commerzbank AG"),
     iban: formatIban(override ? override.iban : value(branding.iban, "DE89 3704 0044 0532 0130 00")),
     bic: override ? override.bic : value(branding.bic, "COBADEFFXXX"),
-    amount: euro.format(deposit ? half : gross),
+    amount: euro.format(terms.paymentAmount),
     reference: order.orderNumber,
-    isDeposit: deposit,
-    remaining: deposit && restLabel ? euro.format(gross - half) : null,
+    isDeposit: terms.isDeposit,
+    remaining: terms.isDeposit ? euro.format(terms.remainingAmount) : null,
     note:
-      deposit && restLabel
-        ? `Anzahlung (50 % von ${euro.format(gross)}) — Restbetrag ${euro.format(gross - half)} ${restLabel}`
+      terms.isDeposit && terms.restText
+        ? `Anzahlung (50 % von ${euro.format(gross)}) zur Sicherung des Tagespreises — Restbetrag ${euro.format(terms.remainingAmount)} ${terms.restText}`
         : null,
   };
 }
@@ -206,9 +192,7 @@ export function buildInvoiceModel(
     invoiceNumber: invoiceNumberFor(order.orderNumber),
     customerNumber: customerNumber(order.orderNumber),
     date: formatDate(order.placedAt),
-    paymentLabel: order.paymentMethod
-      ? (PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod)
-      : "Vorkasse",
+    paymentLabel: paymentTerms(order.paymentMethod, gross).label,
     company: {
       name: value(branding.companyName, "Muster-Energie GmbH"),
       street: value(branding.streetAddress, "Unter den Linden 16"),

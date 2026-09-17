@@ -91,10 +91,10 @@ export function renderInvoiceHtml(model: InvoiceModel) {
   <div style="margin-top:16mm">
     <div style="font:700 17px/24px ${FONT};color:${HEADING}">Rechnung <span style="font:400 12px/24px ${FONT};color:${MUTED}">Nr. ${esc(model.invoiceNumber)}</span></div>
     <p style="margin:10px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">${esc(model.salutation)},</p>
-    <p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">vielen Dank für Ihre Bestellung. Mit der Vorauszahlung sichern Sie sich den heutigen Tagespreis.</p>
+    <p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">${model.bank.isDeposit ? "Vielen Dank für Ihre Bestellung. Mit der erforderlichen Anzahlung von 50 % sichern Sie sich den vereinbarten Tagespreis." : "Vielen Dank für Ihre Bestellung. Mit der Vorauszahlung sichern Sie sich den vereinbarten Tagespreis."}</p>
     ${
       model.bank.isDeposit
-        ? `<p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Wir bitten um eine Anzahlung von 50 % (<strong>${esc(model.bank.amount)}</strong>) unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}). Den Restbetrag von <strong>${esc(model.bank.remaining ?? "")}</strong> zahlen Sie ${model.paymentLabel === "EC-Karte" ? "bei Lieferung vor Ort per EC-Karte" : "bei Lieferung vor Ort in bar"}.</p>`
+        ? `<p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Zur Sicherung des Tagespreises ist eine Anzahlung von 50 % (<strong>${esc(model.bank.amount)}</strong>) erforderlich. Bitte überweisen Sie diese unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}). Den Restbetrag von <strong>${esc(model.bank.remaining ?? "")}</strong> zahlen Sie ${model.paymentLabel === "EC-Karte" ? "bei Lieferung vor Ort per EC-Karte" : "bei Lieferung vor Ort in bar"}.</p>`
         : `<p style="margin:8px 0 0;font:400 11.5px/19px ${FONT};color:${TEXT}">Bitte überweisen Sie den Gesamtbetrag von <strong>${esc(model.bank.amount)}</strong> unter Angabe der Rechnungsnummer <strong>${esc(model.invoiceNumber)}</strong> auf das unten genannte Konto (IBAN ${esc(model.bank.iban)}).</p>`
     }
   </div>
@@ -132,7 +132,7 @@ export function renderInvoiceHtml(model: InvoiceModel) {
   </table>
 
   <div style="margin-top:7mm;background:${GREEN_SOFT};border-left:3px solid ${GREEN};padding:12px 14px">
-    <div style="font:700 8.5px/13px ${FONT};color:${GREEN_DARK};letter-spacing:.8px;text-transform:uppercase">Zahlungsdaten · Bitte überweisen Sie auf folgendes Konto</div>
+    <div style="font:700 8.5px/13px ${FONT};color:${GREEN_DARK};letter-spacing:.8px;text-transform:uppercase">${model.bank.isDeposit ? "Zahlungsdaten · 50 % Anzahlung zur Sicherung des Tagespreises" : "Zahlungsdaten · Bitte überweisen Sie auf folgendes Konto"}</div>
     <div style="margin-top:8px;display:flex;gap:24px">
       <div style="flex:1">
         <div style="font:400 8.5px/13px ${FONT};color:${MUTED}">Empfänger</div>
