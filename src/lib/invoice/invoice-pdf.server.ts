@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 
+import { restTextFor, restTextShortFor } from "@/lib/payment-method";
 import { euro, type InvoiceModel } from "./invoice-data";
 
 const A4 = { width: 595.28, height: 841.89 };
