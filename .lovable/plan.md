@@ -45,11 +45,15 @@ Nein. Die beiden Meldungen `r1102` mit `v=54.240.3.14` und `v=54.240.3.25` bezie
 
 Trotzdem gilt: Mit einer eigenen IP, aber weiterhin ohne DMARC, ist eine erneute Blockade wahrscheinlich — web.de und GMX bewerten dann die Domain, und die ist ohne DMARC schlecht eingestuft. Deshalb ist Schritt 1 in jedem Fall zuerst zu machen, unabhängig davon, ob wir später eine eigene IP holen.
 
+## Wichtig zum bereits gebuchten Resend-Tarif
+
+Der neue Versandversuch lief über `54.240.3.28` — erneut eine Gemeinschafts-IP, nicht über eine eigene IP. Ein Upgrade auf Resend Pro weist **keine** eigene IP zu. Resend bietet die „Managed Dedicated IP" als separates Add-on erst ab Scale an und empfiehlt sie nur bei mehr als 3.000 E-Mails pro Tag. Der gebuchte Tarif löst dieses Problem daher nicht und sollte bei Resend storniert bzw. erstattet werden.
+
 ## Schritt 3 — Dauerhafte Lösung wählen
 
 Wenn Schritt 1 und 2 nicht innerhalb weniger Tage greifen, gibt es zwei belastbare Wege:
 
-- **Eigene Versand-IP bei Resend** (kostenpflichtiger Tarif). Die IP gehört dann nur uns, Reputation wird sauber aufgebaut. Braucht 2–3 Wochen Einlaufzeit mit steigendem Volumen.
+- **Eigene Versand-IP bei Resend** ist bei unserem niedrigen Versandvolumen ausdrücklich nicht empfohlen und nur als separates Scale-Add-on erhältlich. Diese Variante streichen wir daher, sofern das Volumen nicht dauerhaft über 3.000 Mails pro Tag liegt.
 - **Zweiter Versanddienst für deutsche Freemail-Adressen.** Ein EU-Anbieter mit guter web.de/GMX-Reputation übernimmt nur Empfänger auf web.de, gmx.de, gmx.net und t-online.de, alles andere bleibt bei Resend.
 
 ## Technische Umsetzung im Panel
