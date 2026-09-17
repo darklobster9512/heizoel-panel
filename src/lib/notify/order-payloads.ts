@@ -4,6 +4,7 @@ import type { OrderInvoiceData } from "@/lib/email-templates/order-invoice";
 import type { SmsBranding, SmsDemoData } from "@/lib/sms-templates";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
 import { invoiceNumberFor } from "@/lib/iban";
+import { paymentMethodLabel } from "@/lib/payment-method";
 
 const VARIANT_LABEL: Record<string, string> = {
   standard: "Heizöl Standard",
@@ -15,6 +16,7 @@ export const PAYMENT_LABEL: Record<string, string> = {
   vorauskasse: "Vorkasse",
   ueberweisung: "Überweisung",
   barzahlung: "Barzahlung",
+  bar: "Barzahlung",
   ec: "EC-Karte",
 };
 
@@ -133,8 +135,6 @@ export function confirmationDataFrom(order: Order): OrderConfirmationData {
   return {
     ...base(order),
     orderNumber: order.orderNumber,
-    paymentMethod: order.paymentMethod
-      ? (PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod)
-      : "Vorkasse",
+    paymentMethod: paymentMethodLabel(order.paymentMethod),
   };
 }

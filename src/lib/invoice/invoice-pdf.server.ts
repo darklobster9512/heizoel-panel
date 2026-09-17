@@ -135,10 +135,13 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
     model.paymentLabel === "EC-Karte" ? "bei Lieferung vor Ort per EC-Karte" : "bei Lieferung vor Ort in bar";
   const paragraphs = [
     `${model.salutation},`,
-    "vielen Dank für Ihre Bestellung. Mit der Vorauszahlung sichern Sie sich den heutigen Tagespreis.",
+    model.bank.isDeposit
+      ? "Vielen Dank für Ihre Bestellung. Mit der erforderlichen Anzahlung von 50 % sichern Sie sich den Tagespreis."
+      : "Vielen Dank für Ihre Bestellung. Mit der Vorauszahlung sichern Sie sich den heutigen Tagespreis.",
     ...(model.bank.isDeposit
       ? [
-          `Wir bitten um eine Anzahlung von 50 % (${model.bank.amount}) unter Angabe der Rechnungsnummer`,
+          `Zur Sicherung des Tagespreises ist eine Anzahlung von 50 % (${model.bank.amount}) erforderlich.`,
+          "Bitte überweisen Sie diese unter Angabe der Rechnungsnummer",
           `${model.invoiceNumber} auf das unten genannte Konto (IBAN ${model.bank.iban}).`,
           `Den Restbetrag von ${model.bank.remaining ?? ""} zahlen Sie ${restText}.`,
         ]
@@ -197,13 +200,13 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
 
   // Zahlungsdaten
   y -= 26;
-  const bankHeight = model.bank.isDeposit ? 92 : 78;
+  const bankHeight = model.bank.isDeposit ? 96 : 78;
   page.drawRectangle({ x: M, y: y - bankHeight, width: right - M, height: bankHeight, color: GREEN_SOFT });
   page.drawRectangle({ x: M, y: y - bankHeight, width: 2.5, height: bankHeight, color: GREEN });
   draw(
     ctx,
     model.bank.isDeposit
-      ? "ZAHLUNGSDATEN · 50 % ANZAHLUNG AUF FOLGENDES KONTO"
+      ? "ZAHLUNGSDATEN · 50 % ANZAHLUNG ZUR SICHERUNG DES TAGESPREISES"
       : "ZAHLUNGSDATEN · BITTE ÜBERWEISEN SIE AUF FOLGENDES KONTO",
     M + 12,
     y - 16,

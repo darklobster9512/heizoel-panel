@@ -18,6 +18,7 @@ import {
 import { renderOrderInvoiceSms, smsSender } from "@/lib/sms-templates";
 import { invoiceNumberFor } from "@/lib/iban";
 import type { Order, OrderAddress, OrderStatus } from "@/lib/orders.functions";
+import { paymentTerms } from "@/lib/payment-method";
 
 export type GenerateInvoiceResult = {
   id: string;
@@ -324,6 +325,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
       iban: String(bankRow.iban),
       bic: String(bankRow.bic),
     });
+    const terms = paymentTerms(order.paymentMethod, order.total);
 
     const { renderInvoicePdfBytes } = await import("@/lib/invoice/invoice-pdf.server");
     const bytes = await renderInvoicePdfBytes(model);
@@ -341,7 +343,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
       bank_account_id: data.bankAccountId,
       branding_id: brandingId,
       invoice_number: invoiceNumberFor(order.orderNumber),
-      amount: order.total,
+      amount: terms.paymentAmount,
       pdf_path: pdfPath,
       model: JSON.parse(JSON.stringify(model)),
       created_by: context.userId,
