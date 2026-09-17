@@ -61,3 +61,19 @@ export function paymentTerms(value: string | null | undefined, total: number): P
     restText: REST_TEXT[method] ?? null,
   };
 }
+
+/** Kurztext für den Restbetrag, abgeleitet aus Zahlungsart oder Label. */
+export function restTextFor(value: string | null | undefined): string | null {
+  return REST_TEXT[normalizePaymentMethod(value)] ?? null;
+}
+
+/** Kompakte Variante für enge Layouts (PDF). */
+const REST_TEXT_SHORT: Partial<Record<NormalizedPaymentMethod, string>> = {
+  ec: "bei Lieferung per EC-Karte",
+  barzahlung: "bei Lieferung in bar",
+  rechnung: "per Rechnung nach Lieferung",
+};
+
+export function restTextShortFor(value: string | null | undefined): string | null {
+  return REST_TEXT_SHORT[normalizePaymentMethod(value)] ?? null;
+}
