@@ -1,3 +1,4 @@
+import { restTextFor } from "@/lib/payment-method";
 import { euro, type InvoiceModel } from "./invoice-data";
 
 const GREEN = "#22C55E";
