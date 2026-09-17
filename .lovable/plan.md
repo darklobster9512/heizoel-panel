@@ -2,7 +2,7 @@
 
 ## Was wirklich passiert
 
-Die Ablehnung kommt nicht aus dem Panel und nicht aus dem Rechnungs- oder Bestellcode. web.de und GMX (derselbe Betreiber) blockieren die Versand-IP 54.240.3.14. Das ist eine geteilte Amazon-Versand-IP, die Resend für alle Kunden ohne eigene IP benutzt. Deshalb hat der Wechsel auf einen neuen Resend-Account nichts geändert: Der Account ist neu, die IP ist dieselbe.
+Die Ablehnung kommt nicht aus dem Panel und nicht aus dem Rechnungs- oder Bestellcode. web.de und GMX (derselbe Betreiber) blockieren die von Resend verwendeten Versand-IPs. Beim alten Account war es `54.240.3.14`, beim neuen Account ist es `54.240.3.25`. Beide gehören zum selben geteilten Amazon-Versandpool von Resend. Deshalb hat der Accountwechsel nichts geändert: Der neue Account bekam zwar eine andere IP, aber wieder eine bereits blockierte Gemeinschafts-IP.
 
 Zusätzlich fehlt bei der Absenderdomain ein Eintrag, den web.de und GMX praktisch voraussetzen.
 
@@ -41,7 +41,7 @@ Bleibt die Meldung, Antrag über das Formular in der Fehlermeldung stellen (post
 
 ## Ist unsere Domain jetzt dauerhaft „verbrannt"?
 
-Nein. Die Meldung `r1102` mit dem Zusatz `v=54.240.3.14` bezieht sich ausdrücklich auf die **IP-Adresse**, nicht auf heizoel-deutschland.com. Die Mails wurden abgelehnt, bevor der Inhalt oder die Domain bewertet wurde.
+Nein. Die beiden Meldungen `r1102` mit `v=54.240.3.14` und `v=54.240.3.25` beziehen sich ausdrücklich auf die **IP-Adressen**, nicht auf heizoel-deutschland.com. Dass zwei neue Resend-Zugangsdaten zwei verschiedene blockierte IPs liefern, ist ein sehr deutlicher Nachweis für ein Problem mit dem gemeinsamen Resend-Versandpool.
 
 Trotzdem gilt: Mit einer eigenen IP, aber weiterhin ohne DMARC, ist eine erneute Blockade wahrscheinlich — web.de und GMX bewerten dann die Domain, und die ist ohne DMARC schlecht eingestuft. Deshalb ist Schritt 1 in jedem Fall zuerst zu machen, unabhängig davon, ob wir später eine eigene IP holen.
 
