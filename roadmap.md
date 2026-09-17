@@ -33,7 +33,7 @@
 - [x] Typecheck und Vorschau-Build prüfen
 
 ## 2026-09-17 Rechnungsanzahlung
-- [ ] Zahlungswerte `bar`, `barzahlung` und EC-Schreibweisen zentral vereinheitlichen
-- [ ] 50-%-Anzahlung in E-Mail, HTML-Rechnung und PDF eindeutig ausweisen
-- [ ] Bankkonto-Auslastung mit dem tatsächlichen Überweisungsbetrag speichern
-- [ ] Zahlungsarten prüfen und Build kontrollieren
+- [x] Zahlungswerte `bar`, `barzahlung` und EC-Schreibweisen zentral vereinheitlichen
+- [x] 50-%-Anzahlung in E-Mail, HTML-Rechnung und PDF eindeutig ausweisen
+- [x] Bankkonto-Auslastung mit dem tatsächlichen Überweisungsbetrag speichern
+- [x] Zahlungsarten prüfen und Build kontrollieren
