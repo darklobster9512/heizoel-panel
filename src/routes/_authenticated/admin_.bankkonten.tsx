@@ -329,6 +329,11 @@ function BankAccountOrdersDialog({ account, onClose }: { account: BankAccount | 
                 <span className="rounded-full bg-surface px-2.5 py-1 text-[11px] font-semibold text-muted-custom">
                   {ORDER_STATUS_LABEL[entry.status]}
                 </span>
+                {entry.countsTowardLimit ? null : (
+                  <span className="rounded-full border border-line px-2.5 py-1 text-[11px] font-semibold text-muted-custom">
+                    nicht angerechnet
+                  </span>
+                )}
                 {entry.status === "angekommen" ? (
                   <span className="flex items-center gap-1 text-[12px] font-semibold text-brand-hover"><Check className="size-4" /> Angekommen</span>
                 ) : (
