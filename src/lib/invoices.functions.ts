@@ -63,6 +63,7 @@ export type BankAccountOrder = {
   status: OrderStatus;
   placedAt: string;
   createdAt: string;
+  countsTowardLimit: boolean;
 };
 
 
