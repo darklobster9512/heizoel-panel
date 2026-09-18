@@ -232,6 +232,7 @@ export const listBankAccountOrders = createServerFn({ method: "GET" })
         status: (row.orders?.status ?? "neu") as OrderStatus,
         placedAt: String(row.orders?.placed_at ?? row.created_at),
         createdAt: String(row.created_at),
+        countsTowardLimit: row.orders?.status !== "kein_interesse",
       };
     });
   });
