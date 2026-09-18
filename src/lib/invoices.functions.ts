@@ -150,7 +150,7 @@ export const getBankAccountUsage = createServerFn({ method: "GET" })
         .from("bank_accounts")
         .select("id, name, iban, bic, bank_name, limit_amount, is_active")
         .order("created_at", { ascending: true }),
-      context.supabase.from("invoices").select("bank_account_id, amount"),
+      context.supabase.from("invoices").select("bank_account_id, amount, orders(status)"),
     ]);
     if (accounts.error) throw new Error("Bankkonten konnten nicht geladen werden.");
     if (invoices.error) throw new Error("Rechnungen konnten nicht geladen werden.");
@@ -159,6 +159,9 @@ export const getBankAccountUsage = createServerFn({ method: "GET" })
     for (const entry of invoices.data ?? []) {
       const key = text((entry as { bank_account_id: unknown }).bank_account_id);
       if (!key) continue;
+      // Bestellungen ohne Interesse blockieren das Limit nicht mehr.
+      const status = (entry as { orders?: { status?: unknown } | null }).orders?.status;
+      if (status === "kein_interesse") continue;
       const current = used.get(key) ?? { amount: 0, count: 0 };
       current.amount += num((entry as { amount: unknown }).amount);
       current.count += 1;
