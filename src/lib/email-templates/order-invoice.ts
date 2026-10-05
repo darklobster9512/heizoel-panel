@@ -1,3 +1,4 @@
+import { vatPercentFor, vatRateFor } from "@/lib/branding-country";
 import { formatIban } from "@/lib/iban";
 import { paymentTerms } from "@/lib/payment-method";
 import {
@@ -100,7 +101,8 @@ export function renderOrderInvoiceEmail(
     ? { ...bankOverride, iban: formatIban(bankOverride.iban) }
     : bankFrom(branding);
   const r = resolveBranding(branding, bank.accountHolder);
-  const net = invoice.totalPrice / 1.19;
+  const vatPercent = vatPercentFor(branding.country);
+  const net = invoice.totalPrice / (1 + vatRateFor(branding.country));
   const vatAmount = invoice.totalPrice - net;
   const terms = paymentTerms(invoice.paymentMethod, invoice.totalPrice);
   const { isDeposit, paymentAmount: payAmount, remainingAmount: remaining } = terms;
@@ -152,7 +154,7 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
   ${orderRow("Menge", `${number.format(invoice.liters)} Liter`, true)}
   ${orderRow("Preis / 100 L", euro.format(invoice.pricePer100L), false)}
   ${orderRow("Zwischensumme (netto)", euro.format(net), true)}
-  ${orderRow("Umsatzsteuer (19 %)", euro.format(vatAmount), false)}
+  ${orderRow(`Umsatzsteuer (${vatPercent} %)`, euro.format(vatAmount), false)}
   <tr>
     <td style="padding:16px;font:700 15px/20px ${FONT};color:${HEADING}">Rechnungsbetrag</td>
     <td align="right" style="padding:16px;font:700 20px/24px ${FONT};color:${HEADING}">${euro.format(invoice.totalPrice)}</td>

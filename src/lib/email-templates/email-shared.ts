@@ -1,3 +1,4 @@
+import { flagColorsFor, type BrandingCountry } from "@/lib/branding-country";
 import { cleanRegisterNumber } from "@/lib/iban";
 
 export type EmailBranding = {
@@ -17,6 +18,7 @@ export type EmailBranding = {
   iban: string | null;
   bankName: string | null;
   bic: string | null;
+  country?: BrandingCountry | null;
 };
 
 export const GREEN = "#22C55E";
@@ -58,15 +60,16 @@ export function stars(size: number, color = GOLD) {
   return `<span style="font:700 ${size}px/${size + 4}px ${FONT};color:${color};letter-spacing:2px">&#9733;&#9733;&#9733;&#9733;&#9733;</span>`;
 }
 
-export function flagBar(big: boolean) {
+export function flagBar(big: boolean, country?: BrandingCountry | null) {
+  const [c1, c2, c3] = flagColorsFor(country);
   const w = big ? 14 : 12;
   const h1 = big ? 19 : 16;
   const h2 = big ? 20 : 16;
   const h3 = big ? 19 : 16;
   return `<div style="width:${w}px;height:${big ? 58 : 48}px;border-radius:3px;overflow:hidden;font-size:0;line-height:0">
-    <div style="width:${w}px;height:${h1}px;background:${BLACK};font-size:0;line-height:0">&nbsp;</div>
-    <div style="width:${w}px;height:${h2}px;background:${RED};font-size:0;line-height:0">&nbsp;</div>
-    <div style="width:${w}px;height:${h3}px;background:${GERMAN_GOLD};font-size:0;line-height:0">&nbsp;</div>
+    <div style="width:${w}px;height:${h1}px;background:${c1};font-size:0;line-height:0">&nbsp;</div>
+    <div style="width:${w}px;height:${h2}px;background:${c2};font-size:0;line-height:0">&nbsp;</div>
+    <div style="width:${w}px;height:${h3}px;background:${c3};font-size:0;line-height:0">&nbsp;</div>
   </div>`;
 }
 
@@ -84,7 +87,7 @@ export function logoBlock(branding: EmailBranding, shop: string, big: boolean) {
     return `<img src="${esc(branding.logoUrl)}" alt="${shop}" width="${big ? 210 : 180}" style="display:block;max-width:${big ? 210 : 180}px;height:auto;border:0" />`;
   }
   return `<table role="presentation" cellpadding="0" cellspacing="0"><tr>
-    <td valign="middle" style="padding-right:12px">${flagBar(big)}</td>
+    <td valign="middle" style="padding-right:12px">${flagBar(big, branding.country)}</td>
     <td valign="middle">
       <div style="font:700 ${big ? 34 : 28}px/${big ? 36 : 30}px ${FONT};color:${HEADING};letter-spacing:-.5px;text-transform:uppercase">${shopLogoText(shop)}</div>
       <div style="margin-top:4px">${stars(big ? 17 : 15)} <span style="font:700 ${big ? 17 : 15}px/20px ${FONT};color:${HEADING}">4,9</span></div>

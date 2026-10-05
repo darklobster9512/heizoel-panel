@@ -58,6 +58,7 @@ export type Branding = {
   id: string;
   publicId: string;
   status: "draft" | "active";
+  country: "DE" | "AT";
   logoPath: string | null;
   logoUrl: string | null;
   companyName: string | null;
@@ -120,6 +121,7 @@ async function withLogoUrl(
     id: String(row.id),
     publicId: String(row.public_id),
     status: row.status === "active" ? "active" : "draft",
+    country: (row as { country?: string }).country === "AT" ? "AT" : "DE",
     logoPath,
     logoUrl: signed?.data?.signedUrl ?? null,
     companyName: typeof row.company_name === "string" ? row.company_name : null,
@@ -194,6 +196,7 @@ export const saveBranding = createServerFn({ method: "POST" })
     }
     const payload = {
       status: data.status,
+      country: data.country,
       logo_path: data.logoPath,
       company_name: data.companyName,
       shop_name: data.shopName,
