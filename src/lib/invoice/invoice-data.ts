@@ -1,6 +1,7 @@
 import { cleanRegisterNumber, formatIban, invoiceNumberFor } from "@/lib/iban";
 import type { Order, OrderAddress } from "@/lib/orders.functions";
 import { paymentTerms } from "@/lib/payment-method";
+import { vatPercentFor, vatRateFor, type BrandingCountry } from "@/lib/branding-country";
 
 export type InvoiceCompany = {
   name: string;
@@ -46,6 +47,8 @@ export type InvoiceModel = {
   net: number;
   vat: number;
   gross: number;
+  vatPercent: number;
+  country: BrandingCountry;
 };
 
 export type InvoiceBranding = {
@@ -63,6 +66,7 @@ export type InvoiceBranding = {
   iban: string | null;
   bankName: string | null;
   bic: string | null;
+  country?: BrandingCountry | null;
 };
 
 export const INVOICE_FALLBACK_BRANDING: InvoiceBranding = {
@@ -181,7 +185,8 @@ export function buildInvoiceModel(
 ): InvoiceModel {
   const billing = order.billingAddress ?? order.deliveryAddress;
   const gross = order.total;
-  const net = gross / 1.19;
+  const country: BrandingCountry = branding.country === "AT" ? "AT" : "DE";
+  const net = gross / (1 + vatRateFor(country));
   const weekday = formatWeekday(order.slotDate);
   const period = order.slotPeriod ? (PERIOD_LABEL[order.slotPeriod] ?? order.slotPeriod) : null;
   const variantLabel = VARIANT_LABEL[order.variant] ?? "Heizöl Standard";
@@ -218,6 +223,8 @@ export function buildInvoiceModel(
     net,
     vat: gross - net,
     gross,
+    vatPercent: vatPercentFor(country),
+    country,
   };
 }
 

@@ -1,0 +1,1 @@
+ALTER TABLE public.brandings ADD COLUMN country text NOT NULL DEFAULT 'DE' CHECK (country IN ('DE','AT'));

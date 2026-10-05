@@ -45,6 +45,7 @@ export function emailBrandingFrom(row: BrandingRow | null, logoUrl: string | nul
     email: str(row?.["email"]),
     domain: str(row?.["domain"]),
     logoUrl,
+    country: row?.["country"] === "AT" ? "AT" : "DE",
     accountHolder: str(row?.["account_holder"]),
     iban: str(row?.["iban"]),
     bankName: str(row?.["bank_name"]),

@@ -1,3 +1,4 @@
+import { flagColorsFor } from "@/lib/branding-country";
 import { restTextFor } from "@/lib/payment-method";
 import { euro, type InvoiceModel } from "./invoice-data";
 
@@ -28,7 +29,7 @@ function logo(model: InvoiceModel) {
     return `<img src="${esc(model.company.logoUrl)}" alt="${esc(model.company.shopName)}" style="max-height:52px;max-width:190px;display:block" />`;
   }
   return `<div style="display:flex;align-items:center;gap:9px">
-    <span style="display:block;width:7px;height:34px;background:linear-gradient(to bottom,#000 0 33.3%,#DD0000 33.3% 66.6%,#FFCE00 66.6% 100%)"></span>
+    <span style="display:block;width:7px;height:34px;background:linear-gradient(to bottom,${flagColorsFor(model.country)[0]} 0 33.3%,${flagColorsFor(model.country)[1]} 33.3% 66.6%,${flagColorsFor(model.country)[2]} 66.6% 100%);box-shadow:0 0 0 .5px #D1D5DB"></span>
     <span style="font:700 24px/26px ${FONT};letter-spacing:-.5px;color:${HEADING}">${shopNameLogo(model.company.shopName)}</span>
   </div>`;
 }
@@ -128,7 +129,7 @@ export function renderInvoiceHtml(model: InvoiceModel) {
 
   <table style="border-collapse:collapse;margin:5mm 0 0 auto">
     ${sumRow("Nettobetrag", euro.format(model.net), false)}
-    ${sumRow("zzgl. 19 % MwSt.", euro.format(model.vat), false)}
+    ${sumRow(`zzgl. ${model.vatPercent} % MwSt.`, euro.format(model.vat), false)}
     ${sumRow("Gesamtbetrag inkl. MwSt.", euro.format(model.gross), true)}
   </table>
 

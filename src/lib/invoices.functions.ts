@@ -292,6 +292,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
           iban: text(brandingRow.iban),
           bankName: text(brandingRow.bank_name),
           bic: text(brandingRow.bic),
+          country: (brandingRow as { country?: string }).country === "AT" ? "AT" : "DE",
         };
       }
     }

@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { BRANDING_COUNTRIES, vatPercentFor } from "@/lib/branding-country";
 import { saveBranding, type Branding, type BrandingInput } from "@/lib/brandings.functions";
 
 type FormValues = Omit<BrandingInput, "id" | "status">;
 
 const EMPTY: FormValues = {
+  country: "DE",
   logoPath: null,
   companyName: "",
   shopName: "",
@@ -35,6 +37,7 @@ const EMPTY: FormValues = {
 function initialValues(branding?: Branding | null): FormValues {
   if (!branding) return EMPTY;
   return {
+    country: branding.country,
     logoPath: branding.logoPath,
     companyName: branding.companyName ?? "",
     shopName: branding.shopName ?? "",
@@ -63,7 +66,7 @@ const REQUIRED: (keyof FormValues)[] = [
 const FIELD_ERRORS: Record<string, string> = {
   domain: "Bitte eine gültige Domain angeben, z. B. mein-shop.de.",
   email: "Bitte eine gültige E-Mail-Adresse angeben.",
-  vatId: "Die USt-IdNr. muss im Format DE123456789 angegeben werden.",
+  vatId: "Die USt-IdNr. muss im Format DE123456789 bzw. ATU12345678 angegeben werden.",
   resendSenderEmail: "Bitte eine gültige Absender-E-Mail für Resend angeben.",
   sevenSenderName: "Der Seven.io-Absendername darf höchstens 11 Zeichen lang sein.",
 };
@@ -200,6 +203,13 @@ export function BrandingForm({ branding }: { branding?: Branding | null }) {
           </div>
           <Field id="companyName" label="Unternehmensname" value={values.companyName ?? ""} onChange={setValue} required placeholder="Musterheizöl GmbH" />
           <Field id="shopName" label="Shopname" value={values.shopName ?? ""} onChange={setValue} required placeholder="Heizöl-Shop Musterstadt" />
+          <div className="sm:col-span-2">
+            <Label htmlFor="country">Land</Label>
+            <select id="country" value={values.country ?? "DE"} onChange={(event) => setValue("country", event.target.value)} className="mt-2 h-10 w-full rounded-md border border-input bg-background px-3 text-[14px] text-conditions">
+              {BRANDING_COUNTRIES.map((c) => <option key={c.value} value={c.value}>{c.label} ({vatPercentFor(c.value)} % MwSt.)</option>)}
+            </select>
+            <p className="mt-1 text-[12px] text-muted-custom">Bestimmt den MwSt.-Satz und den Flaggenstreifen auf Rechnungen und E-Mails.</p>
+          </div>
         </Section>
 
         <Section icon={<MapPin className="size-4" />} title="Firmensitz" description="Vollständige Geschäftsanschrift des Unternehmens.">

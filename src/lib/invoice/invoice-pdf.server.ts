@@ -1,3 +1,4 @@
+import { flagColorsFor } from "@/lib/branding-country";
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 
 import { restTextFor, restTextShortFor } from "@/lib/payment-method";
@@ -5,6 +6,11 @@ import { euro, type InvoiceModel } from "./invoice-data";
 
 const A4 = { width: 595.28, height: 841.89 };
 const M = 46; // Seitenrand
+function hexToRgb(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  return rgb(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255);
+}
+
 const GREEN = rgb(0.13, 0.77, 0.37);
 const GREEN_SOFT = rgb(0.949, 0.988, 0.961);
 const GREEN_DARK = rgb(0.082, 0.502, 0.239);
@@ -83,9 +89,11 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
     const scale = Math.min(150 / logo.width, 44 / logo.height);
     page.drawImage(logo, { x: M, y: y - logo.height * scale + 18, width: logo.width * scale, height: logo.height * scale });
   } else {
-    page.drawRectangle({ x: M, y: y - 4, width: 5, height: 8, color: rgb(1, 0.808, 0) });
-    page.drawRectangle({ x: M, y: y + 4, width: 5, height: 8, color: rgb(0.867, 0, 0) });
-    page.drawRectangle({ x: M, y: y + 12, width: 5, height: 8, color: rgb(0, 0, 0) });
+    const [top, mid, bottom] = flagColorsFor(model.country).map(hexToRgb);
+    page.drawRectangle({ x: M, y: y - 4, width: 5, height: 8, color: bottom! });
+    page.drawRectangle({ x: M, y: y + 4, width: 5, height: 8, color: mid! });
+    page.drawRectangle({ x: M, y: y + 12, width: 5, height: 8, color: top! });
+    if (model.country === "AT") page.drawRectangle({ x: M, y: y - 4, width: 5, height: 24, borderColor: rgb(0.82, 0.84, 0.86), borderWidth: 0.3 });
     drawShopName(ctx, model.company.shopName, M + 12, y + 2, 17);
   }
 
@@ -190,7 +198,7 @@ export async function renderInvoicePdfBytes(model: InvoiceModel): Promise<Uint8A
   drawRight(ctx, "Nettobetrag", right - 118, y, 9, false, TEXT);
   drawRight(ctx, euro.format(model.net), right, y, 9, true, HEADING);
   y -= 15;
-  drawRight(ctx, "zzgl. 19 % MwSt.", right - 118, y, 9, false, TEXT);
+  drawRight(ctx, `zzgl. ${model.vatPercent} % MwSt.`, right - 118, y, 9, false, TEXT);
   drawRight(ctx, euro.format(model.vat), right, y, 9, true, HEADING);
   y -= 12;
   page.drawRectangle({ x: right - 118, y, width: 118, height: 0.6, color: LINE });
