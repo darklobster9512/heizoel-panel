@@ -1,3 +1,4 @@
+import { countryLabel } from "@/lib/branding-country";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -50,6 +51,7 @@ function BrandingsPage() {
               </div>
               <div className="grid gap-4 p-5 sm:grid-cols-2">
                 <Info icon={<MapPin />} label="Anschrift" value={[branding.streetAddress, [branding.postalCode, branding.city].filter(Boolean).join(" ")].filter(Boolean).join(", ") || "Noch nicht hinterlegt"} />
+                <Info icon={<Globe2 />} label="Land" value={countryLabel(branding.country)} />
                 <Info icon={<Globe2 />} label="Domain" value={branding.domain || "Noch nicht hinterlegt"} />
                 <Info icon={<Mail />} label="Resend" value={branding.resendConfigured ? "Konfiguriert" : "Nicht konfiguriert"} success={branding.resendConfigured} />
                 <Info icon={<MessageSquare />} label="Seven.io" value={branding.sevenConfigured ? "Konfiguriert" : "Nicht konfiguriert"} success={branding.sevenConfigured} />
