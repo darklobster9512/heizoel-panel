@@ -28,7 +28,8 @@ const brandingInputSchema = z.object({
   registryCourt: nullableText(160),
   commercialRegisterNumber: nullableText(80),
   managingDirector: nullableText(160),
-  vatId: z.union([z.string().trim().regex(/^DE[0-9]{9}$/i), z.literal(""), z.null()]).optional(),
+  country: z.enum(["DE", "AT"]).default("DE"),
+  vatId: z.union([z.string().trim().regex(/^(DE[0-9]{9}|ATU[0-9]{8})$/i), z.literal(""), z.null()]).optional(),
   email: z.union([z.string().trim().email().max(255), z.literal(""), z.null()]).optional(),
   domain: z
     .union([
