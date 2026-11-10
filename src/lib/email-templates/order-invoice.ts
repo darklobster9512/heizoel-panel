@@ -180,7 +180,7 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
   <tr><td style="padding:8px 18px 18px;font:400 12px/19px ${FONT};color:${GREEN_DARK}">${payHint}</td></tr>
 </table>`, "0 32px 26px")}
 
-${trustBar()}
+${trustBar(branding.country)}
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
   ${addressBox("Rechnungsadresse", invoice.billingAddress, true)}

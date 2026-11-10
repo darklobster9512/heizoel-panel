@@ -98,7 +98,7 @@ ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="
   </tr>
 </table>`)}
 
-${trustBar()}
+${trustBar(branding.country)}
 
 ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
   ${addressBox("Rechnungsadresse", order.billingAddress, true)}
