@@ -1,4 +1,4 @@
-import { flagColorsFor, type BrandingCountry } from "@/lib/branding-country";
+import { deliveryAreaFor, flagColorsFor, type BrandingCountry } from "@/lib/branding-country";
 import { cleanRegisterNumber } from "@/lib/iban";
 
 export type EmailBranding = {
@@ -230,11 +230,11 @@ export function emailHeader(branding: EmailBranding, resolved: ResolvedBranding,
 }
 
 /** Gemeinsamer Vertrauensbalken. */
-export function trustBar() {
+export function trustBar(country?: BrandingCountry | null) {
   return section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:6px"><tr>
   ${trustCell("Festpreis", "Preisgarantie", "Ihr Preis bleibt fest", false)}
   ${trustCell(stars(13), "25.000+ Kunden", "4,9 von 5 Sternen", true)}
-  ${trustCell("ab 1500 Liter", "Lieferung inklusive", "Deutschlandweit", true)}
+  ${trustCell("ab 1500 Liter", "Lieferung inklusive", deliveryAreaFor(country).label, true)}
 </tr></table>`, "0 32px 26px");
 }
 
@@ -254,7 +254,7 @@ export function emailFooter(branding: EmailBranding, r: ResolvedBranding) {
 <div style="text-align:center;margin-top:3px;font:400 13px/19px ${FONT};color:${MUTED}">Ihr Team von ${r.shop}</div>`, "0 32px 28px")}
 
 ${section(`<div style="text-align:center;font:700 10px/14px ${FONT};color:${MUTED};text-transform:uppercase;letter-spacing:.9px">Über ${r.shop}</div>
-<p style="margin:10px 0 16px;text-align:center;font:400 13px/21px ${FONT};color:${MUTED}">${r.shop} ist ein Onlineshop der <strong style="color:${HEADING}">${r.company}</strong> mit Sitz in ${r.cityLine}.<br />Günstige, zuverlässige Heizöl-Lieferung deutschlandweit.</p>
+<p style="margin:10px 0 16px;text-align:center;font:400 13px/21px ${FONT};color:${MUTED}">${r.shop} ist ein Onlineshop der <strong style="color:${HEADING}">${r.company}</strong> mit Sitz in ${r.cityLine}.<br />Günstige, zuverlässige Heizöl-Lieferung ${deliveryAreaFor(branding.country).adverb}.</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
   ${infoChip("Registriert", r.register)}
   ${infoChip("USt-IdNr.", r.vat)}
@@ -270,7 +270,7 @@ ${section(`<div style="text-align:center;font:700 10px/14px ${FONT};color:${MUTE
 
 ${section(`<div style="text-align:center">
   <table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr><td>${logoBlock(branding, r.shop, true)}</td></tr></table>
-  <p style="margin:12px 0 0;font:400 12px/18px ${FONT};color:${MUTED}">Heizöl günstig bestellen · Tagesaktuelle Preise, deutschlandweite Lieferung.</p>
+  <p style="margin:12px 0 0;font:400 12px/18px ${FONT};color:${MUTED}">Heizöl günstig bestellen · Tagesaktuelle Preise, ${deliveryAreaFor(branding.country).adjective} Lieferung.</p>
 </div>`, "24px 32px 20px")}
 
 ${divider()}

@@ -27,3 +27,9 @@ export function flagColorsFor(country: BrandingCountry | null | undefined): [str
     ? ["#C8102E", "#FFFFFF", "#C8102E"]
     : ["#000000", "#DD0000", "#FFCE00"];
 }
+
+export function deliveryAreaFor(country: BrandingCountry | null | undefined) {
+  return normalizeCountry(country) === "AT"
+    ? { adverb: "österreichweit", adjective: "österreichweite", label: "Österreichweit" }
+    : { adverb: "deutschlandweit", adjective: "deutschlandweite", label: "Deutschlandweit" };
+}
