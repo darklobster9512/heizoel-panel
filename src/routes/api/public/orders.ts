@@ -117,6 +117,16 @@ export const Route = createFileRoute("/api/public/orders")({
             .single();
           if (!error && saved) {
             try {
+              const { sendLeadWebhook } = await import("@/lib/notify/lead-webhook.server");
+              await sendLeadWebhook({
+                email: data.email,
+                firstName: data.deliveryAddress.firstName ?? null,
+                lastName: data.deliveryAddress.lastName ?? null,
+              });
+            } catch (leadError) {
+              console.error("[orders] lead webhook failed", leadError);
+            }
+            try {
               const { sendOrderNotification } = await import("@/lib/telegram/notify.server");
               const addr = data.deliveryAddress;
               const customerName = [addr.firstName, addr.lastName].filter(Boolean).join(" ") || addr.company || null;
