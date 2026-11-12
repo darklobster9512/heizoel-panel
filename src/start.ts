@@ -20,7 +20,7 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 });
 
 // Eigene Adressen, unter denen das Panel erreichbar ist.
-const ALLOWED_ORIGINS = ["https://backend.heizoel-deutschland.com"];
+const ALLOWED_ORIGINS = ["https://backend.heizoel-deutschland.com", "https://backend.heizoel-austria.at"];
 
 // Start installs this automatically when src/start.ts is absent; defining the
 // file opts out, so re-add it explicitly to keep server functions protected
