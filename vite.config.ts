@@ -10,7 +10,7 @@ export default defineConfig({
   },
   vite: {
     server: {
-      allowedHosts: ["backend.heizoel-deutschland.com"],
+      allowedHosts: ["backend.heizoel-deutschland.com", "backend.heizoel-austria.at"],
     },
   },
 });
