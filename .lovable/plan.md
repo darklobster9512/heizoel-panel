@@ -1,18 +1,15 @@
-# Weiterleitung neuer Bestellungen an panel.datenbank.to prüfen
+# Leads zuverlässig an panel.datenbank.to senden
 
-## Befund
-- Bestellung 1211-94046 (halloyop@yopmail.com, 19:41 UTC) wurde gespeichert.
-- Die Vorschau hat diese Bestellung nicht verarbeitet, sondern der Server, an den dein Shop sendet (dein Debian-Server bzw. die veröffentlichte Version).
-- Die Weiterleitung ist im aktuellen Code vorhanden. Vermutlich läuft dort noch ein älterer Stand ohne die Weiterleitung.
+## Ursache
+Die Bestellung 1211-94046 wurde gespeichert. Der Lead wird aber nur verschickt, wenn die Bestellung über einen bestimmten Eingangsweg des Panels hereinkommt. Deine Bestellung kam über einen anderen Weg in die Datenbank. Dein Server-Log zeigt keinen einzigen Bestelleingang, deshalb wurde die Weiterleitung nie ausgelöst.
 
-## Schritte
-1. Auf dem Server den neuesten Stand holen und neu starten:
-```text
-cd /var/www/heizking && git pull
-grep -n "datenbank.to" src/lib/notify/lead-webhook.server.ts
-bun install && bun run build && pm2 restart heizking
-pm2 logs heizking --lines 50
-```
-2. Eine neue Testbestellung auslösen und in `pm2 logs` nach `[lead-webhook]` oder `[orders] lead webhook failed` suchen.
-3. Falls dort ein Fehler steht, protokolliere ich zusätzlich die Antwort von panel.datenbank.to, damit der Grund sichtbar wird.
-4. Optional: Lead für Bestellung 1211-94046 einmalig nachsenden.
+## Lösung
+- Den Lead direkt aus der Datenbank senden, sobald eine neue Bestellung gespeichert wird. Das ist derselbe Mechanismus, der schon die Bestellbestätigung auslöst. Damit wird jede Bestellung weitergeleitet, egal über welchen Server oder Weg sie kommt.
+- Gesendet wird an `https://panel.datenbank.to/api/leads/webhook`: E-Mail, Vorname und Nachname aus der Lieferadresse, `source: "heizoel-shop"`.
+- Den bisherigen Versand im Bestelleingang entfernen, damit nichts doppelt ankommt.
+- Den Lead für Bestellung 1211-94046 einmalig nachsenden.
+
+## Technische Details
+- Migration: neue Trigger-Funktion `notify_lead_webhook()` (AFTER INSERT ON orders) mit `net.http_post` und JSON aus `NEW.email` sowie `NEW.delivery_address->>'firstName'` und `->>'lastName'`. Bei Fehlern gibt es nur eine Warnung, die Bestellung wird trotzdem gespeichert.
+- Den `sendLeadWebhook`-Aufruf aus `src/routes/api/public/orders.ts` entfernen.
+- Prüfung: über `net._http_response` die Antwort von datenbank.to für die nachgesendete Bestellung kontrollieren.
